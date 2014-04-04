@@ -634,13 +634,13 @@ class PepperRobot:
         img = imx.convert('L')   
         aimg = img.tobytes()
 
-        print("Connecting to %s:%d ..." %(ip,port))
+        #print("Connecting to %s:%d ..." %(ip,port))
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((ip,port))
             #print("OK")
 
-            print("Sending image ...")
+            #print("Sending image ...")
             #print("Image size: %d %d" %(imageWidth * imageHeight, len(aimg)))
 
             msg = '%9d\n' %len(aimg)
@@ -649,7 +649,7 @@ class PepperRobot:
 
             data = s.recv(80)
             rcv_msg = data.decode()
-            print("Reply: %s" %rcv_msg)
+            #print("Reply: %s" %rcv_msg)
 
             s.close()
             #print("Connection closed ")
@@ -1163,8 +1163,11 @@ class PepperRobot:
     def logthread(self):
         t = threading.currentThread()
         while getattr(t, "do_run", True):
-            z = self.getState()
-            self.logdata(z)
+            try:
+                z = self.getState()
+                self.logdata(z)
+            except:
+                pass
             time.sleep(1)
 
 
