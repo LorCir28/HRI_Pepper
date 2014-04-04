@@ -15,7 +15,7 @@ from PIL import Image
 from naoqi import ALProxy
 
 
-def showNaoImage(IP, PORT):
+def showNaoImage(IP, PORT, camID):
   """
   First get an image from Nao, then show it on the screen with PIL.
   """
@@ -24,7 +24,7 @@ def showNaoImage(IP, PORT):
   resolution = 2    # VGA
   colorSpace = 11   # RGB
 
-  videoClient = camProxy.subscribe("python_client", resolution, colorSpace, 5)
+  videoClient = camProxy.subscribeCamera("python_client", camID, resolution, colorSpace, 5)
 
   t0 = time.time()
 
@@ -70,7 +70,7 @@ if __name__ == '__main__':
   args = parser.parse_args()
   IP = args.pip
   PORT = args.pport
+  camID = args.camera
 
-
-  naoImage = showNaoImage(IP, PORT)
+  naoImage = showNaoImage(IP, PORT, camID)
 

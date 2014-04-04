@@ -212,7 +212,9 @@ asr_timestamp = 0
 def onWordRecognized(value):
     global asr_word, asr_confidence, asr_timestamp
     print "ASR value = ",value,time.time()
-    if (value[1]>0):
+    if (value[1]>0 and value[0]!=''):
+    #if (value[1]>0 and (value[0]!='' or time.time()-asr_timestamp>1.0)):
+    #if (value[1]>0):
         asr_word = value[0]
         asr_confidence = value[1]
         asr_timestamp = time.time()
@@ -466,7 +468,6 @@ class PepperRobot:
             self.battery_service = self.session.service("ALBattery")
             self.people_service = self.session.service("ALPeoplePerception")
 
-
             self.alive = alive
             print('Alive behaviors: %r' %self.alive)
 
@@ -474,8 +475,6 @@ class PepperRobot:
             self.ba_service.setEnabled(self.alive)
             self.sm_service.setEnabled(self.alive)
             
-            webview = "http://198.18.0.1/apps/spqrel/index.html"
-            self.tablet_service.showWebview(webview)
             self.touchsignalID = self.tablet_service.onTouchDown.connect(touch_cb)
 
             self.touchstatus = self.touch_service.getStatus()
@@ -518,6 +517,11 @@ class PepperRobot:
         cmdstr = "self."+params
         print "Executing %s" %(cmdstr)
         eval(cmdstr)    
+
+    def tablet_home(self):
+        webview = "http://198.18.0.1/apps/spqrel/index.html"
+        self.tablet_service.showWebview(webview)
+
 
     # Network
 
@@ -714,15 +718,18 @@ class PepperRobot:
 
         if value == []:  # empty value when the face disappears
             self.got_face = False
+            self.facetimeStamp = None
             self.white_eyes()
+            self.memset('facedetected', 'false')
         elif not self.got_face:  # only the first time a face appears
             self.got_face = True
             self.green_eyes()
+            self.memset('facedetected', 'true')
+
             #print "I saw a face!"
             #self.tts.say("Hello, you!")
-            # First Field = TimeStamp.
-            timeStamp = value[0]
-            #print "TimeStamp is: " + str(timeStamp)
+            self.facetimeStamp = time.time() #value[0]
+            #print "TimeStamp is: " + str(self.facetimeStamp)
 
             # Second Field = array of face_Info's.
             faceInfoArray = value[1]
@@ -762,6 +769,12 @@ class PepperRobot:
 
             self.savedfaces.append(faceID)
 
+    # Time of continuous face detection
+    def faceDetectionTime(self):
+        if self.facetimeStamp is not None:
+            return time.time() - self.facetimeStamp
+        else:
+            return 0
 
     # Audio settings
 
@@ -1163,6 +1176,17 @@ class PepperRobot:
     def getBatteryCharge(self):
         return self.battery_service.getBatteryCharge()
 
+
+    # Memory
+
+    def memset(self, key, val):
+        self.memory_service.insertData(key,val)
+
+    def memget(self, key):
+        try:
+            return self.memory_service.getData(key)
+        except:
+            return ''
 
     # Logging functions
 
