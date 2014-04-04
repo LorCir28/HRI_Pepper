@@ -19,10 +19,10 @@ import socket
 import threading
 import math
 import random
-import qi
 import datetime
 from datetime import datetime
 
+import qi
 from naoqi import ALProxy
 
 # Python Image Library
@@ -172,12 +172,12 @@ def sensorThread(robot):
         robot.sonar = robot.memory_service.getListData(sonarValues)
         laserValues = robot.memory_service.getListData(frontLaserValues)
         dd = 0 # average distance
-        c = 0
+        c = 0        
         for i in range(0,len(laserValues),2):
-            px = laserValues[i]
-            py = laserValues[i+1]
+            px = laserValues[i] if laserValues[i] is not None else 10
+            py = laserValues[i+1] if laserValues[i+1] is not None else 0
             d = math.sqrt(px*px+py*py)
-            if d<3:
+            if d<10:
                 dd = dd + d
                 c = c+1
         
@@ -244,7 +244,7 @@ def laserMonitorThread (memory_service):
     t = threading.currentThread()
     while getattr(t, "do_run", True):
         laserValues =  memory_service.getListData(laserValueList)
-        print laserValues[44],laserValues[45] #X,Y values of central point
+        #print laserValues[44],laserValues[45] #X,Y values of central point
         time.sleep(0.2)
     print "Exiting Thread"
 
@@ -418,7 +418,20 @@ class PepperRobot:
 
         self.jointNames = ["HeadYaw", "HeadPitch",
                "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw",
-               "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+               "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw",
+               "LHand", "RHand", "HipRoll", "HipPitch", "KneePitch"]
+
+        self.fakeASRkey = 'FakeRobot/ASR'
+        self.fakeASRtimekey = 'FakeRobot/ASRtime'
+
+
+    def session_service(self,name):
+        try:
+            return self.session.service(name)
+        except:
+            print("Service %s not available." %(name))
+            return None
+
 
     # Connect to the robot
     def connect(self, pip=os.environ['PEPPER_IP'], pport=9559, alive=False):
@@ -452,7 +465,9 @@ class PepperRobot:
         self.leds_service = self.session.service("ALLeds")
         self.asr_service = None
         self.tablet_service = None
+        self.bm_service = None
         try:
+            self.asr_service = self.session.service("ALSpeechRecognition")
             self.tablet_service = self.session.service("ALTabletService")
             self.touch_service = self.session.service("ALTouch")
             self.animation_player_service = self.session.service("ALAnimationPlayer")
@@ -462,31 +477,33 @@ class PepperRobot:
             self.bm_service = self.session.service("ALBackgroundMovement")
             self.ba_service = self.session.service("ALBasicAwareness")
             self.sm_service = self.session.service("ALSpeakingMovement")
-            self.asr_service = self.session.service("ALSpeechRecognition")
             self.audiorec_service = self.session.service("ALAudioRecorder")
             self.audio_service = self.session.service("ALAudioDevice")
             self.battery_service = self.session.service("ALBattery")
             self.people_service = self.session.service("ALPeoplePerception")
 
+        except:
+            pass
+
+        if self.bm_service!=None:
             self.alive = alive
             print('Alive behaviors: %r' %self.alive)
-
-            self.bm_service.setEnabled(self.alive)
-            self.ba_service.setEnabled(self.alive)
-            self.sm_service.setEnabled(self.alive)
+            if self.bm_service!=None:
+                self.bm_service.setEnabled(self.alive)
+            if self.ba_service!=None:
+                self.ba_service.setEnabled(self.alive)
+            if self.sm_service!=None:
+                self.sm_service.setEnabled(self.alive)
             
+        if self.tablet_service!=None:
+            webview = "http://198.18.0.1/apps/spqrel/index.html"
+            self.tablet_service.showWebview(webview)
             self.touchsignalID = self.tablet_service.onTouchDown.connect(touch_cb)
-
             self.touchstatus = self.touch_service.getStatus()
             #print touchstatus
             self.touchsensorlist = self.touch_service.getSensorList()
             #print touchsensorlist
 
-        except:
-            print "Services not available."
-
-        #anyTouch = self.memory_service.subscriber("TouchChanged")
-        #idAnyTouch = anyTouch.signal.connect(touchcb)
 
         self.isConnected = True
 
@@ -501,7 +518,9 @@ class PepperRobot:
         if self.laserThread != None:
             self.laserThread.do_run = False
             self.laserThread = None
-        self.tablet_service.onTouchDown.disconnect(self.touchsignalID)
+        
+        if self.session!=None and self.tablet_service!=None:
+            self.tablet_service.onTouchDown.disconnect(self.touchsignalID)
         time.sleep(1)
         self.app.stop()
         
@@ -543,31 +562,34 @@ class PepperRobot:
 
 
     def green_eyes(self):
-        # green face leds
-        self.leds_service.on('LeftFaceLedsGreen')
-        self.leds_service.off('LeftFaceLedsRed')
-        self.leds_service.off('LeftFaceLedsBlue')
-        self.leds_service.on('RightFaceLedsGreen')
-        self.leds_service.off('RightFaceLedsRed')
-        self.leds_service.off('RightFaceLedsBlue')
+        if self.leds_service!=None:
+            # green face leds
+            self.leds_service.on('LeftFaceLedsGreen')
+            self.leds_service.off('LeftFaceLedsRed')
+            self.leds_service.off('LeftFaceLedsBlue')
+            self.leds_service.on('RightFaceLedsGreen')
+            self.leds_service.off('RightFaceLedsRed')
+            self.leds_service.off('RightFaceLedsBlue')
 
     def red_eyes(self):
-        # red face leds
-        self.leds_service.off('LeftFaceLedsGreen')
-        self.leds_service.on('LeftFaceLedsRed')
-        self.leds_service.off('LeftFaceLedsBlue')
-        self.leds_service.off('RightFaceLedsGreen')
-        self.leds_service.on('RightFaceLedsRed')
-        self.leds_service.off('RightFaceLedsBlue')
+        if self.leds_service!=None:
+            # red face leds
+            self.leds_service.off('LeftFaceLedsGreen')
+            self.leds_service.on('LeftFaceLedsRed')
+            self.leds_service.off('LeftFaceLedsBlue')
+            self.leds_service.off('RightFaceLedsGreen')
+            self.leds_service.on('RightFaceLedsRed')
+            self.leds_service.off('RightFaceLedsBlue')
 
     def blue_eyes(self):
-        # red face leds
-        self.leds_service.off('LeftFaceLedsGreen')
-        self.leds_service.off('LeftFaceLedsRed')
-        self.leds_service.on('LeftFaceLedsBlue')
-        self.leds_service.off('RightFaceLedsGreen')
-        self.leds_service.off('RightFaceLedsRed')
-        self.leds_service.on('RightFaceLedsBlue')
+        if self.leds_service!=None:
+            # red face leds
+            self.leds_service.off('LeftFaceLedsGreen')
+            self.leds_service.off('LeftFaceLedsRed')
+            self.leds_service.on('LeftFaceLedsBlue')
+            self.leds_service.off('RightFaceLedsGreen')
+            self.leds_service.off('RightFaceLedsRed')
+            self.leds_service.on('RightFaceLedsBlue')
 
 
     def ears_led(self, enable):
@@ -585,6 +607,7 @@ class PepperRobot:
             # create a thead that monitors directly the signal
             self.sensorThread = threading.Thread(target = sensorThread, args = (self, ))
             self.sensorThread.start()
+            time.sleep(0.5)
 
     def stopSensorMonitor(self):
         self.sensorThread.do_run = False
@@ -822,19 +845,25 @@ class PepperRobot:
     def say(self, interaction):
         if self.stop_request:
             return
-        self.tts_service.setParameter("speed", 80)
-        self.asay2(interaction)
-
+        print('Say: %s' %interaction)
+        if self.tts_service!=None:
+            self.tts_service.setParameter("speed", 80)
+            self.asay2(interaction)
+ 
     def asay2(self, interaction):
         if self.stop_request:
             return
-        # set the local configuration
-        configuration = {"bodyLanguageMode":"contextual"}
-        self.anspeech_service.say(interaction, configuration)
+        if self.anspeech_service!=None:
+            # set the local configuration
+            configuration = {"bodyLanguageMode":"contextual"}
+            self.anspeech_service.say(interaction, configuration)
 
     def asay(self, interaction):
         if self.stop_request:
             return
+        if self.anspeech_service is None:
+            return
+
         # set the local configuration
         #configuration = {"bodyLanguageMode":"contextual"}
 
@@ -851,38 +880,74 @@ class PepperRobot:
         self.anspeech_service.say("^start("+anim+") " + interaction+" ^wait("+anim+")")
 
 
+    def reset_fake_asr(self):
+        self.memory_service.insertData(self.fakeASRkey,'')
+
+    def fake_asr(self):
+        global asr_word, asr_confidence, asr_timestamp
+        try:
+            r = self.memory_service.getData(self.fakeASRkey)
+            if r!='':
+                asr_word = r
+                asr_confidence = 1.0
+                asr_timestamp = self.memory_service.getData(self.fakeASRtimekey)
+                print('fake ASR: [%s], %r' %(asr_word,asr_timestamp))
+                self.reset_fake_asr()
+        except:
+            pass
+
+
+    def asr_cancel(self):
+        self.asr_cancel_flag = True
+
     # vocabulary = list of keywords, e.g. ["yes", "no", "please"]
+    # blocking until timeout
     def asr(self, vocabulary, timeout=5):
         global asr_word, asr_confidence, asr_timestamp
         #establishing vocabulary
-        if (self.asr_service is None):
-            return ''
-        self.asr_service.pause(True)
-        self.asr_service.setVocabulary(vocabulary, False)
-        self.asr_service.pause(False)
-        # Start the speech recognition engine with user Test_ASR
-        self.asr_service.subscribe("asr_pepper_cmd")
-        print 'Speech recognition engine started'
+        if (self.asr_service != None):
+            self.asr_service.pause(True)
+            self.asr_service.setVocabulary(vocabulary, False)
+            self.asr_service.pause(False)
+            # Start the speech recognition engine with user Test_ASR
+            self.asr_service.subscribe("asr_pepper_cmd")
+            print 'Speech recognition engine started'
 
-        #subscribe to event WordRecognized
-        subWordRecognized = self.memory_service.subscriber("WordRecognized")
-        idSubWordRecognized = subWordRecognized.signal.connect(onWordRecognized)
+            #subscribe to event WordRecognized
+            subWordRecognized = self.memory_service.subscriber("WordRecognized")
+            idSubWordRecognized = subWordRecognized.signal.connect(onWordRecognized)
+        else:
+            print('ASR service not available. Use %s memory key to say something' %self.fakeASRkey)
+            self.reset_fake_asr()
+            #val = raw_input('Enter ASR text: ')
+            #return val
 
+
+        self.asr_cancel_flag = False
         asr_word = ''
         i = 0
         dt = 0.5
-        while ((timeout<0 or i<timeout) and asr_word==''):
+        while ((timeout<0 or i<timeout) and asr_word=='' and not self.asr_cancel_flag):
+            self.fake_asr()
             time.sleep(dt)
             i += dt
 
-        #Disconnecting callbacks and subscribers
-        self.asr_service.unsubscribe("asr_pepper_cmd")
-        subWordRecognized.signal.disconnect(idSubWordRecognized)
+        if (self.asr_service != None):
+            #Disconnecting callbacks and subscribers
+            self.asr_service.unsubscribe("asr_pepper_cmd")
+            subWordRecognized.signal.disconnect(idSubWordRecognized)
+
+        
 
         dt = time.time() - asr_timestamp
+
+        print("dt %r %r  -  %f %f" %(time.time(),asr_timestamp, dt, timeout))
+
         if ((timeout<0 or dt<timeout) and asr_confidence>0.3):
+            print("ASR: %s" %asr_word)
             return asr_word
         else:
+            print("ASR: none")
             return ''
 
 
@@ -907,7 +972,10 @@ class PepperRobot:
         self.ba_service.setEnabled(False)
         self.sm_service.setEnabled(False)
 
-        self.animation_player_service.run(interaction)
+        try:
+            self.animation_player_service.run(interaction)
+        except:
+            print("Error in executing gesture %s" %interaction)
 
         self.bm_service.setEnabled(self.alive)
         self.ba_service.setEnabled(self.alive)
@@ -916,34 +984,36 @@ class PepperRobot:
     # Alive behaviors
 
     def setAlive(self, alive):
-        self.alive = alive
-        print('Alive behaviors: %r' %self.alive)
-        self.bm_service.setEnabled(self.alive)
-        self.ba_service.setEnabled(self.alive)
-        self.sm_service.setEnabled(self.alive)
+        if self.bm_service!=None:
+            self.alive = alive
+            print('Alive behaviors: %r' %self.alive)
+            self.bm_service.setEnabled(self.alive)
+            self.ba_service.setEnabled(self.alive)
+            self.sm_service.setEnabled(self.alive)
 
     # Tablet
 
     def showurl(self, weburl):
-        if weburl[0:4]!='http':
-            weburl = "http://198.18.0.1/apps/spqrel/%s" %(weburl)
-        print "URL: ",weburl
-        self.tablet_service.showWebview(weburl)
+        if self.tablet_service!=None:
+            if weburl[0:4]!='http':
+                weburl = "http://198.18.0.1/apps/spqrel/%s" %(weburl)
+            print "URL: ",weburl
+            self.tablet_service.showWebview(weburl)
 
     # Robot motion
 
     def stop(self):
         print 'stop'
         self.motion_service.stopMove()
-        bns = self.beh_service.getRunningBehaviors()
-        for b in bns:
-            self.beh_service.stopBehavior(b)
+        if self.beh_service!=None:
+            bns = self.beh_service.getRunningBehaviors()
+            for b in bns:
+                self.beh_service.stopBehavior(b)
 
     def forward(self, r=1):
         if self.stop_request:
             return
         print 'forward',r
-        #Move in its X direction
         x = r
         y = 0.0
         theta = 0.0
@@ -1010,18 +1080,15 @@ class PepperRobot:
 
     def headscan(self):
         jointNames = ["HeadYaw", "HeadPitch"]
-
         # look left
         initAngles = [1.6, -0.2]
         timeLists  = [5.0, 5.0]
         isAbsolute = True
         self.motion_service.angleInterpolation(jointNames, initAngles, timeLists, isAbsolute)
-
         # look right
         finalAngles = [-1.6, -0.2]
         timeLists  = [10.0, 10.0]
         self.motion_service.angleInterpolation(jointNames, finalAngles, timeLists, isAbsolute)
-
         # look ahead center
         finalAngles = [0.0, -0.2]
         timeLists  = [5.0, 5.0]
@@ -1073,7 +1140,8 @@ class PepperRobot:
     # Behaviors
 
     def normalPosture(self):
-        jointValues = [0.00, -0.21, 1.55, 0.13, -1.24, -0.52, 0.01, 1.56, -0.14, 1.22, 0.52, -0.01]
+        jointValues = [0.00, -0.21, 1.55, 0.13, -1.24, -0.52, 0.01, 1.56, -0.14, 1.22, 0.52, -0.01,
+                       0, 0, 0, 0, 0]
         isAbsolute = True
         self.motion_service.angleInterpolation(self.jointNames, jointValues, 3.0, isAbsolute)
 
@@ -1083,6 +1151,7 @@ class PepperRobot:
         self.motion_service.angleInterpolation(self.jointNames, jointValues, 3.0, isAbsolute)
 
     def getPosture(self):
+        pose = None
         useSensors = True
         pose = self.motion_service.getAngles(self.jointNames, useSensors)
         return pose
@@ -1116,9 +1185,13 @@ class PepperRobot:
 
 
     def run_behavior(self, bname):
-        self.beh_service.startBehavior(bname)
-        #time.sleep(10)
-        #beh_service.stopBehavior(bname)
+        if self.beh_service!=None:
+            try:
+                self.beh_service.startBehavior(bname)
+                #time.sleep(10)
+                #self.beh_service.stopBehavior(bname)
+            except:
+                pass
 
     def sax(self):
         str = 'sax'

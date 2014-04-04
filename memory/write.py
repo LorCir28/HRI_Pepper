@@ -40,6 +40,11 @@ def main():
     #Starting services
     memory_service  = session.service("ALMemory")
 
+    try:
+        val = float(val)
+    except:
+        pass
+
     memory_service.insertData(key,val)
 
     print "Write ",key," = ",val
