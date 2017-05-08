@@ -11,7 +11,7 @@
 #include <iostream>
 #include <alerror/alerror.h>
 #include <alproxies/altexttospeechproxy.h>
-#include <alproxies/alautonomouslifeproxy.h>
+#include <alproxies/alrobotpostureproxy.h>
 
 #include <alcommon/alproxy.h>
 #include <alcommon/albroker.h>
@@ -21,13 +21,13 @@ int main(int argc, char* argv[])
   if(argc != 3)
   {
     std::cerr << "Wrong number of arguments!" << std::endl;
-    std::cerr << "Usage: setstate PEPPER_IP state" << std::endl;
+    std::cerr << "Usage: setstate PEPPER_IP posture" << std::endl;
     exit(2);
   }
 
   int pport = 9559;
   std::string pip = argv[1];
-  std::string state = argv[2];
+  std::string posture = argv[2];
   
   // A broker needs a name, an IP and a port to listen:
   const std::string brokerName = "mybroker";
@@ -38,37 +38,40 @@ int main(int argc, char* argv[])
   // Create a proxy to ALTextToSpeechProxy
   AL::ALProxy proxyTTS(broker, "ALTextToSpeech");
 
-  AL::ALAutonomousLifeProxy proxyAL(broker);
-  std::string current_state = proxyAL.getState();
-  std::cerr << "Robot state: " << current_state << std::endl;
-  
+  AL::ALRobotPostureProxy proxyRP(broker);
+  std::string current_posture = proxyRP.getPosture();
+  std::cerr << "Robot posture: " << current_posture << std::endl;
+    
   /** The desired phrase to be said. */
-  std::string phraseToSay = "Hello! My current state is " + current_state;
+  std::string phraseToSay = "Hello! My current posture is " + current_posture;
   // Call say method
   proxyTTS.callVoid("say", phraseToSay);
+  
+  std::vector<std::string> familypostures = proxyRP.getPostureFamilyList();
+  for (size_t i=0; i<familypostures.size(); i++){
+    std::string fposture = familypostures[i];
+    std::cerr << "Posture Family: " << fposture << std::endl;
+  }
 
-  if (current_state != state){
-    phraseToSay = "Changing my state to " + state;
+  std::vector<std::string> postures = proxyRP.getPostureList();
+  for (size_t i=0; i<postures.size(); i++){
+    std::string posture = postures[i];
+    std::cerr << "Possible postures: " << posture << std::endl;
+  }
+
+
+  if (current_posture != posture){
+    phraseToSay = "Changing my posture to " + posture;
     proxyTTS.callVoid("say", phraseToSay);
 
-    proxyAL.setState(state);
+    proxyRP.goToPosture(posture,1.0);
 
-    current_state = proxyAL.getState();
-    std::cerr << "Robot state: " << current_state << std::endl;
+    current_posture = proxyRP.getPosture();
+    std::cerr << "Robot posture: " << current_posture << std::endl;
   } else {
     phraseToSay = "Nothing to change here.";
     proxyTTS.callVoid("say", phraseToSay);
   }
-  /*
-  std::vector<AutonomousAbilityStatus> aastatus = proxyAL.getAutonomousAbilitiesStatus();
-
-  for (size_t i=0; i<aastatus.size(); i++){
-    aastatusi = aastatus[i];
-    std::cerr << "Autonomous Ability: " << aastatusi.name << std::endl;
-    std::cerr << "Enabled: " << aastatusi.enabled << std::endl;
-    std::cerr << "Running: " << aastatusi.running << std::endl;
-  }*/
-
   
   exit(0);
 }
