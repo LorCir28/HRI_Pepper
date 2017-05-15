@@ -18,16 +18,16 @@
 
 int main(int argc, char* argv[])
 {
-  if(argc != 3)
+  if(argc != 4)
   {
     std::cerr << "Wrong number of arguments!" << std::endl;
-    std::cerr << "Usage: setstate PEPPER_IP state" << std::endl;
+    std::cerr << "Usage: setstate PEPPER_IP PEPPER_PORT state" << std::endl;
     exit(2);
   }
 
-  int pport = 9559;
   std::string pip = argv[1];
-  std::string state = argv[2];
+  int pport = atoi(argv[2]); // 9559;
+  std::string state = argv[3];
   
   // A broker needs a name, an IP and a port to listen:
   const std::string brokerName = "mybroker";
