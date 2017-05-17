@@ -51,7 +51,7 @@ class JointAnglesGUI:
             self.labels[j].grid(row=j, column=1)
             self.scalewidgets.append(Scale(master, from_=jointLimits[jointname][0], to=jointLimits[jointname][1], resolution=0.1, orient="horizontal", length=200))
             self.scalewidgets[j].set(float(initSensorAngles[j]))
-            self.scalewidgets[j].bind("<ButtonRelease-1>", lambda event, widget = self.scalewidgets[j], jointname = jointsNames[j]: self.updateValue(event, widget, jointname))
+            self.scalewidgets[j].bind("<ButtonRelease-1>", lambda event, widget = self.scalewidgets[j], jointname = jointsNames[j]: self.applyAngle(event, widget, jointname))
             self.scalewidgets[j].grid(row=j, column=2)
 
         #Storing the initial position
@@ -71,7 +71,7 @@ class JointAnglesGUI:
         self.posturesmenu.configure(width=20)
         self.posturesmenu.grid(row=len(jointsNames)+2,column=2)
             
-    def updateValue(self, event, widget, jointname):
+    def applyAngle(self, event, widget, jointname):
         print "setting", jointname, "to: ", widget.get()
         angle = widget.get()
         # TODO: complete by applying the selected angle to the robot
@@ -83,6 +83,9 @@ class JointAnglesGUI:
         # TODO: Use a ALRobotPosture to go to posture "Stand"
         # ....
         #
+
+        # TODO: update value of the scalewidgets by reading the sensors
+        # ....
         
     def callbackSave(self):
         print "click!"
