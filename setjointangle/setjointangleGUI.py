@@ -69,13 +69,6 @@ class AngleController:
         pip = args.pip
         pport = args.pport
 
-        ####
-        ####    brokerName = "mybroker"
-        ####    broker = ALBroker(brokerName, "0.0.0.0", 54000, pip, pport)
-        ####    proxyM = ALProxy("ALMotion")
-        ####    currentSensorAngles = proxyM.getAngles(listJoints, useSensors)
-        ####
-        
         session = qi.Session()
         try:
             session.connect("tcp://" + pip + ":" + str(pport))

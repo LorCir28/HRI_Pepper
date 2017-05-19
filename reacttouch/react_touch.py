@@ -1,3 +1,4 @@
+#http://doc.aldebaran.com/2-5/naoqi/core/almemory-api.html
 #http://doc.aldebaran.com/2-5/naoqi/sensors/altouch-api.html
 #http://doc.aldebaran.com/2-5/dev/libqi/api/python/signal.html
 #http://doc.aldebaran.com/2-5/family/pepper_technical/pepper_dcm/actuator_sensor_names.html
