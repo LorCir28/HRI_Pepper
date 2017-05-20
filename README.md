@@ -4,13 +4,13 @@ This repository contains different tools to manage the Softbank Pepper robot.
 They are mainly developed in Python, although some tools provide also the equivalent C++ code.
 
 ## Requirements
-Download the Python and C++ Naoqi SDKs and Choreographe if you want to test the tools in simulation from:  
+Download the Python and C++ Naoqi SDKs and Choregraphe if you want to test the tools in simulation from:  
 https://developer.softbankrobotics.com/us-en/downloads/pepper
-### Choreographe
-For Choreographe use the license key provided there in the downloads link.  
+### Choregraphe
+For Choregraphe use the license key provided there in the downloads link.  
 If you have problems to use this key during the installation, select "Evaluation" mode and proceed with the installation.  
-When you launch Choreographe for the first time you will be asked for a license key. The mentioned key should work at this step.  
-When running the tools in simulation, select a Pepper virtual robot in Choreographe.  
+When you launch Choregraphe for the first time you will be asked for a license key. The mentioned key should work at this step.  
+When running the tools in simulation, select a Pepper virtual robot in Choregraphe.  
 Go to Edit -> Preferences -> Virtual Robot and check which is the current port used by NAOqi. 
 ### Python
 
