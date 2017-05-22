@@ -2,6 +2,7 @@
 
 import qi
 import argparse
+import sys
 
 def main():
     parser = argparse.ArgumentParser()
@@ -47,7 +48,7 @@ def main():
         tts_service.say(phraseToSay)
 
 
-        
+
 
 
 

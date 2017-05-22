@@ -1,5 +1,7 @@
+import qi
 import argparse
 import json
+import sys
 from lu4r.client import LU4RClient
 
 def main():
@@ -17,27 +19,31 @@ def main():
 	pport = args.pport
 	lip = args.lip
 	lport = args.lport
-    
-	client = LU4RClient(lip, lport)
-	
-	sentence = 'bring me the mug'
-	sentences = ['move to the kitchen','bring me the mug','take the glass']
-	print client.parse_sentence(sentence)
-	print client.parse_sentences(sentences)
-    
-    #state = args.state
+
+	#state = args.state
 
     #Start working session
-    #session = qi.Session()
-    #try:
-    #    session.connect("tcp://" + pip + ":" + str(pport))
-    #except RuntimeError:
-    #    print ("Can't connect to Naoqi at ip \"" + pip + "\" on port " + str(pport) +".\n"
-    #           "Please check your script arguments. Run with -h option for help.")
-    #    sys.exit(1)
+	session = qi.Session()
+	try:
+		session.connect("tcp://" + pip + ":" + str(pport))
+	except RuntimeError:
+		print ("Can't connect to Naoqi at ip \"" + pip + "\" on port " + str(pport) +".\n"
+			   "Please check your script arguments. Run with -h option for help.")
+		sys.exit(1)
 
+	configuration = {"bodyLanguageMode":"contextual"}
+	tts_service = session.service("ALAnimatedSpeech")
 
-    #tts_service = session.service("ALTextToSpeech")
+	client = LU4RClient(lip, lport)
+
+	sentence = 'could you bring me the mug'
+	sentences = ['move to the kitchen','bring me the mug','take the glass']
+	interpretation1 = client.parse_sentence(sentence)
+	interpretation2 = client.parse_sentences(sentences)
+
+	print interpretation1
+	phraseToSay = "Hello! This is what I understood " + interpretation1 + ". Is it correct?"
+	tts_service.say(phraseToSay, configuration)
 
 if __name__ == "__main__":
 	main()
