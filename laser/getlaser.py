@@ -6,6 +6,7 @@ import argparse
 import sys
 import time
 import threading
+import os
 
 laserValueList = [
   # RIGHT LASER
@@ -116,7 +117,7 @@ def rhMonitorThread (memory_service):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--pip", type=str, default="127.0.0.1",
+    parser.add_argument("--pip", type=str, default=os.environ['PEPPER_IP'],
                         help="Robot IP address.  On robot or Local Naoqi: use '127.0.0.1'.")
     parser.add_argument("--pport", type=int, default=9559,
                         help="Naoqi port number")
