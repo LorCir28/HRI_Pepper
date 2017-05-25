@@ -30,12 +30,12 @@ def main():
 
     # Display a local image located in img folder in the root of the web server
     # The ip of the robot from the tablet is 198.18.0.1
-    tablet_service.showImage("http://198.18.0.1/img/help_charger.png")
+    tablet_service.showImage("http://198.18.0.1/apps/spqrel/spqrel_logo.jpg")
 
-    time.sleep(3)
+    # time.sleep(1)
 
     # Hide the web view
-    tablet_service.hideImage()
+    # tablet_service.hideImage()
 
 if __name__ == "__main__":
     main()
