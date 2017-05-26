@@ -3,6 +3,7 @@ import argparse
 import json
 import sys
 import time
+import os
 from asr.google_asr import GoogleASR
 
 def main():
@@ -28,10 +29,8 @@ def main():
 
 	#AIzaSyAONQ_K4NOIGfRWXmiuXonThf2rs3XzKPY
 	#AIzaSyDya-9naDiG0Dm8MVVKhQw50HmsvfZeZfE
-	asr = GoogleASR(session, 'en-US', 'AIzaSyDya-9naDiG0Dm8MVVKhQw50HmsvfZeZfE')
-	asr.startRecognition()
-	time.sleep(10)
-	print asr.stopRecognition()
+	asr = GoogleASR(session, 'en-US', 'AIzaSyAONQ_K4NOIGfRWXmiuXonThf2rs3XzKPY')
+	print asr.continuousRecognition(10)
 	
 if __name__ == "__main__":
 	main()
