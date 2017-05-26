@@ -11,6 +11,7 @@ sonarValueList = ["Device/SubDeviceList/Platform/Front/Sonar/Sensor/Value",
                   "Device/SubDeviceList/Platform/Back/Sonar/Sensor/Value"]
 
 import threading
+import os
 
 def rhMonitorThread (memory_service):
     t = threading.currentThread()
@@ -22,7 +23,7 @@ def rhMonitorThread (memory_service):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--pip", type=str, default="127.0.0.1",
+    parser.add_argument("--pip", type=str, default=os.environ['PEPPER_IP'],
                         help="Robot IP address.  On robot or Local Naoqi: use '127.0.0.1'.")
     parser.add_argument("--pport", type=int, default=9559,
                         help="Naoqi port number")

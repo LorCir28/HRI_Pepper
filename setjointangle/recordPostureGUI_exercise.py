@@ -7,6 +7,7 @@ import qi
 import argparse
 import sys
 import time
+import os
 
 jointsNames = ["HeadYaw", "HeadPitch",
                "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw",
@@ -118,7 +119,7 @@ class AngleController:
     def __init__(self,master):
         self.master = master
         parser = argparse.ArgumentParser()
-        parser.add_argument("--pip", type=str, default="127.0.0.1",
+        parser.add_argument("--pip", type=str, default=os.environ['PEPPER_IP'],
                             help="Robot IP address.  On robot or Local Naoqi: use '127.0.0.1'.")
         parser.add_argument("--pport", type=int, default=9559,
                             help="Naoqi port number")
