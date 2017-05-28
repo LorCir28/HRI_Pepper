@@ -5,11 +5,11 @@ import requests
 import json
 import sys
 
-class ASRClient:
+class GoogleClient:
 
 	timeout = 10000
 	url = ''
-	headers = {"Content-Type": "audio/l16; rate=16000"}
+	headers = {"Content-Type": "audio/l16; rate=44100"}
 	
 	def __init__(self, language, key):
 		q = {"output": "json", "lang": language, "key": key}

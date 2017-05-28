@@ -20,14 +20,25 @@ def main(session):
     asr_service.setLanguage("English")
 
     # Example: Adds "yes", "no" and "please" to the vocabulary (without wordspotting)
-    vocabulary = ["can you help me?", "no", "please"]
+    vocabulary = ["yes", "no", "please"]
     asr_service.setVocabulary(vocabulary, False)
 
     # Start the speech recognition engine with user Test_ASR
-    asr_service.subscribe("Test_ASR")
-    print 'Speech recognition engine started'
-    time.sleep(20)
-    asr_service.unsubscribe("Test_ASR")
+	while True:
+		asr_service.subscribe("Test_ASR")
+		time.sleep(20)
+		if asr_service.SpeechDetected():
+			if asr_service.WordRecognized()== "yes":
+				print "have a nice day"
+				asr_service.unsubscribe("Test_ASR")
+				break
+            elif asr_service.WordRecognized()== "no":
+				print "i will find some help"
+				asr_service.unsubscribe("Test_ASR")
+				break
+			else:
+				print "Can you speak louder"
+				continue
 
 
 if __name__ == "__main__":

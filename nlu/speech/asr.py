@@ -6,28 +6,35 @@ import json
 import sys
 import tempfile
 import time
-from google.client import ASRClient
+from asr.google_client import GoogleClient
 
-class GoogleASR:
+class ASR:
 
 	recognizing = False
 	google_client = None
+	nuance_client = None
 	audio_recorder = None
 	leds_controller = None
+	vocabulary = []
 	channels = [0,0,1,0] #Left, Right, Front, Rear
 	filepath = ''
 
 	
-	def __init__(self, session, language, key):
-		self.google_client = ASRClient(language, key)
+	def __init__(self, session, language, key, vocabulary_file):
+		self.google_client = GoogleClient(language, key)
 		self.audio_recorder = session.service("ALAudioRecorder")
-		self.leds_controller = ALProxy("ALLeds")
+		self.nuance_client = session.service("ALSpeechRecognition")
+		with open(vocabulary_file) as f:
+	    	self.vocabulary = f.readlines()
+		self.vocabulary = [x.strip() for x in self.vocabulary]
+		self.nuance_client.setLanguage("English")
+	    self.nuance_client.setVocabulary(vocabulary, False)
+		#self.leds_controller = ALProxy("ALLeds")
 		
 	def continuousRecognition(self,timeout):
 		results = []
 		while not results:
 			self.startRecognition()
-			self.leds_controller.randomEyes(timeout)
 			time.sleep(timeout)
 			results = self.stopRecognition()
 		return results
@@ -39,6 +46,7 @@ class GoogleASR:
 			return 0
 		else:
 			self.recognizing = True
+			#self.nuance_client.subscribe("Test_ASR")
 			self.filepath = '/home/nao/test.wav'
 			print self.filepath
 			print os.path.abspath(self.filepath)
@@ -47,6 +55,7 @@ class GoogleASR:
 			return 1
 	
 	def stopRecognition(self):
+		if
 		if self.recognizing:
 			self.recognizing = False
 			self.audio_recorder.stopMicrophonesRecording()
