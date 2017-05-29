@@ -12,15 +12,14 @@ import time
 def main(session):
 	asr_service = session.service("ALSpeechRecognition")
 	asr_service.setLanguage("English")
-	asr_service.unsubscribe("Test_ASR")
-
+	#asr_service.unsubscribe("Test_ASR")
+	asr_service.pause(True)
 	vocabulary = ["yes", "no", "please"]
 	asr_service.setVocabulary(vocabulary, False)
 
 	while True:
-		
 		asr_service.subscribe("Test_ASR")
-		time.sleep(20)
+		time.sleep(10)
 		if asr_service.SpeechDetected():
 			if asr_service.WordRecognized()== "yes":
 				print "have a nice day"
