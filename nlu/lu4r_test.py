@@ -35,6 +35,7 @@ def main():
 
 	configuration = {"bodyLanguageMode":"contextual"}
 	tts_service = session.service("ALAnimatedSpeech")
+	rp_service = session.service("ALRobotPosture")
 
 	client = LU4RClient(lip, lport)
 
@@ -44,7 +45,7 @@ def main():
 	interpretation2 = client.parse_sentences(sentences)
 
 	print interpretation1
-	phraseToSay = "Hello! This is what I understood " + interpretation1 + ". Is it correct?"
+	phraseToSay = "^start(animations/Stand/Gestures/Hey_1) Hello! ^wait(animations/Stand/Gestures/Hey_1) This is what I understood " + interpretation1 + ". Is it correct?"
 	tts_service.say(phraseToSay, configuration)
 
 if __name__ == "__main__":
