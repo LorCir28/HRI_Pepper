@@ -6,7 +6,7 @@ import json
 import sys
 import tempfile
 import time
-from asr.google_client import GoogleClient
+from speech.google_client import GoogleClient
 
 class ASR:
 
@@ -24,11 +24,12 @@ class ASR:
 		self.google_client = GoogleClient(language, key)
 		self.audio_recorder = session.service("ALAudioRecorder")
 		self.nuance_client = session.service("ALSpeechRecognition")
+		#self.nuance_client.unsubscribe('NuanceASR')
 		with open(vocabulary_file) as f:
-	    	self.vocabulary = f.readlines()
+			self.vocabulary = f.readlines()
 		self.vocabulary = [x.strip() for x in self.vocabulary]
 		self.nuance_client.setLanguage("English")
-	    self.nuance_client.setVocabulary(vocabulary, False)
+		self.nuance_client.setVocabulary(self.vocabulary, False)
 		#self.leds_controller = ALProxy("ALLeds")
 		
 	def continuousRecognition(self,timeout):
@@ -40,6 +41,7 @@ class ASR:
 		return results
 
 	def startRecognition(self):
+		self.nuance_client.subscribe('NuanceASR')
 		self.audio_recorder.stopMicrophonesRecording()
 		if self.recognizing:
 			print '[ASR] Warning! Already recognizing..'
@@ -55,7 +57,6 @@ class ASR:
 			return 1
 	
 	def stopRecognition(self):
-		if
 		if self.recognizing:
 			self.recognizing = False
 			self.audio_recorder.stopMicrophonesRecording()

@@ -10,21 +10,15 @@ import time
 
 
 def main(session):
-    """
-    This example uses the ALSpeechRecognition module.
-    """
-    # Get the service ALSpeechRecognition.
+	asr_service = session.service("ALSpeechRecognition")
+	asr_service.setLanguage("English")
+	asr_service.unsubscribe("Test_ASR")
 
-    asr_service = session.service("ALSpeechRecognition")
+	vocabulary = ["yes", "no", "please"]
+	asr_service.setVocabulary(vocabulary, False)
 
-    asr_service.setLanguage("English")
-
-    # Example: Adds "yes", "no" and "please" to the vocabulary (without wordspotting)
-    vocabulary = ["yes", "no", "please"]
-    asr_service.setVocabulary(vocabulary, False)
-
-    # Start the speech recognition engine with user Test_ASR
 	while True:
+		
 		asr_service.subscribe("Test_ASR")
 		time.sleep(20)
 		if asr_service.SpeechDetected():
@@ -32,7 +26,7 @@ def main(session):
 				print "have a nice day"
 				asr_service.unsubscribe("Test_ASR")
 				break
-            elif asr_service.WordRecognized()== "no":
+			elif asr_service.WordRecognized()== "no":
 				print "i will find some help"
 				asr_service.unsubscribe("Test_ASR")
 				break

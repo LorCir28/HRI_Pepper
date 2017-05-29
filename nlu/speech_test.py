@@ -29,7 +29,7 @@ def main():
 
 	#AIzaSyAONQ_K4NOIGfRWXmiuXonThf2rs3XzKPY
 	#AIzaSyDya-9naDiG0Dm8MVVKhQw50HmsvfZeZfE
-	asr = ASR(session, 'en-US', 'AIzaSyAONQ_K4NOIGfRWXmiuXonThf2rs3XzKPY')
+	asr = ASR(session, 'en-US', 'AIzaSyAONQ_K4NOIGfRWXmiuXonThf2rs3XzKPY','vocabulary.txt')
 	print asr.continuousRecognition(10)
 	
 if __name__ == "__main__":
