@@ -17,6 +17,7 @@ class GoogleClient:
 
 	def recognize(self, file):
 		try:
+			print '[GOOGLE] Recognizing..'
 			transcriptions = []
 			data = open(file, "rb").read()
 			response = requests.post(self.url, headers=self.headers, data=data, timeout=self.timeout)
