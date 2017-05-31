@@ -107,8 +107,12 @@ laserValueList = [
 
 import threading
 import math
-from PyQt5 import QtCore, QtGui, QtOpenGL
-from PyQt5.QtWidgets import QApplication
+try:
+    from PyQt5 import QtCore, QtGui, QtOpenGL
+    from PyQt5.QtWidgets import QApplication
+except ImportError:
+    from PyQt4 import QtCore, QtGui, QtOpenGL
+    from PyQt4.QtGui import QApplication
 from OpenGL.GL import *
 from PyGLWidget import PyGLWidget
 
@@ -118,13 +122,13 @@ class LaserViewer(PyGLWidget):
     def __init__(self, parent = None):
         PyGLWidget.__init__(self, parent)
         self.laserpoints = []
+        self.running = True
 
     def paintGL(self):
-        print "Painting"
         PyGLWidget.paintGL(self)
         glPushMatrix()
         glPushAttrib(GL_COLOR|GL_POINT_SIZE)
-        glPointSize(5)
+        glPointSize(10)
         glBegin(GL_POINTS)
         for i in range(0,len(self.laserpoints)):
             point = self.laserpoints[i]
@@ -135,8 +139,15 @@ class LaserViewer(PyGLWidget):
         glPopMatrix()
         
     def setLaserPoints(self, laserpoints):
-        self.laserpoints = laserpoints   
+        self.laserpoints = laserpoints
+        
+    def closeEvent(self, event):
+        self.running = False
 
+    def isRunning(self):
+        return self.running
+        
+        
 def laserMonitorThread (memory_service, laserviewer):
     t = threading.currentThread()
     while getattr(t, "do_run", True):
@@ -216,16 +227,9 @@ def main():
     #create a thead that monitors directly the signal
     monitorThread = threading.Thread(target = laserMonitorThread, args = (memory_service,laserviewer,))
     monitorThread.start()
-
-    while (True):
+    while (laserviewer.isRunning()):
         qapp.processEvents()
         laserviewer.updateGL()
-        time.sleep(0.2)
-    
-    qapp.exec_()
-    #Program stays at this point until we stop it
-    
-    #app.run()
 
     monitorThread.do_run = False
     
