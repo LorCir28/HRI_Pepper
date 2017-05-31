@@ -32,7 +32,14 @@
 #
 #===============================================================================
 
-from PyQt5 import QtCore, QtGui, QtOpenGL
+try:
+    from PyQt5 import QtCore, QtGui, QtOpenGL
+    from PyQt5.QtWidgets import QApplication
+    useQt5 = True
+except ImportError:
+    from PyQt4 import QtCore, QtGui, QtOpenGL
+    from PyQt4.QtGui import QApplication
+    useQt5 = False
 import math
 import numpy
 import numpy.linalg as linalg
@@ -208,7 +215,11 @@ class PyGLWidget(QtOpenGL.QGLWidget):
 
     def wheelEvent(self, _event):
         # Use the mouse wheel to zoom in/out
-        d = - float(_event.angleDelta().y()) / 200.0 * self.radius_
+        global useQt5
+        if (useQt5):
+            d = - float(_event.angleDelta().y()) / 200.0 * self.radius_
+        else:
+             d = - float(_event.delta()) / 200.0 * self.radius_
         self.translate([0.0, 0.0, d])
         self.updateGL()
         _event.accept()
