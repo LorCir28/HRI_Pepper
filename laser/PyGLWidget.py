@@ -84,7 +84,7 @@ class PyGLWidget(QtOpenGL.QGLWidget):
 
     def initializeGL(self):
         # OpenGL state
-        glClearColor(0.0, 0.0, 0.0, 0.0)
+        glClearColor(1.0, 1.0, 1.0, 0.0)
         glEnable(GL_DEPTH_TEST)
         self.reset_view()
 
@@ -127,7 +127,7 @@ class PyGLWidget(QtOpenGL.QGLWidget):
         glMatrixMode( GL_MODELVIEW )
         glLoadIdentity();
         self.modelview_matrix_ = glGetDoublev( GL_MODELVIEW_MATRIX )
-        self.set_center([0.0, 0.0, 0.0])
+        self.set_center([0.0, 0.0, 10.0])
 
     def reset_rotation(self):
         self.modelview_matrix_[0] = [1.0, 0.0, 0.0, 0.0]
