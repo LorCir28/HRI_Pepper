@@ -1,28 +1,27 @@
 import time
-import signal
-import argparse
 from naoqi import ALProxy, ALBroker, ALModule
-from abc import ABCMeta
-import os
+from abc import ABCMeta, abstractmethod
+
 
 class EventAbstractClass(ALModule):
     __metaclass__ = ABCMeta
 
-    def __init__(self, name, ip, port):
-        self.name = name
+    def __init__(self, inst, ip, port):
+        self.inst = inst
+        self.name = inst.__class__.__name__ + "_inst"
         self._make_global(self.name, self)
-        self.broker = self._connect(name, ip, port)
+        self.broker = self._connect(self.name, ip, port)
         super(EventAbstractClass, self).__init__(self.name)
 
         self.memory = self._make_global("memory", ALProxy("ALMemory"))
 
     def _connect(self, name, ip, port):
         try:
-            broker = ALBroker("speech_broker",
-               "0.0.0.0",   # listen to anyone
-               0,           # find a free port and use it
-               ip,         # parent broker IP
-               port)
+            broker = ALBroker(name + "_broker",
+                              "0.0.0.0",  # listen to anyone
+                              0,  # find a free port and use it
+                              ip,  # parent broker IP
+                              port)
             print "Connected to %s:%s" % (ip, str(port))
             return broker
         except RuntimeError:
@@ -34,9 +33,11 @@ class EventAbstractClass(ALModule):
         globals()[name] = var
         return globals()[name]
 
+    def update_globals(self, glob):
+        glob[self.name] = self
+
     def subscribe(self, event, callback):
-    	from speech_recognition import SpeechRecognition
-    	self.memory.subscribeToEvent(
+        self.memory.subscribeToEvent(
             event,
             self.name,
             callback.func_name
@@ -62,3 +63,10 @@ class EventAbstractClass(ALModule):
             self.memory.unsubscribeToEvent(event, module)
         except RuntimeError:
             print "Could not unsubscribe from NAO speech recognition"
+
+    @abstractmethod
+    def start(self, *args, **kwargs):
+        """
+        All subscribing goes in here.
+        """
+        return
