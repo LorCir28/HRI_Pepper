@@ -40,8 +40,8 @@ class GoogleClient:
             return transcriptions
         except requests.exceptions.RequestException as e:
             print e
-            print '[RECOGNIZE]ERROR! Unable to reach Google.'
-            return 0
+            print '[RECOGNIZE]ERROR! Unable to reach Google. Returning empty list..'
+            return []
 
     def recognize_data(self, data):
         try:
@@ -62,5 +62,5 @@ class GoogleClient:
             return transcriptions
         except requests.exceptions.RequestException as e:
             print e
-            print '[RECOGNIZE]ERROR! Unable to reach Google.'
-            return 0
+            print '[RECOGNIZE]ERROR! Unable to reach Google. Returning empty list..'
+            return []
