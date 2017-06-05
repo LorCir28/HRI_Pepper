@@ -8,34 +8,33 @@ from event_abstract import *
 
 class SpeechRecognition(EventAbstractClass):
     EVENT_NAME = "WordRecognized"
-    FLAC_CONV = 'flac -f '
+    FLAC_COMM = 'flac -f '
     FILE_PATH = '/tmp/recording'
     CHANNELS = [0, 0, 1, 0]
 
     def __init__(self, ip, port, language, word_spotting, audio, visual, vocabulary_file, google_keys):
         super(self.__class__, self).__init__(self, ip, port)
-        # self._make_global(self.__class__.__name__+"_inst", self)
 
         self.__shutdown_requested = False
         signal.signal(signal.SIGINT, self.signal_handler)
+
+        vocabulary = self.__read_vocabulary(vocabulary_file)
+        if (language == 'en') or (language == 'eng') or (language == 'english') or (language == 'English'):
+            nuance_language = 'English'
+            google_language = "en-US"
 
         self.nuance_asr = ALProxy("ALSpeechRecognition")
 
         self.audio_recorder = ALProxy("ALAudioRecorder")
 
-        vocabulary = self.read_vocabulary(vocabulary_file)
-        if (language == 'en') or (language == 'eng') or (language == 'english') or (language == 'English'):
-            nuance_language = 'English'
-            google_language = "en-US"
+        self.google_asr = GoogleClient(google_language, google_keys)
 
         self.configure(
             vocabulary=vocabulary,
             nuance_language=nuance_language,
-            google_language=google_language,
             word_spotting=word_spotting,
             audio=audio,
-            visual=visual,
-            keys=google_keys
+            visual=visual
         )
 
     def start(self, *args, **kwargs):
@@ -59,35 +58,31 @@ class SpeechRecognition(EventAbstractClass):
         self.__shutdown_requested = True
         print 'Good-bye'
 
-    def configure(self, word_spotting, nuance_language, google_language, audio, visual, vocabulary, keys):
+    def configure(self, word_spotting, nuance_language, audio, visual, vocabulary):
         self.nuance_asr.pause(True)
         self.nuance_asr.setVocabulary(vocabulary, word_spotting)
         self.nuance_asr.setLanguage(nuance_language)
         self.nuance_asr.setAudioExpression(audio)
         self.nuance_asr.setVisualExpression(visual)
         self.nuance_asr.pause(False)
-        self.google_asr = GoogleClient(google_language, keys)
 
     def callback(self, *args, **kwargs):
         self.audio_recorder.stopMicrophonesRecording()
         """
         Convert Wave file into Flac file
         """
-        os.system(self.FLAC_CONV + self.FILE_PATH + '.wav')
+        os.system(self.FLAC_COMM + self.FILE_PATH + '.wav')
         f = open(self.FILE_PATH + '.flac', 'rb')
         flac_cont = f.read()
         f.close()
 
-        results = [r.encode('ascii', 'ignore') for r in self.google_asr.recognize_data(flac_cont)]
-        if args[1][1] > 0.5:
-            results.append(args[1][0])
-        print results
-        if 'bye' in results:
-            self.stop()
+        results = None
+        results['GoogleASR'] = [r.encode('ascii', 'ignore') for r in self.google_asr.recognize_data(flac_cont)]
+        results['NuanceASR'] = [args[1][0]]
         self.audio_recorder.startMicrophonesRecording(self.FILE_PATH + ".wav", "wav", 16000, self.CHANNELS)
         self.memory.raiseEvent("VordRecognized", results)
 
-    def read_vocabulary(self, vocabulary_file):
+    def __read_vocabulary(self, vocabulary_file):
         with open(vocabulary_file) as f:
             vocabulary = f.readlines()
         return [x.strip() for x in vocabulary]
@@ -120,10 +115,10 @@ def main():
                         help="Turn off bip sound when recognition starts")
     parser.add_argument("--no-visual", action="store_true",
                         help="Turn off blinking eyes when recognition starts")
-    parser.add_argument("-v", "--vocabulary", type=str, default="vocabulary.txt",
-                        help="A txt file containing the list of sentences composing the vocabulary.")
+    parser.add_argument("-v", "--vocabulary", type=str, default="nuance_grammar.txt",
+                        help="A txt file containing the list of sentences composing the vocabulary")
     parser.add_argument("-k", "--keys", type=str, default="google_keys.txt",
-                        help="A txt file containing the list of the keys for the Google ASR.")
+                        help="A txt file containing the list of the keys for the Google ASR")
     args = parser.parse_args()
 
     sr = SpeechRecognition(

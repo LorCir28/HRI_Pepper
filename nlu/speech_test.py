@@ -16,7 +16,7 @@ def main():
                         help="Turn off bip sound when recognition starts")
     parser.add_argument("--no-visual", action="store_true",
                         help="Turn off blinking eyes when recognition starts")
-    parser.add_argument("-v", "--vocabulary", type=str, default="vocabulary.txt",
+    parser.add_argument("-v", "--vocabulary", type=str, default="nuance_grammar.txt",
                         help="A txt file containing the list of sentences composing the vocabulary.")
     parser.add_argument("-k", "--keys", type=str, default="google_keys.txt",
                         help="A txt file containing the list of the keys for the Google ASR.")

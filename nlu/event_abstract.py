@@ -52,17 +52,17 @@ class EventAbstractClass(ALModule):
     def remove_subscribers(self, event):
         subscribers = self.memory.getSubscribers(event)
         if subscribers:
-            print "Speech recognition already in use by another node"
+            print event + " already in use by another node"
             for module in subscribers:
                 self.__stop_module(module, event)
 
     def __stop_module(self, module, event):
-        print "Unsubscribing '{}' from NAO speech recognition".format(
+        print "Unsubscribing '{}' from " + event.format(
             module)
         try:
             self.memory.unsubscribeToEvent(event, module)
         except RuntimeError:
-            print "Could not unsubscribe from NAO speech recognition"
+            print "Could not unsubscribe from " + event
 
     @abstractmethod
     def start(self, *args, **kwargs):
