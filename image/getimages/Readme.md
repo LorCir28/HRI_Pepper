@@ -1,6 +1,6 @@
 # How to compile
-**OpenCV** library within **NAOqi C++ SDK** is not ready to use visualization functions such as ```cv::namedWindow``` or ```cv::imshow```.
-For this reason, you have to replace the **OpenCV** libraries **NAOqi C++ SDK** by another version of the libraries in which these functions are implemented.  
+**OpenCV** library within **NAOqi C++ SDK** is not ready to use visualization functions such as ```cv::namedWindow``` or ```cv::imshow```.  
+For this reason, you have to replace the **OpenCV** libraries in **NAOqi C++ SDK** by another version of the libraries in which these functions are implemented.  
 The **OpenCV** version of **NAOqi C++ SDK 2.5.5** is 2.4.9.
 ## Instructions
 ### Preparation to compile with OpenCV
@@ -21,7 +21,7 @@ $ make
 * Copy the compiled libraries 
 ```
 $ cd <path-to-your-naoqi-c++-sdk>/lib
-$ sudo <path-to-your-opencv-2.4.9>/build/lib/libopencv_* .
+$ sudo cp <path-to-your-opencv-2.4.9>/build/lib/libopencv_* .
 ```
 ### Compile getimages
 From the getimages folder (assuming qibuild environment set up accordingly)
