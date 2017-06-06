@@ -1,8 +1,8 @@
 import argparse
-import os
 import signal
+import slu_utils
 from naoqi import ALProxy, ALBroker, ALModule
-from speech.google_client import *
+from google_client import *
 from event_abstract import *
 
 
@@ -18,7 +18,7 @@ class SpeechRecognition(EventAbstractClass):
         self.__shutdown_requested = False
         signal.signal(signal.SIGINT, self.signal_handler)
 
-        vocabulary = self.__read_vocabulary(vocabulary_file)
+        vocabulary = slu_utils.lines_to_list(vocabulary_file)
         if (language == 'en') or (language == 'eng') or (language == 'english') or (language == 'English'):
             nuance_language = 'English'
             google_language = "en-US"
@@ -76,16 +76,11 @@ class SpeechRecognition(EventAbstractClass):
         flac_cont = f.read()
         f.close()
 
-        results = None
-        results['GoogleASR'] = [r.encode('ascii', 'ignore') for r in self.google_asr.recognize_data(flac_cont)]
-        results['NuanceASR'] = [args[1][0]]
+        results = {}
+        results['GoogleASR'] = [r.encode('ascii', 'ignore').lower() for r in self.google_asr.recognize_data(flac_cont)]
+        results['NuanceASR'] = [args[1][0].lower()]
         self.audio_recorder.startMicrophonesRecording(self.FILE_PATH + ".wav", "wav", 16000, self.CHANNELS)
         self.memory.raiseEvent("VordRecognized", results)
-
-    def __read_vocabulary(self, vocabulary_file):
-        with open(vocabulary_file) as f:
-            vocabulary = f.readlines()
-        return [x.strip() for x in vocabulary]
 
     def _spin(self, *args):
         while not self.__shutdown_requested:

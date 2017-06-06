@@ -4,7 +4,7 @@ import json
 import sys
 import os
 
-from lu4r.client import LU4RClient
+from language_understanding.lu4r_client import LU4RClient
 
 
 def main():

@@ -1,13 +1,14 @@
 import os
-from aiml.Kernel import Kernel
+from Kernel import Kernel
 import argparse
 import signal
+import slu_utils
 from event_abstract import *
 
 
 class DialogueManager(EventAbstractClass):
     PATH = ''
-    EVENT_NAME = "VordReranked"
+    EVENT_NAME = "VRanked"
 
     def __init__(self, ip, port, aiml_path):
         super(self.__class__, self).__init__(self, ip, port)
@@ -16,7 +17,7 @@ class DialogueManager(EventAbstractClass):
         signal.signal(signal.SIGINT, self.signal_handler)
 
         self.kernel = Kernel()
-        self._learn(aiml_path)
+        self.__learn(aiml_path)
 
     def start(self, *args, **kwargs):
         self.subscribe(
@@ -32,10 +33,12 @@ class DialogueManager(EventAbstractClass):
         self.broker.shutdown()
 
     def callback(self, *args, **kwargs):
-        print 'User says: ' + args[1]
-        reply = self.kernel.respond(args[1][0])
+        transcriptions_dict = slu_utils.list_to_dict_w_probabilities(args[1])
+        best_transcription = slu_utils.pick_best(transcriptions_dict)
+        print 'User says: ' + best_transcription
+        reply = self.kernel.respond(best_transcription)
         print 'Robot says: ' + reply
-        self.memory.raiseEvent("VordReplied", reply)
+        self.memory.raiseEvent("Veply", reply)
 
     def _spin(self, *args):
         while not self.__shutdown_requested:
@@ -48,14 +51,12 @@ class DialogueManager(EventAbstractClass):
         self.__shutdown_requested = True
         print 'Good-bye'
 
-    def _learn(self, path):
-        print "Importing AIML KBs..."
-        for root, directories, filenames in os.walk(path):
-            for filename in filenames:
-                if filename.endswith('aiml'):
+    def __learn(self, path):
+        for root, directories, file_names in os.walk(path):
+            for filename in file_names:
+                if filename.endswith('.aiml'):
                     self.kernel.learn(os.path.join(root, filename))
-        print "...AIML KBs imported!"
-        print 'Number of categories: ' + str(self.kernel.numCategories())
+        print 'Number of categories: ' + str(self.kernel.num_categories())
 
 
 def main():
@@ -66,7 +67,7 @@ def main():
     parser.add_argument("-p", "--pport", type=int, default=9559,
                         help="Robot port number")
     parser.add_argument("-a", "--aiml-path", type=str, default="kbs",
-                        help="Use one of the supported languages (only English at the moment)")
+                        help="Path to the root folder of AIML Knowledge Base")
     args = parser.parse_args()
 
     dm = DialogueManager(

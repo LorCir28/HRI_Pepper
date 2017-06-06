@@ -38,11 +38,11 @@ class Kernel:
 
         # set up the sessions        
         self._sessions = {}
-        self._addSession(self._globalSessionID)
+        self._add_session(self._globalSessionID)
 
         # Set up the bot predicates
         self._botPredicates = {}
-        self.setBotPredicate("name", "Nameless")
+        self.set_bot_predicate("name", "Nameless")
 
         # set up the word substitutors (subbers):
         self._subbers = {}
@@ -101,7 +101,7 @@ class Kernel:
         """
         start = time.clock()
         if brainFile:
-            self.loadBrain(brainFile)
+            self.load_brain(brainFile)
 
         # learnFiles might be a string, in which case it should be
         # turned into a single-element list.
@@ -133,12 +133,12 @@ class Kernel:
         """Return the Kernel's version string."""
         return self._version
 
-    def numCategories(self):
+    def num_categories(self):
         """Return the number of categories the Kernel has learned."""
         # there's a one-to-one mapping between templates and categories
         return self._brain.numTemplates()
 
-    def resetBrain(self):
+    def reset_brain(self):
         """Reset the brain to its initial state.
 
         This is essentially equivilant to:
@@ -149,7 +149,7 @@ class Kernel:
         del (self._brain)
         self.__init__()
 
-    def loadBrain(self, filename):
+    def load_brain(self, filename):
         """Attempt to load a previously-saved 'brain' from the
         specified filename.
 
@@ -163,7 +163,7 @@ class Kernel:
             end = time.clock() - start
             print "done (%d categories in %.2f seconds)" % (self._brain.numTemplates(), end)
 
-    def saveBrain(self, filename):
+    def save_brain(self, filename):
         """Dump the contents of the bot's brain to a file on disk."""
         if self._verboseMode: print "Saving brain to %s..." % filename,
         start = time.clock()
@@ -171,7 +171,7 @@ class Kernel:
         if self._verboseMode:
             print "done (%.2f seconds)" % (time.clock() - start)
 
-    def getPredicate(self, name, sessionID=_globalSessionID):
+    def get_predicate(self, name, sessionID=_globalSessionID):
         """Retrieve the current value of the predicate 'name' from the
         specified session.
 
@@ -184,7 +184,7 @@ class Kernel:
         except KeyError:
             return ""
 
-    def setPredicate(self, name, value, sessionID=_globalSessionID):
+    def set_predicate(self, name, value, sessionID=_globalSessionID):
         """Set the value of the predicate 'name' in the specified
         session.
 
@@ -193,10 +193,10 @@ class Kernel:
         created.
 
         """
-        self._addSession(sessionID)  # add the session, if it doesn't already exist.
+        self._add_session(sessionID)  # add the session, if it doesn't already exist.
         self._sessions[sessionID][name] = value
 
-    def getBotPredicate(self, name):
+    def get_bot_predicate(self, name):
         """Retrieve the value of the specified bot predicate.
 
         If name is not a valid bot predicate, the empty string is returned.        
@@ -207,7 +207,7 @@ class Kernel:
         except KeyError:
             return ""
 
-    def setBotPredicate(self, name, value):
+    def set_bot_predicate(self, name, value):
         """Set the value of the specified bot predicate.
 
         If name is not a valid bot predicate, it will be created.
@@ -217,13 +217,13 @@ class Kernel:
         # Clumsy hack: if updating the bot name, we must update the
         # name in the brain as well
         if name == "name":
-            self._brain.setBotName(self.getBotPredicate("name"))
+            self._brain.setBotName(self.get_bot_predicate("name"))
 
-    def setTextEncoding(self, encoding):
+    def set_text_encoding(self, encoding):
         """Set the text encoding used when loading AIML files (Latin-1, UTF-8, etc.)."""
         self._textEncoding = encoding
 
-    def loadSubs(self, filename):
+    def load_subs(self, filename):
         """Load a substitutions file.
 
         The file must be in the Windows-style INI format (see the
@@ -246,7 +246,7 @@ class Kernel:
             for k, v in parser.items(s):
                 self._subbers[s][k] = v
 
-    def _addSession(self, sessionID):
+    def _add_session(self, sessionID):
         """Create a new session with the specified ID string."""
         if self._sessions.has_key(sessionID):
             return
@@ -258,12 +258,12 @@ class Kernel:
             self._inputStack: []
         }
 
-    def _deleteSession(self, sessionID):
+    def _delete_session(self, sessionID):
         """Delete the specified session."""
         if self._sessions.has_key(sessionID):
-            _sessions.pop(sessionID)
+            self._sessions.pop(sessionID)
 
-    def getSessionData(self, sessionID=None):
+    def get_session_data(self, sessionID=None):
         """Return a copy of the session data dictionary for the
         specified session.
 
@@ -294,7 +294,7 @@ class Kernel:
             # Load and parse the AIML file.
             parser = AimlParser.create_parser()
             handler = parser.getContentHandler()
-            handler.setEncoding(self._textEncoding)
+            handler.set_encoding(self._textEncoding)
             try:
                 parser.parse(f)
             except xml.sax.SAXParseException, msg:
@@ -325,7 +325,7 @@ class Kernel:
         self._respondLock.acquire()
 
         # Add the session, if it doesn't already exist
-        self._addSession(sessionID)
+        self._add_session(sessionID)
 
         # split the input into discrete sentences
         sentences = Utils.sentences(input)
@@ -333,27 +333,27 @@ class Kernel:
         for s in sentences:
             # Add the input to the history list before fetching the
             # response, so that <input/> tags work properly.
-            inputHistory = self.getPredicate(self._inputHistory, sessionID)
+            inputHistory = self.get_predicate(self._inputHistory, sessionID)
             inputHistory.append(s)
             while len(inputHistory) > self._maxHistorySize:
                 inputHistory.pop(0)
-            self.setPredicate(self._inputHistory, inputHistory, sessionID)
+            self.set_predicate(self._inputHistory, inputHistory, sessionID)
 
             # Fetch the response
             response = self._respond(s, sessionID)
 
             # add the data from this exchange to the history lists
-            outputHistory = self.getPredicate(self._outputHistory, sessionID)
+            outputHistory = self.get_predicate(self._outputHistory, sessionID)
             outputHistory.append(response)
             while len(outputHistory) > self._maxHistorySize:
                 outputHistory.pop(0)
-            self.setPredicate(self._outputHistory, outputHistory, sessionID)
+            self.set_predicate(self._outputHistory, outputHistory, sessionID)
 
             # append this response to the final response.
             finalResponse += (response + "  ")
         finalResponse = finalResponse.strip()
 
-        assert (len(self.getPredicate(self._inputStack, sessionID)) == 0)
+        assert (len(self.get_predicate(self._inputStack, sessionID)) == 0)
 
         # release the lock and return
         self._respondLock.release()
@@ -372,7 +372,7 @@ class Kernel:
             return ""
 
         # guard against infinite recursion
-        inputStack = self.getPredicate(self._inputStack, sessionID)
+        inputStack = self.get_predicate(self._inputStack, sessionID)
         if len(inputStack) > self._maxRecursionDepth:
             if self._verboseMode:
                 err = "WARNING: maximum recursion depth exceeded (input='%s')" % input.encode(self._textEncoding,
@@ -381,16 +381,16 @@ class Kernel:
             return ""
 
         # push the input onto the input stack
-        inputStack = self.getPredicate(self._inputStack, sessionID)
+        inputStack = self.get_predicate(self._inputStack, sessionID)
         inputStack.append(input)
-        self.setPredicate(self._inputStack, inputStack, sessionID)
+        self.set_predicate(self._inputStack, inputStack, sessionID)
 
         # run the input through the 'normal' subber
         subbedInput = self._subbers['normal'].sub(input)
 
         # fetch the bot's previous response, to pass to the match()
         # function as 'that'.
-        outputHistory = self.getPredicate(self._outputHistory, sessionID)
+        outputHistory = self.get_predicate(self._outputHistory, sessionID)
         try:
             that = outputHistory[-1]
         except IndexError:
@@ -398,7 +398,7 @@ class Kernel:
         subbedThat = self._subbers['normal'].sub(that)
 
         # fetch the current topic
-        topic = self.getPredicate("topic", sessionID)
+        topic = self.get_predicate("topic", sessionID)
         subbedTopic = self._subbers['normal'].sub(topic)
 
         # Determine the final response.
@@ -415,9 +415,9 @@ class Kernel:
         response = response.strip()
 
         # pop the top entry off the input stack.
-        inputStack = self.getPredicate(self._inputStack, sessionID)
+        inputStack = self.get_predicate(self._inputStack, sessionID)
         inputStack.pop()
-        self.setPredicate(self._inputStack, inputStack, sessionID)
+        self.set_predicate(self._inputStack, inputStack, sessionID)
 
         return response
 
@@ -460,7 +460,7 @@ class Kernel:
         
         """
         attrName = elem[1]['name']
-        return self.getBotPredicate(attrName)
+        return self.get_bot_predicate(attrName)
 
     # <condition>
     def _processCondition(self, elem, sessionID):
@@ -499,7 +499,7 @@ class Kernel:
         # Case #1: test the value of a specific predicate for a
         # specific value.
         if attr.has_key('name') and attr.has_key('value'):
-            val = self.getPredicate(attr['name'], sessionID)
+            val = self.get_predicate(attr['name'], sessionID)
             if val == attr['value']:
                 for e in elem[2:]:
                     response += self._processElement(e, sessionID)
@@ -536,7 +536,7 @@ class Kernel:
                         # get the value to check against
                         liValue = liAttr['value']
                         # do the test
-                        if self.getPredicate(liName, sessionID) == liValue:
+                        if self.get_predicate(liName, sessionID) == liValue:
                             foundMatch = True
                             response += self._processElement(li, sessionID)
                             break
@@ -615,7 +615,7 @@ class Kernel:
         specified session.
 
         """
-        return self.getPredicate(elem[1]['name'], sessionID)
+        return self.get_predicate(elem[1]['name'], sessionID)
 
     # <gossip>
     def _processGossip(self, elem, sessionID):
@@ -654,7 +654,7 @@ class Kernel:
         the current session.
 
         """
-        inputHistory = self.getPredicate(self._inputHistory, sessionID)
+        inputHistory = self.get_predicate(self._inputHistory, sessionID)
         try:
             index = int(elem[1]['index'])
         except:
@@ -825,7 +825,7 @@ class Kernel:
         value = ""
         for e in elem[2:]:
             value += self._processElement(e, sessionID)
-        self.setPredicate(elem[1]['name'], value, sessionID)
+        self.set_predicate(elem[1]['name'], value, sessionID)
         return value
 
     # <size>
@@ -836,7 +836,7 @@ class Kernel:
         in the bot's brain.
 
         """
-        return str(self.numCategories())
+        return str(self.num_categories())
 
     # <sr>
     def _processSr(self, elem, sessionID):
@@ -884,15 +884,15 @@ class Kernel:
         except KeyError:
             index = 1
         # fetch the user's last input
-        inputStack = self.getPredicate(self._inputStack, sessionID)
+        inputStack = self.get_predicate(self._inputStack, sessionID)
         input = self._subbers['normal'].sub(inputStack[-1])
         # fetch the Kernel's last response (for 'that' context)
-        outputHistory = self.getPredicate(self._outputHistory, sessionID)
+        outputHistory = self.get_predicate(self._outputHistory, sessionID)
         try:
             that = self._subbers['normal'].sub(outputHistory[-1])
         except:
             that = ""  # there might not be any output yet
-        topic = self.getPredicate("topic", sessionID)
+        topic = self.get_predicate("topic", sessionID)
         response = self._brain.star("star", input, that, topic, index)
         return response
 
@@ -993,7 +993,7 @@ class Kernel:
         of the Kernel's previous responses.
 
         """
-        outputHistory = self.getPredicate(self._outputHistory, sessionID)
+        outputHistory = self.get_predicate(self._outputHistory, sessionID)
         index = 1
         try:
             # According to the AIML spec, the optional index attribute
@@ -1030,15 +1030,15 @@ class Kernel:
         except KeyError:
             index = 1
         # fetch the user's last input
-        inputStack = self.getPredicate(self._inputStack, sessionID)
+        inputStack = self.get_predicate(self._inputStack, sessionID)
         input = self._subbers['normal'].sub(inputStack[-1])
         # fetch the Kernel's last response (for 'that' context)
-        outputHistory = self.getPredicate(self._outputHistory, sessionID)
+        outputHistory = self.get_predicate(self._outputHistory, sessionID)
         try:
             that = self._subbers['normal'].sub(outputHistory[-1])
         except:
             that = ""  # there might not be any output yet
-        topic = self.getPredicate("topic", sessionID)
+        topic = self.get_predicate("topic", sessionID)
         response = self._brain.star("thatstar", input, that, topic, index)
         return response
 
@@ -1075,15 +1075,15 @@ class Kernel:
         except KeyError:
             index = 1
         # fetch the user's last input
-        inputStack = self.getPredicate(self._inputStack, sessionID)
+        inputStack = self.get_predicate(self._inputStack, sessionID)
         input = self._subbers['normal'].sub(inputStack[-1])
         # fetch the Kernel's last response (for 'that' context)
-        outputHistory = self.getPredicate(self._outputHistory, sessionID)
+        outputHistory = self.get_predicate(self._outputHistory, sessionID)
         try:
             that = self._subbers['normal'].sub(outputHistory[-1])
         except:
             that = ""  # there might not be any output yet
-        topic = self.getPredicate("topic", sessionID)
+        topic = self.get_predicate("topic", sessionID)
         response = self._brain.star("topicstar", input, that, topic, index)
         return response
 
@@ -1144,15 +1144,15 @@ if __name__ == "__main__":
 
     _testTag(k, 'bot', 'test bot', ["My name is Nameless"])
 
-    k.setPredicate('gender', 'male')
+    k.set_predicate('gender', 'male')
     _testTag(k, 'condition test #1', 'test condition name value', ['You are handsome'])
-    k.setPredicate('gender', 'female')
+    k.set_predicate('gender', 'female')
     _testTag(k, 'condition test #2', 'test condition name value', [''])
     _testTag(k, 'condition test #3', 'test condition name', ['You are beautiful'])
-    k.setPredicate('gender', 'robot')
+    k.set_predicate('gender', 'robot')
     _testTag(k, 'condition test #4', 'test condition name', ['You are genderless'])
     _testTag(k, 'condition test #5', 'test condition', ['You are genderless'])
-    k.setPredicate('gender', 'male')
+    k.set_predicate('gender', 'male')
     _testTag(k, 'condition test #6', 'test condition', ['You are handsome'])
 
     # the date test will occasionally fail if the original and "test"
@@ -1181,7 +1181,7 @@ if __name__ == "__main__":
     _testTag(k, 'random', 'test random', ["response #1", "response #2", "response #3"])
     _testTag(k, 'random empty', 'test random empty', ["Nothing here!"])
     _testTag(k, 'sentence', "test sentence", ["My first letter should be capitalized."])
-    _testTag(k, 'size', "test size", ["I've learned %d categories" % k.numCategories()])
+    _testTag(k, 'size', "test size", ["I've learned %d categories" % k.num_categories()])
     _testTag(k, 'sr', "test sr test srai", ["srai results: srai test passed"])
     _testTag(k, 'sr nested', "test nested sr test srai", ["srai results: srai test passed"])
     _testTag(k, 'srai', "test srai", ["srai test passed"])
@@ -1199,11 +1199,11 @@ if __name__ == "__main__":
     _testTag(k, 'thatstar test #3', "test thatstar multiple", ['I say beans and franks for everybody'])
     _testTag(k, 'thatstar test #4', "test thatstar multiple", ['Yes, beans and franks for all!'])
     _testTag(k, 'think', "test think", [""])
-    k.setPredicate("topic", "fruit")
+    k.set_predicate("topic", "fruit")
     _testTag(k, 'topic', "test topic", ["We were discussing apples and oranges"])
-    k.setPredicate("topic", "Soylent Green")
+    k.set_predicate("topic", "Soylent Green")
     _testTag(k, 'topicstar test #1', 'test topicstar', ["Solyent Green is made of people!"])
-    k.setPredicate("topic", "Soylent Ham and Cheese")
+    k.set_predicate("topic", "Soylent Ham and Cheese")
     _testTag(k, 'topicstar test #2', 'test topicstar multiple', ["Both Soylents Ham and Cheese are made of people!"])
     _testTag(k, 'unicode support', u"郧上好", [u"Hey, you speak Chinese! 郧上好"])
     _testTag(k, 'uppercase', 'test uppercase', ["The Last Word Should Be UPPERCASE"])

@@ -2,6 +2,7 @@ import os
 import urllib
 import requests
 import json
+import slu_utils
 
 
 class GoogleClient:
@@ -10,15 +11,9 @@ class GoogleClient:
     headers = {"Content-Type": "audio/x-flac; rate=16000"}
 
     def __init__(self, language, key_file):
-        keys = self.read_google_keys(key_file)
-        print keys
+        keys = slu_utils.lines_to_list(key_file)
         q = {"output": "json", "lang": language, "key": keys[0]}
-        self.url = "http://www.google.com/speech-api/v2/recognize?%s" % (urllib.urlencode(q))
-
-    def read_google_keys(self, key_file):
-        with open(key_file) as f:
-            keys = f.readlines()
-        return [x.strip() for x in keys]
+        self.url = "http://www.google.com/speech_to_text-api/v2/recognize?%s" % (urllib.urlencode(q))
 
     def recognize_file(self, file_path):
         try:
@@ -27,6 +22,7 @@ class GoogleClient:
             data = open(file_path, "rb").read()
             response = requests.post(self.url, headers=self.headers, data=data, timeout=self.timeout)
             json_units = response.text.split(os.linesep)
+            print json_units
             for unit in json_units:
                 if not unit:
                     continue
@@ -38,6 +34,9 @@ class GoogleClient:
                         for result in results:
                             transcriptions.append(result["transcript"])
             return transcriptions
+        except ValueError as ve:
+            print '[RECOGNIZE]ERROR! Google APIs are temporary unavailable. Returning empty list..'
+            return []
         except requests.exceptions.RequestException as e:
             print e
             print '[RECOGNIZE]ERROR! Unable to reach Google. Returning empty list..'
@@ -60,7 +59,19 @@ class GoogleClient:
                         for result in results:
                             transcriptions.append(result["transcript"])
             return transcriptions
+        except ValueError as ve:
+            print '[RECOGNIZE]ERROR! Google APIs are temporary unavailable. Returning empty list..'
+            return []
         except requests.exceptions.RequestException as e:
             print e
             print '[RECOGNIZE]ERROR! Unable to reach Google. Returning empty list..'
             return []
+
+
+def main():
+    g = GoogleClient("en-US", "google_keys.txt")
+    print g.recognize_file('file.flac')
+
+
+if __name__ == "__main__":
+    main()

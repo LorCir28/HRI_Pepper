@@ -8,10 +8,10 @@ def sentences(s):
     """Split the string s into a list of sentences."""
     try:
         s + ""
-    except:
-        raise TypeError, "s must be a string"
+    except TypeError:
+        print "s must be a string"
     pos = 0
-    sentenceList = []
+    sentence_list = []
     l = len(s)
     while pos < l:
         try:
@@ -27,12 +27,12 @@ def sentences(s):
         except:
             e = l + 1
         end = min(p, q, e)
-        sentenceList.append(s[pos:end].strip())
+        sentence_list.append(s[pos:end].strip())
         pos = end + 1
     # If no sentences were found, return a one-item list containing
     # the entire input string.
-    if len(sentenceList) == 0: sentenceList.append(s)
-    return sentenceList
+    if len(sentence_list) == 0: sentence_list.append(s)
+    return sentence_list
 
 
 # Self test

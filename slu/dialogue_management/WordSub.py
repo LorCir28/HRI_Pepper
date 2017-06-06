@@ -37,7 +37,7 @@ import string
 class WordSub(dict):
     """All-in-one multiple-string-substitution class."""
 
-    def _wordToRegex(self, word):
+    def _word_to_regex(self, word):
         """Convert a word to a regex object which matches the word."""
         if word != "" and word[0].isalpha() and word[-1].isalpha():
             return "\\b%s\\b" % re.escape(word)
@@ -49,7 +49,7 @@ class WordSub(dict):
         dictionary.
 
         """
-        self._regex = re.compile("|".join(map(self._wordToRegex, self.keys())))
+        self._regex = re.compile("|".join(map(self._word_to_regex, self.keys())))
         self._regexIsDirty = False
 
     def __init__(self, defaults={}):

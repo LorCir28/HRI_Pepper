@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--author: Andrea Vanzo -->
+
+<!-- version 0.1 -->
+
+<aiml>
+
+<category>
+	<pattern>MOTION *</pattern> 
+	<template>
+		<srai>SEARCHGOAL <star index="1"/></srai>
+		<srai>SEARCHMANNER <star index="1"/></srai>
+	</template>
+</category>
+
+<category>
+	<pattern> SEARCHGOAL GOAL * </pattern> 
+	<template>
+		<star index="1"/>
+	</template>
+</category>
+
+<category>
+	<pattern> SEARCHMANNER MANNER *</pattern> 
+	<template>
+		<star index="1"/>
+	</template>
+</category>
+
+
+</aiml>

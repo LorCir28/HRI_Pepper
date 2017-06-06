@@ -62,11 +62,11 @@ class AimlHandler(ContentHandler):
         self._locator = Locator()
         self.setDocumentLocator(self._locator)
 
-    def getNumErrors(self):
+    def get_num_errors(self):
         "Return the number of errors found while parsing the current document."
         return self._numParseErrors
 
-    def setEncoding(self, encoding):
+    def set_encoding(self, encoding):
         """Set the text encoding to use when encoding strings read from XML.
 
         Defaults to 'UTF-8'.
@@ -80,7 +80,7 @@ class AimlHandler(ContentHandler):
         column = self._locator.getColumnNumber()
         return "(line %d, column %d)" % (line, column)
 
-    def _pushWhitespaceBehavior(self, attr):
+    def _push_whitespace_behavior(self, attr):
         """Push a new string onto the whitespaceBehaviorStack.
 
         The string's value is taken from the "xml:space" attribute, if it exists
@@ -120,7 +120,7 @@ class AimlHandler(ContentHandler):
 
         # process this start-element.
         try:
-            self._startElement(name, attr)
+            self._start_element(name, attr)
         except AimlParserError, msg:
             # Print the error message
             sys.stderr.write("PARSE ERROR: %s\n" % msg)
@@ -130,7 +130,7 @@ class AimlHandler(ContentHandler):
             if self._state >= self._STATE_InsideCategory:
                 self._skipCurrentCategory = True
 
-    def _startElement(self, name, attr):
+    def _start_element(self, name, attr):
         if name == "aiml":
             # <aiml> tags are only legal in the OutsideAiml state
             if self._state != self._STATE_OutsideAiml:
@@ -148,15 +148,7 @@ class AimlHandler(ContentHandler):
                 # print "         Defaulting to version 1.0"
                 self._version = "1.0"
             self._forwardCompatibleMode = (self._version != "1.0.1")
-            self._pushWhitespaceBehavior(attr)
-        # Not sure about this namespace business yet...
-        # try:
-        #	self._namespace = attr["xmlns"]
-        #	if self._version == "1.0.1" and self._namespace != "http://alicebot.org/2001/AIML-1.0.1":
-        #		raise AimlParserError, "Incorrect namespace for AIML v1.0.1 "+self._location()
-        # except KeyError:
-        #	if self._version != "1.0":
-        #		raise AimlParserError, "Missing 'version' attribute(s) in <aiml> tag "+self._location()
+            self._push_whitespace_behavior(attr)
         elif self._state == self._STATE_OutsideAiml:
             # If we're outside of an AIML element, we ignore all tags.
             return
@@ -180,7 +172,7 @@ class AimlHandler(ContentHandler):
             # If we're not inside a topic, the topic is implicitly set to *
             if not self._insideTopic: self._currentTopic = u"*"
             self._elemStack = []
-            self._pushWhitespaceBehavior(attr)
+            self._push_whitespace_behavior(attr)
         elif name == "pattern":
             # <pattern> tags are only legal in the InsideCategory state
             if self._state != self._STATE_InsideCategory:
@@ -201,7 +193,7 @@ class AimlHandler(ContentHandler):
                 self._currentThat = u"*"
             self._state = self._STATE_InsideTemplate
             self._elemStack.append(['template', {}])
-            self._pushWhitespaceBehavior(attr)
+            self._push_whitespace_behavior(attr)
         elif self._state == self._STATE_InsidePattern:
             # Certain tags are allowed inside <pattern> elements.
             if name == "bot" and attr.has_key("name") and attr["name"] == u"name":
@@ -229,7 +221,7 @@ class AimlHandler(ContentHandler):
             self._validateElemStart(name, attrDict, self._version)
             # Push the current element onto the element stack.
             self._elemStack.append([name.encode(self._encoding), attrDict])
-            self._pushWhitespaceBehavior(attr)
+            self._push_whitespace_behavior(attr)
             # If this is a condition element, push a new entry onto the
             # foundDefaultLiStack
             if name == "condition":
@@ -281,7 +273,7 @@ class AimlHandler(ContentHandler):
                 parentAttr = self._elemStack[-1][1]
                 required, optional, canBeParent = self._validInfo[parent]
                 nonBlockStyleCondition = (
-                parent == "condition" and not (parentAttr.has_key("name") and parentAttr.has_key("value")))
+                    parent == "condition" and not (parentAttr.has_key("name") and parentAttr.has_key("value")))
                 if not canBeParent:
                     raise AimlParserError, ("Unexpected text inside <%s> element " % parent) + self._location()
                 elif parent == "random" or nonBlockStyleCondition:
@@ -473,7 +465,7 @@ class AimlHandler(ContentHandler):
         for a in required:
             if a not in attr and not self._forwardCompatibleMode:
                 raise AimlParserError, ("Required \"%s\" attribute missing in <%s> element " % (
-                a, name)) + self._location()
+                    a, name)) + self._location()
         for a in attr:
             if a in required: continue
             if a[0:4] == "xml:": continue  # attributes in the "xml" namespace can appear anywhere
@@ -490,10 +482,10 @@ class AimlHandler(ContentHandler):
                         temp = int(v)
                     except:
                         raise AimlParserError, ("Bad type for \"%s\" attribute (expected integer, found \"%s\") " % (
-                        k, v)) + self._location()
+                            k, v)) + self._location()
                     if temp < 1:
                         raise AimlParserError, ("\"%s\" attribute must have non-negative value " % (
-                        k)) + self._location()
+                            k)) + self._location()
 
         # See whether the containing element is permitted to contain
         # subelements. If not, this element is invalid no matter what it is.
@@ -506,7 +498,7 @@ class AimlHandler(ContentHandler):
             raise AimlParserError, ("Element stack is empty while validating <%s> " % name) + self._location()
         required, optional, canBeParent = self._validInfo[parent]
         nonBlockStyleCondition = (
-        parent == "condition" and not (parentAttr.has_key("name") and parentAttr.has_key("value")))
+            parent == "condition" and not (parentAttr.has_key("name") and parentAttr.has_key("value")))
         if not canBeParent:
             raise AimlParserError, ("<%s> elements cannot have any contents " % parent) + self._location()
         # Special-case test if the parent element is <condition> (the
@@ -521,7 +513,7 @@ class AimlHandler(ContentHandler):
         elif name == "li":
             if not (parent == "random" or nonBlockStyleCondition):
                 raise AimlParserError, (
-                                       "Unexpected <li> element contained by <%s> element " % parent) + self._location()
+                                           "Unexpected <li> element contained by <%s> element " % parent) + self._location()
             if nonBlockStyleCondition:
                 if parentAttr.has_key("name"):
                     # Single-predicate condition.  Each <li> element except the

@@ -1,5 +1,6 @@
 import argparse
 import signal
+import slu_utils
 from event_abstract import *
 
 
@@ -14,9 +15,9 @@ class ReRanker(EventAbstractClass):
         self.verb_cost = verb_cost
         self.grammar_cost = grammar_cost
         self.nuance_cost = nuance_cost
-        self.noun_dictionary = self.__read_vocabulary(noun_dictionary)
-        self.verb_dictionary = self.__read_vocabulary(verb_dictionary)
-        self.nuance_grammar = self.__read_vocabulary(nuance_grammar)
+        self.noun_dictionary = slu_utils.lines_to_list(noun_dictionary)
+        self.verb_dictionary = slu_utils.lines_to_list(verb_dictionary)
+        self.nuance_grammar = slu_utils.lines_to_list(nuance_grammar)
         self.__shutdown_requested = False
         signal.signal(signal.SIGINT, self.signal_handler)
 
@@ -36,11 +37,11 @@ class ReRanker(EventAbstractClass):
     def callback(self, *args, **kwargs):
         print 'ReRanking..'
         temp = args[1]
-        transcriptions = self._convert_list_into_dict(temp)
+        transcriptions = slu_utils.list_to_dict(temp)
         if 'GoogleASR' in transcriptions:
             transcriptions = self.__re_rank(transcriptions)
         print transcriptions
-        self.memory.raiseEvent("VordReranked", transcriptions)
+        self.memory.raiseEvent("VRanked", transcriptions)
 
     def _spin(self, *args):
         while not self.__shutdown_requested:
@@ -52,21 +53,6 @@ class ReRanker(EventAbstractClass):
         print 'Caught Ctrl+C, stopping.'
         self.__shutdown_requested = True
         print 'Good-bye'
-
-    def _convert_list_into_dict(self, transcriptions):
-        d = {}
-        for asr in transcriptions:
-            counter = 0
-            d[asr[0]] = {}
-            for trans in asr[1]:
-                counter = counter + 1
-                d[asr[0]][trans] = counter
-        return d
-
-    def __read_vocabulary(self, vocabulary_file):
-        with open(vocabulary_file) as f:
-            vocabulary = f.readlines()
-        return [x.strip() for x in vocabulary]
 
     def __re_rank(self, transcriptions):
         """
@@ -92,52 +78,49 @@ class ReRanker(EventAbstractClass):
         for asr in transcriptions:
             n = len(transcriptions[asr])
             m = (n * (n + 1)) / 2
-            for trans in transcriptions[asr]:
-                transcriptions[asr][trans] = (float(transcriptions[asr][trans]) + float(self.alpha)) / (float(m) + float(self.alpha * n))
+            if len(transcriptions[asr]) > 1:
+                for trans in transcriptions[asr]:
+                    transcriptions[asr][trans] = (float(transcriptions[asr][trans]) + float(self.alpha)) / (float(m) + float(self.alpha * n))
         return transcriptions
 
     def __compute_noun_posterior(self, transcriptions):
         for asr in transcriptions:
-            for trans in transcriptions[asr]:
-                for noun in self.noun_dictionary:
-                    if noun in trans:
-                        transcriptions[asr][trans] = transcriptions[asr][trans] * float(self.noun_cost)
-            transcriptions[asr] = self.__normalize(transcriptions[asr])
+            if len(transcriptions[asr]) > 1:
+                for trans in transcriptions[asr]:
+                    for noun in self.noun_dictionary:
+                        if noun in trans:
+                            transcriptions[asr][trans] = transcriptions[asr][trans] * float(self.noun_cost)
+                transcriptions[asr] = slu_utils.normalize(transcriptions[asr])
         return transcriptions
 
     def __compute_verb_posterior(self, transcriptions):
         for asr in transcriptions:
-            for trans in transcriptions[asr]:
-                for noun in self.verb_dictionary:
-                    if noun in trans:
-                        transcriptions[asr][trans] = transcriptions[asr][trans] * float(self.verb_cost)
-            transcriptions[asr] = self.__normalize(transcriptions[asr])
+            if len(transcriptions[asr]) > 1:
+                for trans in transcriptions[asr]:
+                    for noun in self.verb_dictionary:
+                        if noun in trans:
+                            transcriptions[asr][trans] = transcriptions[asr][trans] * float(self.verb_cost)
+                transcriptions[asr] = slu_utils.normalize(transcriptions[asr])
         return transcriptions
 
     def __compute_grammar_posterior(self, transcriptions):
         for asr in transcriptions:
-            for trans in transcriptions[asr]:
-                for noun in self.nuance_grammar:
-                    if noun in trans:
-                        transcriptions[asr][trans] = transcriptions[asr][trans] * float(self.grammar_cost)
-            transcriptions[asr] = self.__normalize(transcriptions[asr])
+            if len(transcriptions[asr]) > 1:
+                for trans in transcriptions[asr]:
+                    for noun in self.nuance_grammar:
+                        if noun in trans:
+                            transcriptions[asr][trans] = transcriptions[asr][trans] * float(self.grammar_cost)
+                transcriptions[asr] = slu_utils.normalize(transcriptions[asr])
         return transcriptions
 
     def __compute_nuance_posterior(self, transcriptions):
         for asr in transcriptions:
-            for trans in transcriptions[asr]:
-                if trans in transcriptions['NuanceASR']:
-                    transcriptions[asr][trans] = transcriptions[asr][trans] * float(self.nuance_cost)
-            transcriptions[asr] = self.__normalize(transcriptions[asr])
+            if len(transcriptions[asr]) > 1:
+                for trans in transcriptions[asr]:
+                    if trans in transcriptions['NuanceASR']:
+                        transcriptions[asr][trans] = transcriptions[asr][trans] * float(self.nuance_cost)
+                transcriptions[asr] = slu_utils.normalize(transcriptions[asr])
         return transcriptions
-
-    def __normalize(self, sublist):
-        m = .0
-        for trans in sublist:
-            m = m + sublist[trans]
-        for trans in sublist:
-            sublist[trans] = sublist[trans] / m
-        return sublist
 
 
 def main():
