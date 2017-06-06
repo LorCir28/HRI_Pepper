@@ -8,7 +8,8 @@ modules that enable a fast design, development and deployment
 of effective interactions through Natural Language with the Pepper robot.
 
 It provides the following modules:
- * **Speech-To-Text** -> ``speech_to_text``
+ 
+ *  **Speech-To-Text** -> ``speech_to_text``
  * **Speech Re-Ranking** -> ``speech_reranking``
  * **Language Understanding** -> ``language_understanding``
  * **Dialogue Management** -> ``dialogue_management``
@@ -23,10 +24,12 @@ It provides the following modules:
 To use the modules, you need to set the library in the `PYTHONPATH`.
 
  * **Linux**
+ 
  ~~~
  echo 'export PYTHONPATH=${PYTHONPATH}:/path/to/library' >> ~/.bashrc
  ~~~
  * **Mac**
+ 
  ~~~
  echo 'export PYTHONPATH=${PYTHONPATH}:/path/to/library' >> ~/.bash_profile
  ~~~
