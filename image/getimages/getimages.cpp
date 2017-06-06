@@ -16,6 +16,9 @@
 #include <alvision/alvisiondefinitions.h>
 #include <alerror/alerror.h>
 
+// Boost includes.
+#include <boost/program_options.hpp>
+
 #include <iostream>
 #include <string>
 
@@ -27,11 +30,11 @@ using namespace AL;
 *
 * \param robotIp the IP adress of the robot
 */
-void showImages(const std::string& robotIp)
+void showImages(const std::string& robotIp, int port)
 {
 
   /** Create a proxy to ALVideoDevice on the robot.*/
-  ALVideoDeviceProxy camProxy(robotIp, 9559);
+  ALVideoDeviceProxy camProxy(robotIp, port);
 
   /** Subscribe a client image requiring 320*240 and BGR colorspace.*/
   const std::string clientName = camProxy.subscribe("test", kQVGA, kBGRColorSpace, 30);
@@ -76,25 +79,31 @@ void showImages(const std::string& robotIp)
 
 
 
-int main(int argc, char* argv[])
+int main(int argc, char** argv)
 {
-  if (argc < 2)
-  {
-    std::cerr << "Usage 'getimages robotIp'" << std::endl;
-    return 1;
-  }
+  namespace po = boost::program_options;
 
-  const std::string robotIp(argv[1]);
+  po::options_description description("Options");
+  description.add_options()
+    ("help", "Displays this help message")
+    ("pip", po::value<std::string>()->default_value(std::getenv("PEPPER_IP")), "Robot IP address.  On robot or Local Naoqi: use '127.0.0.1'.")
+    ("pport", po::value<int>()->default_value(9559), "Naoqi port number.")
+    ;
 
-  try
-  {
-    showImages(robotIp);
-  }
-  catch (const AL::ALError& e)
-  {
-    std::cerr << "Caught exception " << e.what() << std::endl;
-  }
+  po::variables_map vm;
+  po::store(po::parse_command_line(argc, argv, description), vm);
+  po::notify(vm);
+  
+  // --help option
+  if (vm.count("help")){ 
+    std::cout << description << std::endl; 
+    return 0; 
+  } 
 
-  return 0;
+  const std::string pip = vm["pip"].as<std::string>();
+  int pport = vm["pport"].as<int>();
+  
+  showImages(pip, pport);
+  
 }
 
