@@ -1,9 +1,3 @@
-HOW TO COMPILE
-==============
-
-**
-
-
 # How to compile
 **OpenCV** library within **NAOqi C++ SDK** is not ready to use visualization functions such as ```cv::namedWindow``` or ```cv::imshow```.
 For this reason, you have to replace the **OpenCV** libraries **NAOqi C++ SDK** by another version of the libraries in which these functions are implemented.  
