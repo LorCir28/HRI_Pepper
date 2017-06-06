@@ -66,7 +66,6 @@ optional arguments:
 
  * Check the availability of the network connection (Google requirement): if not, deactivate Google ASR
  * Catch the requests limit error
- * Check is the v2 of Google APIs is still available
 
 ###Speech Re-Ranking
 

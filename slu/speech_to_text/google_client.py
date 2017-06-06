@@ -13,7 +13,7 @@ class GoogleClient:
     def __init__(self, language, key_file):
         keys = slu_utils.lines_to_list(key_file)
         q = {"output": "json", "lang": language, "key": keys[0]}
-        self.url = "http://www.google.com/speech_to_text-api/v2/recognize?%s" % (urllib.urlencode(q))
+        self.url = "https://www.google.com/speech-api/v2/recognize?%s" % (urllib.urlencode(q))
 
     def recognize_file(self, file_path):
         try:
@@ -70,7 +70,8 @@ class GoogleClient:
 
 def main():
     g = GoogleClient("en-US", "google_keys.txt")
-    print g.recognize_file('file.flac')
+    while True:
+        print g.recognize_file('file.flac')
 
 
 if __name__ == "__main__":
