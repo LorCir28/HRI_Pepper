@@ -44,7 +44,7 @@ def onHeadFrontTouched(motion_service, value):
         movingForward = True
         motion_service.move(x, y, theta)
     else:
-        print "Stoping."
+        print "Stopping."
         movingForward = False
         motion_service.stopMove()
 
