@@ -111,7 +111,7 @@ def rhMonitorThread (memory_service):
     t = threading.currentThread()
     while getattr(t, "do_run", True):
         laserValues =  memory_service.getListData(laserValueList)
-        print laserValues[44],laserValues[45]
+        print laserValues[42],laserValues[44],laserValues[46] # X values of central beams
         time.sleep(0.1)
     print "Exiting Thread"
 
