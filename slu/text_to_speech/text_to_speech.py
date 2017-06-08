@@ -13,6 +13,8 @@ class TextToSpeech(EventAbstractClass):
         self.__shutdown_requested = False
         signal.signal(signal.SIGINT, self.signal_handler)
         self.tts = ALProxy("ALAnimatedSpeech")
+        self.breathing = ALProxy("ALMotion")
+        self.breathing.setBreathEnabled('Arms', True)
         self.configuration = {"bodyLanguageMode": body_language_mode}
 
     def start(self, *args, **kwargs):
@@ -21,7 +23,7 @@ class TextToSpeech(EventAbstractClass):
             callback=self.callback
         )
 
-        print "Subscribers:", self.memory.getSubscribers(TextToSpeech.EVENT_NAME)
+        print "[" + self.inst.__class__.__name__ + "] Subscribers:", self.memory.getSubscribers(TextToSpeech.EVENT_NAME)
 
         self._spin()
 
@@ -29,7 +31,6 @@ class TextToSpeech(EventAbstractClass):
         self.broker.shutdown()
 
     def callback(self, *args, **kwargs):
-
         self.tts.say(args[1], self.configuration)
 
     def _spin(self, *args):
@@ -37,11 +38,12 @@ class TextToSpeech(EventAbstractClass):
             for f in args:
                 f()
             time.sleep(.1)
+        self.breathing.setBreathEnabled("Arms", False)
 
     def signal_handler(self, signal, frame):
-        print 'Caught Ctrl+C, stopping.'
+        print "[" + self.inst.__class__.__name__ + "] Caught Ctrl+C, stopping."
         self.__shutdown_requested = True
-        print 'Good-bye'
+        print "[" + self.inst.__class__.__name__ + "] Good-bye"
 
 
 def main():

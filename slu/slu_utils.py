@@ -1,4 +1,3 @@
-
 def lines_to_list(_file):
     with open(_file) as f:
         _list = f.readlines()
@@ -41,4 +40,4 @@ def pick_best(transcriptions):
             if transcriptions[asr][hypo] < confidence:
                 best_hypo = hypo
                 confidence = transcriptions[asr][hypo]
-    return hypo
+    return best_hypo

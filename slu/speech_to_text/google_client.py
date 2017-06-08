@@ -6,7 +6,7 @@ import slu_utils
 
 
 class GoogleClient:
-    timeout = 10000
+    timeout = 5
     url = ''
     headers = {"Content-Type": "audio/x-flac; rate=16000"}
 
@@ -17,12 +17,11 @@ class GoogleClient:
 
     def recognize_file(self, file_path):
         try:
-            print '[GOOGLE] Recognizing..'
+            print "[" + self.inst.__class__.__name__ + "] [GOOGLE] Recognizing.."
             transcriptions = []
             data = open(file_path, "rb").read()
             response = requests.post(self.url, headers=self.headers, data=data, timeout=self.timeout)
             json_units = response.text.split(os.linesep)
-            print json_units
             for unit in json_units:
                 if not unit:
                     continue
@@ -35,16 +34,15 @@ class GoogleClient:
                             transcriptions.append(result["transcript"])
             return transcriptions
         except ValueError as ve:
-            print '[RECOGNIZE]ERROR! Google APIs are temporary unavailable. Returning empty list..'
+            print "[" + self.inst.__class__.__name__ + "] [RECOGNIZE]ERROR! Google APIs are temporary unavailable. Returning empty list.."
             return []
         except requests.exceptions.RequestException as e:
-            print e
-            print '[RECOGNIZE]ERROR! Unable to reach Google. Returning empty list..'
+            print "[" + self.inst.__class__.__name__ + "] [RECOGNIZE]ERROR! Unable to reach Google. Returning empty list.."
             return []
 
     def recognize_data(self, data):
         try:
-            print '[GOOGLE] Recognizing..'
+            print "[" + self.inst.__class__.__name__ + "] [GOOGLE] Recognizing.."
             transcriptions = []
             response = requests.post(self.url, headers=self.headers, data=data, timeout=self.timeout)
             json_units = response.text.split(os.linesep)
@@ -60,18 +58,17 @@ class GoogleClient:
                             transcriptions.append(result["transcript"])
             return transcriptions
         except ValueError as ve:
-            print '[RECOGNIZE]ERROR! Google APIs are temporary unavailable. Returning empty list..'
+            print "[" + self.inst.__class__.__name__ + "] [RECOGNIZE]ERROR! Google APIs are temporary unavailable. Returning empty list.."
             return []
         except requests.exceptions.RequestException as e:
-            print e
-            print '[RECOGNIZE]ERROR! Unable to reach Google. Returning empty list..'
+            print "[" + self.inst.__class__.__name__ + "] [RECOGNIZE]ERROR! Unable to reach Google. Returning empty list.."
             return []
 
 
 def main():
-    g = GoogleClient("en-US", "google_keys.txt")
+    g = GoogleClient("en-US", "resources/google_keys.txt")
     while True:
-        print g.recognize_file('file.flac')
+        print g.recognize_file('resources/recording.flac')
 
 
 if __name__ == "__main__":

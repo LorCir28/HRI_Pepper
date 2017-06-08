@@ -27,7 +27,7 @@ class ReRanker(EventAbstractClass):
             callback=self.callback
         )
 
-        print "Subscribers:", self.memory.getSubscribers(ReRanker.EVENT_NAME)
+        print "[" + self.inst.__class__.__name__ + "] Subscribers:", self.memory.getSubscribers(ReRanker.EVENT_NAME)
 
         self._spin()
 
@@ -35,12 +35,12 @@ class ReRanker(EventAbstractClass):
         self.broker.shutdown()
 
     def callback(self, *args, **kwargs):
-        print 'ReRanking..'
+        print "[" + self.inst.__class__.__name__ + "] ReRanking.."
         temp = args[1]
         transcriptions = slu_utils.list_to_dict(temp)
         if 'GoogleASR' in transcriptions:
             transcriptions = self.__re_rank(transcriptions)
-        print transcriptions
+            print "[" + self.inst.__class__.__name__ + "] " + transcriptions
         self.memory.raiseEvent("VRanked", transcriptions)
 
     def _spin(self, *args):
@@ -50,9 +50,9 @@ class ReRanker(EventAbstractClass):
             time.sleep(.1)
 
     def signal_handler(self, signal, frame):
-        print 'Caught Ctrl+C, stopping.'
+        print "[" + self.inst.__class__.__name__ + "] Caught Ctrl+C, stopping."
         self.__shutdown_requested = True
-        print 'Good-bye'
+        print "[" + self.inst.__class__.__name__ + "] Good-bye"
 
     def __re_rank(self, transcriptions):
         """
@@ -71,7 +71,7 @@ class ReRanker(EventAbstractClass):
         transcriptions = self.__compute_noun_posterior(transcriptions)
         transcriptions = self.__compute_verb_posterior(transcriptions)
         transcriptions = self.__compute_grammar_posterior(transcriptions)
-        transcriptions = self.__compute_nuance_posterior(transcriptions)
+        transcriptions = self.__compute_overlap_posterior(transcriptions)
         return transcriptions
 
     def __compute_prior(self, transcriptions):
@@ -113,7 +113,7 @@ class ReRanker(EventAbstractClass):
                 transcriptions[asr] = slu_utils.normalize(transcriptions[asr])
         return transcriptions
 
-    def __compute_nuance_posterior(self, transcriptions):
+    def __compute_overlap_posterior(self, transcriptions):
         for asr in transcriptions:
             if len(transcriptions[asr]) > 1:
                 for trans in transcriptions[asr]:
@@ -138,13 +138,13 @@ def main():
                         help="Cost for the verb posterior distribution")
     parser.add_argument("-g", "--grammar-cost", type=float, default=.1,
                         help="Cost for the grammar posterior distribution")
-    parser.add_argument("-u", "--nuance-cost", type=float, default=.1,
-                        help="Cost for the Nuance posterior distribution")
-    parser.add_argument("--noun-dictionary", type=str, default="noun_dictionary.txt",
+    parser.add_argument("-o", "--overlap-cost", type=float, default=.1,
+                        help="Cost for the overlap posterior distribution")
+    parser.add_argument("--noun-dictionary", type=str, default="resources/noun_dictionary.txt",
                         help="A txt file containing the list of domain nouns")
-    parser.add_argument("--verb-dictionary", type=str, default="verb_dictionary.txt",
+    parser.add_argument("--verb-dictionary", type=str, default="resources/verb_dictionary.txt",
                         help="A txt file containing the list of domain verbs")
-    parser.add_argument("--nuance-grammar", type=str, default="nuance_grammar.txt",
+    parser.add_argument("--nuance-grammar", type=str, default="resources/nuance_grammar.txt",
                         help="A txt file containing the list of sentences composing the vocabulary")
 
     args = parser.parse_args()

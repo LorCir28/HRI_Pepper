@@ -25,7 +25,7 @@ class DialogueManager(EventAbstractClass):
             callback=self.callback
         )
 
-        print "Subscribers:", self.memory.getSubscribers(DialogueManager.EVENT_NAME)
+        print "[" + self.inst.__class__.__name__ + "] Subscribers:", self.memory.getSubscribers(DialogueManager.EVENT_NAME)
 
         self._spin()
 
@@ -35,9 +35,9 @@ class DialogueManager(EventAbstractClass):
     def callback(self, *args, **kwargs):
         transcriptions_dict = slu_utils.list_to_dict_w_probabilities(args[1])
         best_transcription = slu_utils.pick_best(transcriptions_dict)
-        print 'User says: ' + best_transcription
+        print "[" + self.inst.__class__.__name__ + "] User says: " + best_transcription
         reply = self.kernel.respond(best_transcription)
-        print 'Robot says: ' + reply
+        print "[" + self.inst.__class__.__name__ + "] Robot says: " + reply
         self.memory.raiseEvent("Veply", reply)
 
     def _spin(self, *args):
@@ -47,16 +47,16 @@ class DialogueManager(EventAbstractClass):
             time.sleep(.1)
 
     def signal_handler(self, signal, frame):
-        print 'Caught Ctrl+C, stopping.'
+        print "[" + self.inst.__class__.__name__ + "] Caught Ctrl+C, stopping."
         self.__shutdown_requested = True
-        print 'Good-bye'
+        print "[" + self.inst.__class__.__name__ + "] Good-bye"
 
     def __learn(self, path):
         for root, directories, file_names in os.walk(path):
             for filename in file_names:
                 if filename.endswith('.aiml'):
                     self.kernel.learn(os.path.join(root, filename))
-        print 'Number of categories: ' + str(self.kernel.num_categories())
+        print "[" + self.inst.__class__.__name__ + "] Number of categories: " + str(self.kernel.num_categories())
 
 
 def main():
@@ -66,7 +66,7 @@ def main():
                         help="Robot ip address")
     parser.add_argument("-p", "--pport", type=int, default=9559,
                         help="Robot port number")
-    parser.add_argument("-a", "--aiml-path", type=str, default="kbs",
+    parser.add_argument("-a", "--aiml-path", type=str, default="resources/aiml_kbs",
                         help="Path to the root folder of AIML Knowledge Base")
     args = parser.parse_args()
 

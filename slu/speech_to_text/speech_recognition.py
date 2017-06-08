@@ -1,16 +1,17 @@
 import argparse
 import signal
-import slu_utils
 from naoqi import ALProxy, ALBroker, ALModule
 from google_client import *
 from event_abstract import *
 
 
 class SpeechRecognition(EventAbstractClass):
-    EVENT_NAME = "WordRecognized"
+    WR_EVENT = "WordRecognized"
+    TD_EVENT = "ALTextToSpeech/TextDone"
     FLAC_COMM = 'flac -f '
     FILE_PATH = '/tmp/recording'
     CHANNELS = [0, 0, 1, 0]
+    timeout = 0
 
     def __init__(self, ip, port, language, word_spotting, audio, visual, vocabulary_file, google_keys):
         super(self.__class__, self).__init__(self, ip, port)
@@ -39,24 +40,30 @@ class SpeechRecognition(EventAbstractClass):
 
     def start(self, *args, **kwargs):
         self.subscribe(
-            event=SpeechRecognition.EVENT_NAME,
-            callback=self.callback
+            event=SpeechRecognition.WR_EVENT,
+            callback=self.word_recognized_callback
+        )
+        self.subscribe(
+            event=SpeechRecognition.TD_EVENT,
+            callback=self.text_done_callback
         )
 
-        print "Subscribers:", self.memory.getSubscribers(SpeechRecognition.EVENT_NAME)
+        print "[" + self.inst.__class__.__name__ + "] Subscribers:", self.memory.getSubscribers(SpeechRecognition.WR_EVENT)
+        print "[" + self.inst.__class__.__name__ + "] Subscribers:", self.memory.getSubscribers(SpeechRecognition.TD_EVENT)
 
         self.audio_recorder.stopMicrophonesRecording()
         self.audio_recorder.startMicrophonesRecording(self.FILE_PATH + ".wav", "wav", 16000, self.CHANNELS)
 
         self._spin()
 
-        self.unsubscribe(SpeechRecognition.EVENT_NAME)
+        self.unsubscribe(SpeechRecognition.WR_EVENT)
+        self.unsubscribe(SpeechRecognition.TD_EVENT)
         self.broker.shutdown()
 
     def stop(self):
         self.audio_recorder.stopMicrophonesRecording()
         self.__shutdown_requested = True
-        print 'Good-bye'
+        print '[' + self.inst.__class__.__name__ + '] Good-bye'
 
     def configure(self, word_spotting, nuance_language, audio, visual, vocabulary):
         self.nuance_asr.pause(True)
@@ -66,8 +73,9 @@ class SpeechRecognition(EventAbstractClass):
         self.nuance_asr.setVisualExpression(visual)
         self.nuance_asr.pause(False)
 
-    def callback(self, *args, **kwargs):
+    def word_recognized_callback(self, *args, **kwargs):
         self.audio_recorder.stopMicrophonesRecording()
+        self.nuance_asr.pause(True)
         """
         Convert Wave file into Flac file
         """
@@ -79,20 +87,41 @@ class SpeechRecognition(EventAbstractClass):
         results = {}
         results['GoogleASR'] = [r.encode('ascii', 'ignore').lower() for r in self.google_asr.recognize_data(flac_cont)]
         results['NuanceASR'] = [args[1][0].lower()]
+        print "[" + self.inst.__class__.__name__ + "] " + results
+        self.timeout = 0
+        self.nuance_asr.pause(False)
         self.audio_recorder.startMicrophonesRecording(self.FILE_PATH + ".wav", "wav", 16000, self.CHANNELS)
         self.memory.raiseEvent("VordRecognized", results)
+
+    def text_done_callback(self, *args, **kwargs):
+        if args[1] == 0:
+            self.audio_recorder.stopMicrophonesRecording()
+            self.nuance_asr.pause(True)
+        else:
+            self.audio_recorder.startMicrophonesRecording(self.FILE_PATH + ".wav", "wav", 16000, self.CHANNELS)
+            self.nuance_asr.pause(False)
+
+    def reset(self):
+
+        print "[" + self.inst.__class__.__name__ + "] Reset recording.."
+        self.audio_recorder.stopMicrophonesRecording()
+        self.audio_recorder.startMicrophonesRecording(self.FILE_PATH + ".wav", "wav", 16000, self.CHANNELS)
 
     def _spin(self, *args):
         while not self.__shutdown_requested:
             for f in args:
                 f()
             time.sleep(.1)
+            self.timeout = self.timeout + 1
+            if self.timeout > 400:
+                self.timeout = 0
+                self.reset()
 
     def signal_handler(self, signal, frame):
-        print 'Caught Ctrl+C, stopping.'
+        print "[" + self.inst.__class__.__name__ + "] Caught Ctrl+C, stopping."
         self.audio_recorder.stopMicrophonesRecording()
         self.__shutdown_requested = True
-        print 'Good-bye'
+        print "[" + self.inst.__class__.__name__ + "] Good-bye"
 
 
 def main():
@@ -110,9 +139,9 @@ def main():
                         help="Turn off bip sound when recognition starts")
     parser.add_argument("--no-visual", action="store_true",
                         help="Turn off blinking eyes when recognition starts")
-    parser.add_argument("-v", "--vocabulary", type=str, default="nuance_grammar.txt",
+    parser.add_argument("-v", "--vocabulary", type=str, default="resources/nuance_grammar.txt",
                         help="A txt file containing the list of sentences composing the vocabulary")
-    parser.add_argument("-k", "--keys", type=str, default="google_keys.txt",
+    parser.add_argument("-k", "--keys", type=str, default="resources/google_keys.txt",
                         help="A txt file containing the list of the keys for the Google ASR")
     args = parser.parse_args()
 

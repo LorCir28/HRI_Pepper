@@ -34,11 +34,10 @@ class LU4RClient:
     def status(self):
         try:
             response = requests.post(self.LU4R_STATUS_URL, {}, headers=self.HEADERS)
-            print response.text
+            print "[" + self.inst.__class__.__name__ + "]" + response.text
             return 1
         except requests.exceptions.RequestException as e:
-            print e
-            print '[STATUS]ERROR! LU4R is not running. Launch it and retry.'
+            print "[" + self.inst.__class__.__name__ + "] [STATUS]ERROR! LU4R is not running. Launch it and retry."
             return 0
 
     def info(self):
@@ -46,8 +45,7 @@ class LU4RClient:
             response = requests.post(self.LU4R_INFO_URL, {}, headers=self.HEADERS)
             return response.text
         except requests.exceptions.RequestException as e:
-            print e
-            print '[INFO]ERROR! LU4R is not running. Launch it and retry.'
+            print "[" + self.inst.__class__.__name__ + "] [INFO]ERROR! LU4R is not running. Launch it and retry."
             return 0
 
     def parse_sentence(self, sentence):
@@ -57,11 +55,10 @@ class LU4RClient:
             response = requests.post(self.LU4R_PARSE_URL, to_send, headers=self.HEADERS)
             return response.text
         except requests.exceptions.RequestException as e:
-            print '[PARSE]ERROR! LU4R cannot to parse.'
+            print "[" + self.inst.__class__.__name__ + "] [PARSE]ERROR! LU4R cannot to parse."
 
     def parse_sentences(self, sentences):
         sentences_dict = []
-        hypothesis = {}
         counter = 1;
         for sentence in sentences:
             hypothesis = dict()
@@ -76,10 +73,10 @@ class LU4RClient:
             response = requests.post(self.LU4R_PARSE_URL, to_send, headers=self.HEADERS)
             return response.text
         except requests.exceptions.RequestException as e:
-            print '[PARSE]ERROR! LU4R cannot to parse.'
+            print "[" + self.inst.__class__.__name__ + "] [PARSE]ERROR! LU4R cannot to parse."
 
     def parse_sentence_perceptual(self, sentence, entities):
         if self.chain_type != 'SIMPLE':
-            print "[WARNING]BASIC chain active. Perceptual information will be neglected."
+            print "[" + self.inst.__class__.__name__ + "] [WARNING]BASIC chain active. Perceptual information will be neglected."
         self.json_entities = entities
         return self.parse_sentence(sentence)
