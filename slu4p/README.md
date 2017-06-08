@@ -207,9 +207,6 @@ optional arguments:
 ##Author
 
 * **Andrea Vanzo** - [andrea.vanzo1@gmail.com](mailto:andrea.vanzo1@gmail.com)
-<!--* [Website](http://www.dis.uniroma1.it/~vanzo/) * [GitHub](https://github.com/andreavanzo)* [BitBucket](https://bitbucket.org/andrea_vanzo/)
--->
-
 
 ##Acknowledgements
 
