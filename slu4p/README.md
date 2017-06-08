@@ -30,17 +30,24 @@ To use the modules, the whole package needs to be uploaded directly on the Peppe
 
  * **Linux**
  
- ~~~
- echo 'export PYTHONPATH=${PYTHONPATH}:/path/to/library' >> ~/.bashrc
- source ~/.bashrc
- ~~~
+```
+$ echo 'export PYTHONPATH=${PYTHONPATH}:/path/to/library' >> ~/.bashrc
+$ source ~/.bashrc
+```
  
  * **Mac**
  
- ~~~
- echo 'export PYTHONPATH=${PYTHONPATH}:/path/to/library' >> ~/.bash_profile
- source ~/.bash_profile
- ~~~
+```
+$ echo 'export PYTHONPATH=${PYTHONPATH}:/path/to/library' >> ~/.bash_profile
+$ source ~/.bash_profile
+```
+
+##Running
+The system can be lauched either by individually running each module (see below) or using the following provided bash script:
+
+```
+WIP
+```
 
 ###Speech-To-Text
 
@@ -60,7 +67,7 @@ The subscription to the `ALTextToSpeech/TextDone` event is essential to avoid po
     * *Nuance grammar*: a text file that contains, for each line, a keyword/sentence to be recognized by Nuance ASR.
     * *GoogleAPI keys*: a text file where, in each line, a Google key is provided.
 
-~~~
+```
 usage: speech_recognition.py [-h] [-i PIP] [-p PPORT] [-l LANG]
                              [--word-spotting] [--no-audio] [--no-visual]
                              [-v VOCABULARY] [-k KEYS]
@@ -80,7 +87,7 @@ optional arguments:
                         the vocabulary
   -k KEYS, --keys KEYS  A txt file containing the list of the keys for the
                         Google ASR
-~~~
+```
 
 #####TODO
 
@@ -110,7 +117,7 @@ The module subscribes the `VordRecognized` event and, once the new ranking has b
  * **Dependencies**
     * `Speech Recognition`
 
-~~~
+```
 usage: reranker.py [-h] [-i PIP] [-p PPORT] [-a ALPHA] [-n NOUN_COST]
                    [-v VERB_COST] [-g GRAMMAR_COST] [-o OVERLAP_COST]
                    [--noun-dictionary NOUN_DICTIONARY]
@@ -140,7 +147,7 @@ optional arguments:
   --nuance-grammar NUANCE_GRAMMAR
                         A txt file containing the list of sentences composing
                         the vocabulary
-~~~
+```
 
 ###Language Understanding
 
@@ -164,7 +171,7 @@ Whenever the Re-Ranking module raises the `VRanked` event, this module picks the
  * **Dependencies**
     * `Speech Recognition`
 
-~~~
+```
 usage: dialogue_manager.py [-h] [-i PIP] [-p PPORT] [-a AIML_PATH]
 
 optional arguments:
@@ -174,7 +181,7 @@ optional arguments:
                         Robot port number
   -a AIML_PATH, --aiml-path AIML_PATH
                         Path to the root folder of AIML Knowledge Base
-~~~
+```
 
 ###Text-To-Speech
 
@@ -184,7 +191,7 @@ This module is the end of the processing chain. Its purpose is to generate a spe
     * `Speech Recognition`
     * `Dialogue Management`
 
-~~~
+```
 usage: text_to_speech.py [-h] [-i PIP] [-p PPORT]
                          [-l {contextual,random,disabled}]
 
@@ -195,7 +202,7 @@ optional arguments:
                         Robot port number
   -l {contextual,random,disabled}, --language-mode {contextual,random,disabled}
                         The body language modality while speaking
-~~~
+```
 
 ##Author
 
