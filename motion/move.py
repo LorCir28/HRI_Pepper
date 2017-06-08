@@ -36,8 +36,6 @@ def init():
     app.start()
     session = app.session
 
-    print 'Done'
-
     #Starting services
     motion_service = session.service("ALMotion")
 
@@ -100,15 +98,14 @@ def main():
     
     init()
 
-    #square(0.5)
-    #circle(0)
-    #turn(0.7)
-
     forward()
     left()
     right(2)
     left()
     backward()
+
+    #square(0.5)
+    #circle(0)
 
 
 

@@ -18,17 +18,26 @@ def main():
     pip = args.pip
     pport = args.pport
 
-    #Start working session
-    session = qi.Session()
+    print "Connecting to tcp://" + pip + ":" + str(pport)
+
+	#Starting application
     try:
-        session.connect("tcp://" + pip + ":" + str(pport))
+        connection_url = "tcp://" + pip + ":" + str(pport)
+        app = qi.Application(["Move", "--qi-url=" + connection_url ])
     except RuntimeError:
         print ("Can't connect to Naoqi at ip \"" + pip + "\" on port " + str(pport) +".\n"
                "Please check your script arguments. Run with -h option for help.")
         sys.exit(1)
 
+    app.start()
+    session = app.session
+
+
+
     #Starting services
     motion_service = session.service("ALMotion")
+
+    print 'Stop'
 
     motion_service.stopMove() 
     
@@ -36,3 +45,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
