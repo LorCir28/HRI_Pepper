@@ -17,7 +17,7 @@ class GoogleClient:
 
     def recognize_file(self, file_path):
         try:
-            print "[" + self.inst.__class__.__name__ + "] [GOOGLE] Recognizing.."
+            print "[" + self.__class__.__name__ + "] [GOOGLE] Recognizing.."
             transcriptions = []
             data = open(file_path, "rb").read()
             response = requests.post(self.url, headers=self.headers, data=data, timeout=self.timeout)
@@ -42,7 +42,7 @@ class GoogleClient:
 
     def recognize_data(self, data):
         try:
-            print "[" + self.inst.__class__.__name__ + "] [GOOGLE] Recognizing.."
+            print "[" + self.__class__.__name__ + "] [GOOGLE] Recognizing.."
             transcriptions = []
             response = requests.post(self.url, headers=self.headers, data=data, timeout=self.timeout)
             json_units = response.text.split(os.linesep)

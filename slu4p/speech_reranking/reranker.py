@@ -1,6 +1,6 @@
 import argparse
 import signal
-import slu_utils
+from slu_utils import *
 from event_abstract import *
 
 
@@ -8,16 +8,17 @@ class ReRanker(EventAbstractClass):
     PATH = ''
     EVENT_NAME = "VordRecognized"
 
-    def __init__(self, ip, port, alpha, noun_cost, verb_cost, grammar_cost, nuance_cost, noun_dictionary, verb_dictionary, nuance_grammar):
+    def __init__(self, ip, port, alpha, noun_cost, verb_cost, grammar_cost, nuance_cost, noun_dictionary,
+                 verb_dictionary, nuance_grammar):
         super(self.__class__, self).__init__(self, ip, port)
         self.alpha = alpha
         self.noun_cost = noun_cost
         self.verb_cost = verb_cost
         self.grammar_cost = grammar_cost
         self.nuance_cost = nuance_cost
-        self.noun_dictionary = slu_utils.lines_to_list(noun_dictionary)
-        self.verb_dictionary = slu_utils.lines_to_list(verb_dictionary)
-        self.nuance_grammar = slu_utils.lines_to_list(nuance_grammar)
+        self.noun_dictionary = lines_to_list(noun_dictionary)
+        self.verb_dictionary = lines_to_list(verb_dictionary)
+        self.nuance_grammar = lines_to_list(nuance_grammar)
         self.__shutdown_requested = False
         signal.signal(signal.SIGINT, self.signal_handler)
 
@@ -37,11 +38,15 @@ class ReRanker(EventAbstractClass):
     def callback(self, *args, **kwargs):
         print "[" + self.inst.__class__.__name__ + "] ReRanking.."
         temp = args[1]
-        transcriptions = slu_utils.list_to_dict(temp)
+        transcriptions = list_to_dict(temp)
         if 'GoogleASR' in transcriptions:
             transcriptions = self.__re_rank(transcriptions)
-            print "[" + self.inst.__class__.__name__ + "] " + transcriptions
+            print "[" + self.inst.__class__.__name__ + "] " + str(transcriptions)
         self.memory.raiseEvent("VRanked", transcriptions)
+
+    def stop(self):
+        self.__shutdown_requested = True
+        print '[' + self.inst.__class__.__name__ + '] Good-bye'
 
     def _spin(self, *args):
         while not self.__shutdown_requested:
@@ -80,7 +85,8 @@ class ReRanker(EventAbstractClass):
             m = (n * (n + 1)) / 2
             if len(transcriptions[asr]) > 1:
                 for trans in transcriptions[asr]:
-                    transcriptions[asr][trans] = (float(transcriptions[asr][trans]) + float(self.alpha)) / (float(m) + float(self.alpha * n))
+                    transcriptions[asr][trans] = (float(transcriptions[asr][trans]) + float(self.alpha)) / (
+                    float(m) + float(self.alpha * n))
         return transcriptions
 
     def __compute_noun_posterior(self, transcriptions):
@@ -90,7 +96,7 @@ class ReRanker(EventAbstractClass):
                     for noun in self.noun_dictionary:
                         if noun in trans:
                             transcriptions[asr][trans] = transcriptions[asr][trans] * float(self.noun_cost)
-                transcriptions[asr] = slu_utils.normalize(transcriptions[asr])
+                transcriptions[asr] = normalize(transcriptions[asr])
         return transcriptions
 
     def __compute_verb_posterior(self, transcriptions):
@@ -100,7 +106,7 @@ class ReRanker(EventAbstractClass):
                     for noun in self.verb_dictionary:
                         if noun in trans:
                             transcriptions[asr][trans] = transcriptions[asr][trans] * float(self.verb_cost)
-                transcriptions[asr] = slu_utils.normalize(transcriptions[asr])
+                transcriptions[asr] = normalize(transcriptions[asr])
         return transcriptions
 
     def __compute_grammar_posterior(self, transcriptions):
@@ -110,7 +116,7 @@ class ReRanker(EventAbstractClass):
                     for noun in self.nuance_grammar:
                         if noun in trans:
                             transcriptions[asr][trans] = transcriptions[asr][trans] * float(self.grammar_cost)
-                transcriptions[asr] = slu_utils.normalize(transcriptions[asr])
+                transcriptions[asr] = normalize(transcriptions[asr])
         return transcriptions
 
     def __compute_overlap_posterior(self, transcriptions):
@@ -119,7 +125,7 @@ class ReRanker(EventAbstractClass):
                 for trans in transcriptions[asr]:
                     if trans in transcriptions['NuanceASR']:
                         transcriptions[asr][trans] = transcriptions[asr][trans] * float(self.nuance_cost)
-                transcriptions[asr] = slu_utils.normalize(transcriptions[asr])
+                transcriptions[asr] = normalize(transcriptions[asr])
         return transcriptions
 
 
@@ -156,7 +162,7 @@ def main():
         noun_cost=args.noun_cost,
         verb_cost=args.verb_cost,
         grammar_cost=args.grammar_cost,
-        nuance_cost=args.nuance_cost,
+        nuance_cost=args.overlap_cost,
         noun_dictionary=args.noun_dictionary,
         verb_dictionary=args.verb_dictionary,
         nuance_grammar=args.nuance_grammar
