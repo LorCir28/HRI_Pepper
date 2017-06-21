@@ -15,7 +15,7 @@ It provides the following modules:
  * **Speech Re-Ranking** -> ``speech_reranking``
  * **Language Understanding** -> ``language_understanding``
  * **Dialogue Management** -> ``dialogue_management``
- * **Text-To-Speech** -> ``test_to_speech``
+ * **Text-To-Speech** -> ``text_to_speech``
 
 The modules are self-contained, so that there is no need to install other libraries.
 
@@ -24,30 +24,24 @@ The modules are self-contained, so that there is no need to install other librar
  * `pynaoqi (> 2.5)`
  * `Pepper robot`
  
-##Installation
+##Setup
 
-To use the modules, the whole package needs to be uploaded directly on the Pepper (e.g. in the `/home/nao` folder). Then, set the library path in the `PYTHONPATH`:
+To setup the `SLU4P` packages, the whole folder has to be uploaded directly on the Pepper (e.g. in the `/home/nao` folder).
+Then, navigate to the `slu4p` folder and run the `setup.sh`:
 
- * **Linux**
- 
 ```
-$ echo 'export PYTHONPATH=${PYTHONPATH}:/path/to/library' >> ~/.bashrc
-$ source ~/.bashrc
+$ cd /home/nao/slu4p
+$ ./setup.sh
 ```
- 
- * **Mac**
- 
+
+Notice that you may need to change the execution permissions of the bash file with:
+
 ```
-$ echo 'export PYTHONPATH=${PYTHONPATH}:/path/to/library' >> ~/.bash_profile
-$ source ~/.bash_profile
+$ chmod +x setup.sh
 ```
 
 ##Running
-The system can be lauched either by individually running each module (see below) or using the following provided bash script:
-
-```
-WIP
-```
+The system can be lauched by individually running each module (see below).
 
 ###Speech-To-Text
 
@@ -63,9 +57,18 @@ Whenever no results are available from Google (e.g. the service is not reachable
 
 The subscription to the `ALTextToSpeech/TextDone` event is essential to avoid possible overlaps between *listening* and *speaking*. Whenever the value is `0`, it means the robot is speaking and the listening is stopped. On the contrary, if its value is `1` the listening is started.
 
+As the Speech Recognition is the entry point of the SLU process, it requires a mechanism to pause the recognition. This is essential when, for example, the robot is moving and does not require to listen for possible sentences. In order to pause the ASR, this module is subscribed to the `ASRPause` event. Whenever the value is `1`, the ASR will be shutdown and the listening is not triggered. To re-activate the ASR, the value needs to be set again to `0`.
+
  * **Resources**
     * *Nuance grammar*: a text file that contains, for each line, a keyword/sentence to be recognized by Nuance ASR.
     * *GoogleAPI keys*: a text file where, in each line, a Google key is provided.
+
+####Running
+
+```
+$ python speech_to_text/speech_recognition.py -v resources/nuance_grammar.txt -k resources/google_keys.txt
+```
+####Usage
 
 ```
 usage: speech_recognition.py [-h] [-i PIP] [-p PPORT] [-l LANG]
@@ -116,6 +119,14 @@ The module subscribes the `VordRecognized` event and, once the new ranking has b
 
  * **Dependencies**
     * `Speech Recognition`
+
+####Running
+
+```
+$ python speech_reranking/reranker.py --noun-dictionary resources/noun_dictionary.txt --verb-dictionary resources/verb_dictionary.txt --nuance-grammar resources/nuance_grammar.txt
+```
+
+####Usage
 
 ```
 usage: reranker.py [-h] [-i PIP] [-p PPORT] [-a ALPHA] [-n NOUN_COST]
@@ -171,6 +182,14 @@ Whenever the Re-Ranking module raises the `VRanked` event, this module picks the
  * **Dependencies**
     * `Speech Recognition`
 
+####Running
+
+```
+$ python dialogue_management/dialogue_manager.py -a resources/aiml_kbs/alice
+```
+
+####Usage
+
 ```
 usage: dialogue_manager.py [-h] [-i PIP] [-p PPORT] [-a AIML_PATH]
 
@@ -190,6 +209,14 @@ This module is the end of the processing chain. Its purpose is to generate a spe
  * **Dependencies**
     * `Speech Recognition`
     * `Dialogue Management`
+
+####Running
+
+```
+$ python text_to_speech/text_to_speech.py
+```
+
+####Usage
 
 ```
 usage: text_to_speech.py [-h] [-i PIP] [-p PPORT]
@@ -212,3 +239,25 @@ optional arguments:
 
 ##References
 [1] Andrea Vanzo, Danilo Croce, Emanuele Bastianelli, Roberto Basili, Daniele Nardi, *"Robust Spoken Language Understanding for House Service Robots"*, In Proceedings of the 17th International Conference on Intelligent Text Processing and Computational Linguistics CICLing 2016, Konya, Turkey, 2016.
+
+##FAQ
+
+* **When I try to run one of the modules, I get the following error**:
+
+```
+Traceback (most recent call last):
+  File "speech_to_text/speech_recognition.py", line 4, in <module>
+    from google_client import *
+  File "/data/home/nao/slu4p/speech_to_text/google_client.py", line 5, in <module>
+    import slu_utils
+ImportError: No module named slu_utils
+```
+This error occurs because Python cannot find the `slu_utils` module as the `PYTHONPATH` variable for the current session does not contain `/home/nao/slu4p`. Even though you previously run the `setup.sh` script, whenever a new connection with Pepper is open (through, for example `ssh nao@pepper.local`) it seems that the new session does not source the `.bashrc`.
+
+To solve the issue, you just need to run
+
+```
+$ source ~/.bashrc
+```
+on the new terminal.
+

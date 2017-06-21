@@ -8,6 +8,7 @@ from event_abstract import *
 class SpeechRecognition(EventAbstractClass):
     WR_EVENT = "WordRecognized"
     TD_EVENT = "ALTextToSpeech/TextDone"
+    ASR_PAUSE = "ASRPause"
     FLAC_COMM = 'flac -f '
     FILE_PATH = '/tmp/recording'
     CHANNELS = [0, 0, 1, 0]
@@ -48,8 +49,19 @@ class SpeechRecognition(EventAbstractClass):
             callback=self.text_done_callback
         )
 
-        print "[" + self.inst.__class__.__name__ + "] Subscribers:", self.memory.getSubscribers(SpeechRecognition.WR_EVENT)
-        print "[" + self.inst.__class__.__name__ + "] Subscribers:", self.memory.getSubscribers(SpeechRecognition.TD_EVENT)
+        self.subscribe(
+            event=SpeechRecognition.ASR_PAUSE,
+            callback=self.pause_callback
+        )
+
+        print "[" + self.inst.__class__.__name__ + "] Subscribers:", self.memory.getSubscribers(
+            SpeechRecognition.WR_EVENT)
+        print "[" + self.inst.__class__.__name__ + "] Subscribers:", self.memory.getSubscribers(
+            SpeechRecognition.TD_EVENT)
+        print "[" + self.inst.__class__.__name__ + "] Subscribers:", self.memory.getSubscribers(
+            SpeechRecognition.ASR_PAUSE)
+
+        self.is_paused = False
 
         self.audio_recorder.stopMicrophonesRecording()
         self.audio_recorder.startMicrophonesRecording(self.FILE_PATH + ".wav", "wav", 16000, self.CHANNELS)
@@ -58,10 +70,12 @@ class SpeechRecognition(EventAbstractClass):
 
         self.unsubscribe(SpeechRecognition.WR_EVENT)
         self.unsubscribe(SpeechRecognition.TD_EVENT)
+        self.unsubscribe(SpeechRecognition.ASR_PAUSE)
         self.broker.shutdown()
 
     def stop(self):
         self.audio_recorder.stopMicrophonesRecording()
+        self.is_paused = True
         self.__shutdown_requested = True
         print '[' + self.inst.__class__.__name__ + '] Good-bye'
 
@@ -87,22 +101,35 @@ class SpeechRecognition(EventAbstractClass):
         results = {}
         results['GoogleASR'] = [r.encode('ascii', 'ignore').lower() for r in self.google_asr.recognize_data(flac_cont)]
         results['NuanceASR'] = [args[1][0].lower()]
-        print "[" + self.inst.__class__.__name__ + "] " + results
+        print "[" + self.inst.__class__.__name__ + "] " + str(results)
         self.timeout = 0
         self.nuance_asr.pause(False)
         self.audio_recorder.startMicrophonesRecording(self.FILE_PATH + ".wav", "wav", 16000, self.CHANNELS)
         self.memory.raiseEvent("VordRecognized", results)
 
     def text_done_callback(self, *args, **kwargs):
-        if args[1] == 0:
+        if not self.is_paused:
+            if args[1] == 0:
+                self.audio_recorder.stopMicrophonesRecording()
+                self.nuance_asr.pause(True)
+            else:
+                self.audio_recorder.startMicrophonesRecording(self.FILE_PATH + ".wav", "wav", 16000, self.CHANNELS)
+                self.nuance_asr.pause(False)
+
+    def pause_callback(self, *args, **kwargs):
+        if args[1] == 1:
             self.audio_recorder.stopMicrophonesRecording()
-            self.nuance_asr.pause(True)
+            self.unsubscribe(SpeechRecognition.WR_EVENT)
+            self.is_paused = True
         else:
             self.audio_recorder.startMicrophonesRecording(self.FILE_PATH + ".wav", "wav", 16000, self.CHANNELS)
-            self.nuance_asr.pause(False)
+            self.subscribe(
+                event=SpeechRecognition.WR_EVENT,
+                callback=self.word_recognized_callback
+            )
+            self.is_paused = False
 
     def reset(self):
-
         print "[" + self.inst.__class__.__name__ + "] Reset recording.."
         self.audio_recorder.stopMicrophonesRecording()
         self.audio_recorder.startMicrophonesRecording(self.FILE_PATH + ".wav", "wav", 16000, self.CHANNELS)

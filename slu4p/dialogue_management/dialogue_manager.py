@@ -25,7 +25,8 @@ class DialogueManager(EventAbstractClass):
             callback=self.callback
         )
 
-        print "[" + self.inst.__class__.__name__ + "] Subscribers:", self.memory.getSubscribers(DialogueManager.EVENT_NAME)
+        print "[" + self.inst.__class__.__name__ + "] Subscribers:", self.memory.getSubscribers(
+            DialogueManager.EVENT_NAME)
 
         self._spin()
 
