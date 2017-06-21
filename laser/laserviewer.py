@@ -115,7 +115,7 @@ except ImportError:
 from OpenGL.GL import *
 from PyGLWidget import PyGLWidget
 
-MAX_RANGE = 7.0
+MAX_RANGE = 5.0
 class LaserViewer(PyGLWidget):
 
     def __init__(self, parent = None):
@@ -133,6 +133,9 @@ class LaserViewer(PyGLWidget):
         glBegin(GL_POINTS)
         for i in range(0,len(self.laserpoints)):
             point = self.laserpoints[i]
+            d = math.sqrt(point[0]*point[0]+point[1]*point[1])
+            if d >= MAX_RANGE:
+                continue
             glColor3f(1.0, 0.0, 0.0)
             glVertex3f(point[0], point[1], 0)
         glEnd()
@@ -167,7 +170,7 @@ def laserMonitorThread (memory_service, laserviewer):
 
 
 def rawPointsToRobotFrame (rawPoints):
-    pointsInRobotFrame = []
+    pointsInRobotFrame = [0]*len(rawPoints)
     for i in range(0,len(rawPoints)):
         rawPoint = rawPoints[i]
         if i < 15:
@@ -175,29 +178,23 @@ def rawPointsToRobotFrame (rawPoints):
             lX = -0.01800; lY = -0.08990; lt = -1.57079;
             tX = rawPoint[0]*math.cos(lt) - rawPoint[1]*math.sin(lt) + lX
             tY = rawPoint[0]*math.sin(lt) + rawPoint[1]*math.cos(lt) + lY
-            d = math.sqrt(tX*tX+tY*tY)
-            if d < MAX_RANGE:
-                pointsInRobotFrame.append((tX,tY))
+            pointsInRobotFrame[i] = (tX,tY)
             continue
         if i < 30:
             #Front Laser Point
             lX = 0.05620; lY = 0.0; lt = 0.0;
             tX = rawPoint[0]*math.cos(lt) - rawPoint[1]*math.sin(lt) + lX
             tY = rawPoint[0]*math.sin(lt) + rawPoint[1]*math.cos(lt) + lY
-            d = math.sqrt(tX*tX+tY*tY)
-            if d < MAX_RANGE:
-                pointsInRobotFrame.append((tX,tY))
+            pointsInRobotFrame[i] = (tX,tY)
             continue
         if i < 45:
             #Left Laser Point
             lX = -0.01800; lY = 0.08990; lt = 1.57079;
             tX = rawPoint[0]*math.cos(lt) - rawPoint[1]*math.sin(lt) + lX
             tY = rawPoint[0]*math.sin(lt) + rawPoint[1]*math.cos(lt) + lY
-            d = math.sqrt(tX*tX+tY*tY)
-            if d < MAX_RANGE:
-                pointsInRobotFrame.append((tX,tY))
+            pointsInRobotFrame[i] = (tX,tY)
             continue
-
+        
     return pointsInRobotFrame
     
         
