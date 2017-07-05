@@ -8,7 +8,10 @@ from event_abstract import *
 
 class DialogueManager(EventAbstractClass):
     PATH = ''
-    EVENT_NAME = "VRanked"
+    RANKED_EVENT = "VRanked"
+    DIALOGUE_REQUEST_EVENT = "DialogueVequest"
+    cocktail_data = {}
+    order_counter = 0
 
     def __init__(self, ip, port, aiml_path):
         super(self.__class__, self).__init__(self, ip, port)
@@ -21,25 +24,41 @@ class DialogueManager(EventAbstractClass):
 
     def start(self, *args, **kwargs):
         self.subscribe(
-            event=DialogueManager.EVENT_NAME,
-            callback=self.callback
+            event=DialogueManager.RANKED_EVENT,
+            callback=self.ranked_callback
+        )
+        self.subscribe(
+            event=DialogueManager.DIALOGUE_REQUEST_EVENT,
+            callback=self.request_callback
         )
 
         print "[" + self.inst.__class__.__name__ + "] Subscribers:", self.memory.getSubscribers(
-            DialogueManager.EVENT_NAME)
+            DialogueManager.RANKED_EVENT)
+        print "[" + self.inst.__class__.__name__ + "] Subscribers:", self.memory.getSubscribers(
+            DialogueManager.DIALOGUE_REQUEST_EVENT)
 
         self._spin()
 
-        self.unsubscribe(DialogueManager.EVENT_NAME)
+        self.unsubscribe(DialogueManager.RANKED_EVENT)
+        self.unsubscribe(DialogueManager.DIALOGUE_REQUEST_EVENT)
         self.broker.shutdown()
 
-    def callback(self, *args, **kwargs):
+    def ranked_callback(self, *args, **kwargs):
         transcriptions_dict = slu_utils.list_to_dict_w_probabilities(args[1])
         best_transcription = slu_utils.pick_best(transcriptions_dict)
         print "[" + self.inst.__class__.__name__ + "] User says: " + best_transcription
         reply = self.kernel.respond(best_transcription)
-        print "[" + self.inst.__class__.__name__ + "] Robot says: " + reply
-        self.memory.raiseEvent("Veply", reply)
+        self.do_something(reply)
+        #print "[" + self.inst.__class__.__name__ + "] Robot says: " + reply
+        #self.memory.raiseEvent("Veply", reply)
+
+    def request_callback(self, *args, **kwargs):
+        splitted = args[1].replace('_', ' ')
+        if 'start' in splitted:
+            self.memory.raiseEvent("ASRPause", 0)
+        reply = self.kernel.respond(splitted)
+        self.do_something(reply)
+
 
     def _spin(self, *args):
         while not self.__shutdown_requested:
@@ -59,6 +78,30 @@ class DialogueManager(EventAbstractClass):
                     self.kernel.learn(os.path.join(root, filename))
         print "[" + self.inst.__class__.__name__ + "] Number of categories: " + str(self.kernel.num_categories())
 
+    def do_something(self, message):
+        splitted = message.split('|')
+        for submessage in splitted:
+            if '[SAY]' in submessage:
+                reply = submessage.replace('[SAY]', '').strip()
+                print "[" + self.inst.__class__.__name__ + "] Robot says: " + reply
+                self.memory.raiseEvent("Veply", reply)
+            elif '[TAKEORDERDATA]' in submessage:
+                data = submessage.replace('[TAKEORDERDATA]', '').replace(')', '').strip()
+                customer, drink = data.split('(')
+                temp = {}
+                temp['drink'] = drink
+                temp['customer'] = customer
+                self.cocktail_data[self.order_counter] = temp
+                self.memory.raiseEvent("DialogueVesponse", self.cocktail_data)
+                self.order_counter = self.order_counter + 1
+            elif '[DRINKSALTERNATIVES]' in submessage:
+                data = submessage.replace('[DRINKSALTERNATIVES]', '').replace(')', '').strip()
+                # search for drinks from the drinks' list
+            elif '[STOP]' in submessage:
+                self.memory.raiseEvent("ASRPause", 0)
+            else:
+                print submessage
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -67,7 +110,7 @@ def main():
                         help="Robot ip address")
     parser.add_argument("-p", "--pport", type=int, default=9559,
                         help="Robot port number")
-    parser.add_argument("-a", "--aiml-path", type=str, default="resources/aiml_kbs",
+    parser.add_argument("-a", "--aiml-path", type=str, default="resources/aiml_kbs/spqrel",
                         help="Path to the root folder of AIML Knowledge Base")
     args = parser.parse_args()
 

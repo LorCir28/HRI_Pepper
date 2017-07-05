@@ -34,10 +34,10 @@ class GoogleClient:
                             transcriptions.append(result["transcript"])
             return transcriptions
         except ValueError as ve:
-            print "[" + self.inst.__class__.__name__ + "] [RECOGNIZE]ERROR! Google APIs are temporary unavailable. Returning empty list.."
+            print "[" + self.__class__.__name__ + "] [RECOGNIZE]ERROR! Google APIs are temporary unavailable. Returning empty list.."
             return []
         except requests.exceptions.RequestException as e:
-            print "[" + self.inst.__class__.__name__ + "] [RECOGNIZE]ERROR! Unable to reach Google. Returning empty list.."
+            print "[" + self.__class__.__name__ + "] [RECOGNIZE]ERROR! Unable to reach Google. Returning empty list.."
             return []
 
     def recognize_data(self, data):
@@ -58,10 +58,10 @@ class GoogleClient:
                             transcriptions.append(result["transcript"])
             return transcriptions
         except ValueError as ve:
-            print "[" + self.inst.__class__.__name__ + "] [RECOGNIZE]ERROR! Google APIs are temporary unavailable. Returning empty list.."
+            print "[" + self.__class__.__name__ + "] [RECOGNIZE]ERROR! Google APIs are temporary unavailable. Returning empty list.."
             return []
         except requests.exceptions.RequestException as e:
-            print "[" + self.inst.__class__.__name__ + "] [RECOGNIZE]ERROR! Unable to reach Google. Returning empty list.."
+            print "[" + self.__class__.__name__ + "] [RECOGNIZE]ERROR! Unable to reach Google. Returning empty list.."
             return []
 
 

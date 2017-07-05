@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="1.0">
+
+<category>
+	<pattern>TAKEORDER *</pattern>
+	<template>
+		<think>
+			<set name="topic">TAKEORDER</set>
+		</think>
+		<srai>RESET</srai>
+		<srai><star/></srai>
+	</template>
+</category>
+
+<category>
+	<pattern>MISSINGDRINK *</pattern>
+	<template>
+		<think>
+			<set name="topic">MISSINGDRINK</set>
+		</think>
+		<srai>START <star/></srai>
+	</template>
+</category>
+
+<category>
+	<pattern>REPEAT</pattern>
+	<template>
+		[SAY]
+		<that/>
+	</template>
+</category>
+
+</aiml>

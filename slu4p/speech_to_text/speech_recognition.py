@@ -104,6 +104,7 @@ class SpeechRecognition(EventAbstractClass):
         print "[" + self.inst.__class__.__name__ + "] " + str(results)
         self.timeout = 0
         self.nuance_asr.pause(False)
+        self.audio_recorder.stopMicrophonesRecording()
         self.audio_recorder.startMicrophonesRecording(self.FILE_PATH + ".wav", "wav", 16000, self.CHANNELS)
         self.memory.raiseEvent("VordRecognized", results)
 
@@ -113,6 +114,7 @@ class SpeechRecognition(EventAbstractClass):
                 self.audio_recorder.stopMicrophonesRecording()
                 self.nuance_asr.pause(True)
             else:
+                self.audio_recorder.stopMicrophonesRecording()
                 self.audio_recorder.startMicrophonesRecording(self.FILE_PATH + ".wav", "wav", 16000, self.CHANNELS)
                 self.nuance_asr.pause(False)
 
@@ -122,6 +124,7 @@ class SpeechRecognition(EventAbstractClass):
             self.unsubscribe(SpeechRecognition.WR_EVENT)
             self.is_paused = True
         else:
+            self.audio_recorder.stopMicrophonesRecording()
             self.audio_recorder.startMicrophonesRecording(self.FILE_PATH + ".wav", "wav", 16000, self.CHANNELS)
             self.subscribe(
                 event=SpeechRecognition.WR_EVENT,
@@ -140,7 +143,7 @@ class SpeechRecognition(EventAbstractClass):
                 f()
             time.sleep(.1)
             self.timeout = self.timeout + 1
-            if self.timeout > 400:
+            if self.timeout > 300:
                 self.timeout = 0
                 self.reset()
 

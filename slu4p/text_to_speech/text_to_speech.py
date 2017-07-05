@@ -8,14 +8,17 @@ class TextToSpeech(EventAbstractClass):
     PATH = ''
     EVENT_NAME = "Veply"
 
-    def __init__(self, ip, port, body_language_mode):
+    def __init__(self, ip, port, body_language_mode, speed, pitch):
         super(self.__class__, self).__init__(self, ip, port)
         self.__shutdown_requested = False
         signal.signal(signal.SIGINT, self.signal_handler)
-        self.tts = ALProxy("ALAnimatedSpeech")
-        self.breathing = ALProxy("ALMotion")
-        self.breathing.setBreathEnabled('Arms', True)
-        self.configuration = {"bodyLanguageMode": body_language_mode}
+        self.tts = ALProxy("ALTextToSpeech")
+        self.tts.setParameter("speed", speed)
+        self.tts.setParameter("pitchShift", pitch)
+
+        #self.breathing = ALProxy("ALMotion")
+        #self.breathing.setBreathEnabled('Arms', True)
+        #self.configuration = {"bodyLanguageMode": body_language_mode}
 
     def start(self, *args, **kwargs):
         self.subscribe(
@@ -31,14 +34,16 @@ class TextToSpeech(EventAbstractClass):
         self.broker.shutdown()
 
     def callback(self, *args, **kwargs):
-        self.tts.say(args[1], self.configuration)
+        self.tts.say(args[1])
+
+        #self.tts.say(args[1], self.configuration)
 
     def _spin(self, *args):
         while not self.__shutdown_requested:
             for f in args:
                 f()
             time.sleep(.1)
-        self.breathing.setBreathEnabled("Arms", False)
+        #self.breathing.setBreathEnabled("Arms", False)
 
     def signal_handler(self, signal, frame):
         print "[" + self.inst.__class__.__name__ + "] Caught Ctrl+C, stopping."
@@ -56,13 +61,19 @@ def main():
     parser.add_argument("-l", "--language-mode", type=str, default="contextual",
                         help="The body language modality while speaking",
                         choices=['contextual', 'random', 'disabled'])
+    parser.add_argument("-s", "--speed", type=int, default=70,
+                        help="The speaking speed")
+    parser.add_argument("-t", "--pitch", type=float, default=0.8,
+                        help="The speaking pitch")
 
     args = parser.parse_args()
 
     tts = TextToSpeech(
         ip=args.pip,
         port=args.pport,
-        body_language_mode=args.language_mode
+        body_language_mode=args.language_mode,
+        speed=args.speed,
+        pitch=args.pitch
     )
     tts.update_globals(globals())
     tts.start()
