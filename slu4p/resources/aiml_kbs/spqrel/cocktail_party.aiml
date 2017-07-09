@@ -73,7 +73,7 @@
 
 <topic name="MISSINGDRINK">
 	<category>
-		<pattern>START CUSTOMER * DRINK *</pattern>
+		<pattern>CUSTOMER * DRINK * START</pattern>
 		<template>
 			<think>
 				<set name="temp_customer"><star index="1"/></set>

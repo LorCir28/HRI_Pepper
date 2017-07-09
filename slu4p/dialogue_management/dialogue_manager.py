@@ -53,10 +53,16 @@ class DialogueManager(EventAbstractClass):
         #self.memory.raiseEvent("Veply", reply)
 
     def request_callback(self, *args, **kwargs):
-        splitted = args[1].replace('_', ' ')
+        splitted = args[1].split('_')
         if 'start' in splitted:
             self.memory.raiseEvent("ASRPause", 0)
-        reply = self.kernel.respond(splitted)
+        if 'takeorder' in splitted:
+            to_send = ' '.join(splitted)
+        if 'missingdrink' in splitted:
+            customer = self.cocktail_data.get(splitted[1], None)['customer']
+            drink = self.cocktail_data[splitted[1]]['drink']
+            to_send = 'missingdrink customer ' + customer + ' drink ' + drink + ' '+ splitted[2]
+        reply = self.kernel.respond(to_send)
         self.do_something(reply)
 
 
@@ -91,7 +97,8 @@ class DialogueManager(EventAbstractClass):
                 temp = {}
                 temp['drink'] = drink
                 temp['customer'] = customer
-                self.cocktail_data[self.order_counter] = temp
+                self.cocktail_data[str(self.order_counter)] = temp
+                print self.cocktail_data
                 self.memory.raiseEvent("DialogueVesponse", self.cocktail_data)
                 self.order_counter = self.order_counter + 1
             elif '[DRINKSALTERNATIVES]' in submessage:

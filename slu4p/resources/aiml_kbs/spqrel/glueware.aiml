@@ -18,7 +18,7 @@
 		<think>
 			<set name="topic">MISSINGDRINK</set>
 		</think>
-		<srai>START <star/></srai>
+		<srai><star/></srai>
 	</template>
 </category>
 

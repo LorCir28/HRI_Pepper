@@ -61,9 +61,9 @@ def main():
     parser.add_argument("-l", "--language-mode", type=str, default="contextual",
                         help="The body language modality while speaking",
                         choices=['contextual', 'random', 'disabled'])
-    parser.add_argument("-s", "--speed", type=int, default=70,
+    parser.add_argument("-s", "--speed", type=int, default=90,
                         help="The speaking speed")
-    parser.add_argument("-t", "--pitch", type=float, default=0.8,
+    parser.add_argument("-t", "--pitch", type=float, default=0.9,
                         help="The speaking pitch")
 
     args = parser.parse_args()
