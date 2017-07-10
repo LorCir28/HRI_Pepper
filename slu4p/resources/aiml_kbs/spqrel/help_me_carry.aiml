@@ -339,8 +339,226 @@
 	
 </topic>
 
-<topic name="WHATTIME">
+<topic name="GUIDE">
+
+	<category>
+		<pattern>RESET</pattern>
+		<template>
+			<think>
+				<set name="Operator">TOFILL</set>
+			</think>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>START</pattern>
+		<template>
+			<condition>
+				<li name="Operator" value="TOFILL">
+					<srai>AskName</srai>
+				</li>
+				<li>
+					<srai>NAMEACQUIRED</srai>
+				</li>
+			</condition>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>ASKNAME</pattern>
+		<template>
+			[SAY]
+			<random>
+				<li>Hi there!</li>
+				<li>Hello!</li>
+				<li>Nice to meet you!</li>
+			</random>
+			<random>
+				<li>Please, can you tell me your name?</li>
+				<li>What is your name?</li>
+				<li>What's your name?</li>
+				<li>Can I ask your name?</li>
+			</random>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* ANDREA *</pattern>
+		<template>
+			<think>
+				<set name="Operator">andrea</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* ANDREA</pattern>
+		<template>
+			<think>
+				<set name="Operator">andrea</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>ANDREA *</pattern>
+		<template>
+			<think>
+				<set name="Operator">andrea</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>ANDREA</pattern>
+		<template>
+			<think>
+				<set name="Operator">andrea</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* MAYTE *</pattern>
+		<template>
+			<think>
+				<set name="Operator">mayte</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* MAYTE</pattern>
+		<template>
+			<think>
+				<set name="Operator">mayte</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>MAYTE *</pattern>
+		<template>
+			<think>
+				<set name="Operator">mayte</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>MAYTE</pattern>
+		<template>
+			<think>
+				<set name="Operator">mayte</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* LUCA *</pattern>
+		<template>
+			<think>
+				<set name="Operator">luca</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>LUCA *</pattern>
+		<template>
+			<think>
+				<set name="Operator">luca</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* LUCA</pattern>
+		<template>
+			<think>
+				<set name="Operator">luca</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>LUCA</pattern>
+		<template>
+			<think>
+				<set name="Operator">luca</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* MARC *</pattern>
+		<template>
+			<think>
+				<set name="Operator">marc</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* MARC</pattern>
+		<template>
+			<think>
+				<set name="Operator">marc</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>MARC *</pattern>
+		<template>
+			<think>
+				<set name="Operator">marc</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>MARC</pattern>
+		<template>
+			<think>
+				<set name="Operator">marc</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>NAMEACQUIRED</pattern>
+		<template>
+			[SAY]
+			<random>
+				<li>Hi <get name="Operator"/>!</li>
+				<li>Hello <get name="Operator"/>!</li>
+			</random>
+			<random>
+				<li>Could you please follow me?</li>
+				<li>Can you follow me?</li>
+			</random>
+		</template>
+	</category>
 	
 </topic>
+
+
 
 </aiml>

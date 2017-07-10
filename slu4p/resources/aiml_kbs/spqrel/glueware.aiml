@@ -58,6 +58,7 @@
 		<think>
 			<set name="topic">GUIDE</set>
 		</think>
+		<srai>RESET</srai>
 		<srai><star/></srai>
 	</template>
 </category>

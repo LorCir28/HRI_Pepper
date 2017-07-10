@@ -108,4 +108,84 @@
 	</template>
 </category>
 
+<category>
+		<pattern>* YES *</pattern>
+		<template>
+			<srai>POSITIVERESPONSE</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* YES</pattern>
+		<template>
+			<srai>POSITIVERESPONSE</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>YES *</pattern>
+		<template>
+			<srai>POSITIVERESPONSE</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>YES</pattern>
+		<template>
+			<srai>POSITIVERESPONSE</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* NO *</pattern>
+		<template>
+			<srai>NEGATIVERESPONSE</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* NO</pattern>
+		<template>
+			<srai>NEGATIVERESPONSE</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>NO *</pattern>
+		<template>
+			<srai>NEGATIVERESPONSE</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>NO</pattern>
+		<template>
+			<srai>NEGATIVERESPONSE</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>POSITIVERESPONSE</pattern>
+		<template>
+			[SAY]
+			<random>
+				<li>Great!</li>
+				<li>Perfect!</li>
+				<li>That's great!</li>
+				<li>Brilliant!</li>
+			</random>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>NEGATIVERESPONSE</pattern>
+		<template>
+			[SAY]
+			<random>
+				<li>Okay, no problem!</li>
+				<li>Sure, no problem!</li>
+			</random>
+		</template>
+	</category>
+
 </aiml>

@@ -63,6 +63,7 @@ class DialogueManager(EventAbstractClass):
             customer = self.cocktail_data.get(splitted[1], None)['customer']
             drink = self.cocktail_data[splitted[1]]['drink']
             to_send = 'missingdrink customer ' + customer + ' drink ' + drink + ' '+ splitted[2]
+        print to_send
         reply = self.kernel.respond(to_send)
         print reply
         self.do_something(reply)
