@@ -11,6 +11,7 @@ class DialogueManager(EventAbstractClass):
     RANKED_EVENT = "VRanked"
     DIALOGUE_REQUEST_EVENT = "DialogueVequest"
     cocktail_data = {}
+    location = {}
     order_counter = 0
 
     def __init__(self, ip, port, aiml_path):
@@ -58,10 +59,15 @@ class DialogueManager(EventAbstractClass):
             self.memory.raiseEvent("ASRPause", 0)
         if 'takeorder' in splitted:
             to_send = ' '.join(splitted)
+        if 'follow' in splitted:
+            to_send = ' '.join(splitted)
+        if 'lookforhelp' in splitted:
+            to_send = ' '.join(splitted)
         if 'missingdrink' in splitted:
             customer = self.cocktail_data.get(splitted[1], None)['customer']
             drink = self.cocktail_data[splitted[1]]['drink']
             to_send = 'missingdrink customer ' + customer + ' drink ' + drink + ' '+ splitted[2]
+        print to_send
         reply = self.kernel.respond(to_send)
         self.do_something(reply)
 
@@ -104,6 +110,10 @@ class DialogueManager(EventAbstractClass):
             elif '[DRINKSALTERNATIVES]' in submessage:
                 data = submessage.replace('[DRINKSALTERNATIVES]', '').replace(')', '').strip()
                 # search for drinks from the drinks' list
+            elif '[LOOKFORDATA]' in submessage:
+                data = submessage.replace('[TAKEORDERDATA]', '').strip()
+                self.location['location'] = data
+                self.memory.raiseEvent("DialogueVesponse", self.location)
             elif '[STOP]' in submessage:
                 self.memory.raiseEvent("ASRPause", 0)
             else:

@@ -1,6 +1,57 @@
 <?xml version="1.0"?>
 <aiml version="1.0">
 
+<category>
+	<pattern>* HELLO *</pattern>
+	<template><srai>GREETINGS</srai></template>
+</category>
 
+<category>
+	<pattern>HELLO *</pattern>
+	<template><srai>GREETINGS</srai></template>
+</category>
+
+<category>
+	<pattern>* HELLO</pattern>
+	<template><srai>GREETINGS</srai></template>
+</category>
+
+<category>
+	<pattern>HELLO</pattern>
+	<template><srai>GREETINGS</srai></template>
+</category>
+
+<category>
+	<pattern>* HI *</pattern>
+	<template><srai>GREETINGS</srai></template>
+</category>
+
+<category>
+	<pattern>HI *</pattern>
+	<template><srai>GREETINGS</srai></template>
+</category>
+
+<category>
+	<pattern>* HI</pattern>
+	<template><srai>GREETINGS</srai></template>
+</category>
+
+<category>
+	<pattern>HI</pattern>
+	<template><srai>GREETINGS</srai></template>
+</category>
+
+<category>
+	<pattern>GREETINGS</pattern>
+	<template>
+	[SAY]
+		<random>
+			<li>Hello!</li>
+			<li>Hi there!</li>
+			<li>Hi!</li>
+			<li>Hello buddy!</li>
+		</random>
+	</template>
+</category>
 
 </aiml>

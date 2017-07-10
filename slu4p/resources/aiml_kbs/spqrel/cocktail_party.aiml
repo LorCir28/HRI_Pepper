@@ -234,8 +234,8 @@
 		</template>
 	</category>
 
-	<category>
-		<pattern> * IS * </pattern>
+	<!--<category>
+		<pattern>* IS *</pattern>
 		<template>
 			<think>
 				<set name="Customer"><star index="2"/></set>
@@ -265,7 +265,184 @@
 			</think>
 			<srai>START</srai>
 		</template>
+	</category>-->
+	
+	<category>
+		<pattern>* ANDREA *</pattern>
+		<template>
+			<think>
+				<set name="Customer">andrea</set>
+				<set name="topic">TAKEORDER</set>
+			</think>
+			<srai>START</srai>
+		</template>
 	</category>
+	
+	<category>
+		<pattern>* ANDREA</pattern>
+		<template>
+			<think>
+				<set name="Customer">andrea</set>
+				<set name="topic">TAKEORDER</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>ANDREA *</pattern>
+		<template>
+			<think>
+				<set name="Customer">andrea</set>
+				<set name="topic">TAKEORDER</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>ANDREA</pattern>
+		<template>
+			<think>
+				<set name="Customer">andrea</set>
+				<set name="topic">TAKEORDER</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* MAYTE *</pattern>
+		<template>
+			<think>
+				<set name="Customer">mayte</set>
+				<set name="topic">TAKEORDER</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* MAYTE</pattern>
+		<template>
+			<think>
+				<set name="Customer">mayte</set>
+				<set name="topic">TAKEORDER</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>MAYTE *</pattern>
+		<template>
+			<think>
+				<set name="Customer">mayte</set>
+				<set name="topic">TAKEORDER</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>MAYTE</pattern>
+		<template>
+			<think>
+				<set name="Customer">mayte</set>
+				<set name="topic">TAKEORDER</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* LUCA *</pattern>
+		<template>
+			<think>
+				<set name="Customer">luca</set>
+				<set name="topic">TAKEORDER</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>LUCA *</pattern>
+		<template>
+			<think>
+				<set name="Customer">luca</set>
+				<set name="topic">TAKEORDER</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* LUCA</pattern>
+		<template>
+			<think>
+				<set name="Customer">luca</set>
+				<set name="topic">TAKEORDER</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>LUCA</pattern>
+		<template>
+			<think>
+				<set name="Customer">luca</set>
+				<set name="topic">TAKEORDER</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* MARC *</pattern>
+		<template>
+			<think>
+				<set name="Customer">marc</set>
+				<set name="topic">TAKEORDER</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* MARC</pattern>
+		<template>
+			<think>
+				<set name="Customer">marc</set>
+				<set name="topic">TAKEORDER</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>MARC *</pattern>
+		<template>
+			<think>
+				<set name="Customer">marc</set>
+				<set name="topic">TAKEORDER</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>MARC</pattern>
+		<template>
+			<think>
+				<set name="Customer">marc</set>
+				<set name="topic">TAKEORDER</set>
+			</think>
+			<srai>START</srai>
+		</template>
+	</category>
+	
 </topic>
 
 

@@ -72,4 +72,48 @@
 	</template>
 </category>
 
+<category>
+	<pattern>FOLLOWME</pattern>
+	<template>
+		<random>
+			<li>Okay!</li>
+			<li>Alright!</li>
+			<li>Good!</li>
+			<li>Perfect!</li>
+		</random>
+		<random>
+			<li>I'm following you.</li>
+			<li>I'm chasing you.</li>
+		</random>
+		Please go ahead!
+	</template>
+</category>
+
+<category>
+	<pattern>STOPFOLLOWING</pattern>
+	<template>
+		<random>
+			<li>Okay!</li>
+			<li>Alright!</li>
+			<li>Good!</li>
+			<li>Perfect!</li>
+		</random>
+		<random>
+			<li>Here we are.</li>
+			<li>Here I am.</li>
+		</random>
+	</template>
+</category>
+
+<category>
+	<pattern>WHATWEDONOW</pattern>
+	<template>
+		<random>
+			<li>What can we do now?</li>
+			<li>How can I help you?</li>
+			<li>Is there something I can do?</li>
+		</random>
+	</template>
+</category>
+
 </aiml>

@@ -1,0 +1,313 @@
+<?xml version="1.0"?>
+<aiml version="1.0">
+
+
+<topic name="FOLLOW">
+
+	<category>
+		<pattern>START</pattern>
+		<template>[SAY] I'm ready to follow you!</template>
+	</category>
+
+	<category>
+		<pattern>* FOLLOW *</pattern>
+		<template>
+			<srai>SAY FOLLOWME</srai>
+		</template>
+	</category>
+
+	<category>
+		<pattern>* FOLLOW</pattern>
+		<template>
+			<srai>SAY FOLLOWME</srai>
+		</template>
+	</category>
+
+	<category>
+		<pattern>FOLLOW *</pattern>
+		<template>
+			<srai>SAY FOLLOWME</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>FOLLOW</pattern>
+		<template>
+			<srai>SAY FOLLOWME</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* CHASE *</pattern>
+		<template>
+			<srai>SAY FOLLOWME</srai>
+		</template>
+	</category>
+
+	<category>
+		<pattern>* CHASE</pattern>
+		<template>
+			<srai>SAY FOLLOWME</srai>
+		</template>
+	</category>
+
+	<category>
+		<pattern>CHASE *</pattern>
+		<template>
+			<srai>SAY FOLLOWME</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>CHASE</pattern>
+		<template>
+			<srai>SAY FOLLOWME</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* STOP *</pattern>
+		<template>
+			<srai>SAY STOPFOLLOWING</srai>
+		</template>
+	</category>
+
+	<category>
+		<pattern>* STOP</pattern>
+		<template>
+			<srai>SAY STOPFOLLOWING</srai>
+		</template>
+	</category>
+
+	<category>
+		<pattern>STOP *</pattern>
+		<template>
+			<srai>SAY STOPFOLLOWING</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* HERE *</pattern>
+		<template>
+			<srai>SAY STOPFOLLOWING</srai>
+		</template>
+	</category>
+
+	<category>
+		<pattern>* HERE</pattern>
+		<template>
+			<srai>SAY STOPFOLLOWING</srai>
+		</template>
+	</category>
+
+	<category>
+		<pattern>HERE *</pattern>
+		<template>
+			<srai>SAY STOPFOLLOWING</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>HERE</pattern>
+		<template>
+			<srai>SAY STOPFOLLOWING</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>STOP</pattern>
+		<template>
+			<set name="topic"></set>
+			[STOP]
+		</template>
+	</category>
+	
+</topic>
+
+<topic name="LOOKFORHELP">
+
+	<category>
+		<pattern>START</pattern>
+		<template>
+			<srai>SAY WHATWEDONOW</srai>
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* KITCHEN *</pattern>
+		<template>
+			[LOOKFORDATA]kitchen
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* KITCHEN</pattern>
+		<template>
+			[LOOKFORDATA]kitchen
+		</template>
+	</category>
+	
+	<category>
+		<pattern>KITCHEN *</pattern>
+		<template>
+			[LOOKFORDATA]kitchen
+		</template>
+	</category>
+	
+	<category>
+		<pattern>KITCHEN</pattern>
+		<template>
+			[LOOKFORDATA]kitchen
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* CORRIDOR *</pattern>
+		<template>
+			[LOOKFORDATA]corridor
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* CORRIDOR</pattern>
+		<template>
+			[LOOKFORDATA]corridor
+		</template>
+	</category>
+	
+	<category>
+		<pattern>CORRIDOR *</pattern>
+		<template>
+			[LOOKFORDATA]corridor
+		</template>
+	</category>
+	
+	<category>
+		<pattern>CORRIDOR</pattern>
+		<template>
+			[LOOKFORDATA]corridor
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* LIVING ROOM *</pattern>
+		<template>
+			[LOOKFORDATA]living room
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* LIVING ROOM</pattern>
+		<template>
+			[LOOKFORDATA]living room
+		</template>
+	</category>
+	
+	<category>
+		<pattern>LIVING ROOM *</pattern>
+		<template>
+			[LOOKFORDATA]living room
+		</template>
+	</category>
+	
+	<category>
+		<pattern>LIVING ROOM</pattern>
+		<template>
+			[LOOKFORDATA]living room
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* DINING ROOM *</pattern>
+		<template>
+			[LOOKFORDATA]dining room
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* DINING ROOM</pattern>
+		<template>
+			[LOOKFORDATA]dining room
+		</template>
+	</category>
+	
+	<category>
+		<pattern>DINING ROOM *</pattern>
+		<template>
+			[LOOKFORDATA]dining room
+		</template>
+	</category>
+	
+	<category>
+		<pattern>DINING ROOM</pattern>
+		<template>
+			[LOOKFORDATA]dining room
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* BEDROOM *</pattern>
+		<template>
+			[LOOKFORDATA]bedroom
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* BEDROOM</pattern>
+		<template>
+			[LOOKFORDATA]bedroom
+		</template>
+	</category>
+	
+	<category>
+		<pattern>BEDROOM *</pattern>
+		<template>
+			[LOOKFORDATA]bedroom
+		</template>
+	</category>
+	
+	<category>
+		<pattern>BEDROOM</pattern>
+		<template>
+			[LOOKFORDATA]bedroom
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* TOILET *</pattern>
+		<template>
+			[LOOKFORDATA]toilet
+		</template>
+	</category>
+	
+	<category>
+		<pattern>* TOILET</pattern>
+		<template>
+			[LOOKFORDATA]bedroom
+		</template>
+	</category>
+	
+	<category>
+		<pattern>TOILET *</pattern>
+		<template>
+			[LOOKFORDATA]bedroom
+		</template>
+	</category>
+	
+	<category>
+		<pattern>TOILET</pattern>
+		<template>
+			[LOOKFORDATA]bedroom
+		</template>
+	</category>
+	
+	<category>
+		<pattern>STOP</pattern>
+		<template>
+			<set name="topic"></set>
+			[STOP]
+		</template>
+	</category>
+</topic>
+
+</aiml>
