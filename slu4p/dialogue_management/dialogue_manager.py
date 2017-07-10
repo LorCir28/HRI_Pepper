@@ -4,6 +4,7 @@ import argparse
 import signal
 import slu_utils
 from event_abstract import *
+import datetime
 
 
 class DialogueManager(EventAbstractClass):
@@ -55,20 +56,15 @@ class DialogueManager(EventAbstractClass):
 
     def request_callback(self, *args, **kwargs):
         splitted = args[1].split('_')
+        to_send = ' '.join(splitted)
         if 'start' in splitted:
             self.memory.raiseEvent("ASRPause", 0)
-        if 'takeorder' in splitted:
-            to_send = ' '.join(splitted)
-        if 'follow' in splitted:
-            to_send = ' '.join(splitted)
-        if 'lookforhelp' in splitted:
-            to_send = ' '.join(splitted)
         if 'missingdrink' in splitted:
             customer = self.cocktail_data.get(splitted[1], None)['customer']
             drink = self.cocktail_data[splitted[1]]['drink']
             to_send = 'missingdrink customer ' + customer + ' drink ' + drink + ' '+ splitted[2]
-        print to_send
         reply = self.kernel.respond(to_send)
+        print reply
         self.do_something(reply)
 
 
@@ -114,6 +110,11 @@ class DialogueManager(EventAbstractClass):
                 data = submessage.replace('[TAKEORDERDATA]', '').strip()
                 self.location['location'] = data
                 self.memory.raiseEvent("DialogueVesponse", self.location)
+            elif '[WHATSTHETIME]' in submessage:
+                now = datetime.datetime.now()
+                reply = "It's " + str(now.hour )+ " " + str(now.minute)
+                print "[" + self.inst.__class__.__name__ + "] Robot says: " + reply
+                self.memory.raiseEvent("Veply", reply)
             elif '[STOP]' in submessage:
                 self.memory.raiseEvent("ASRPause", 0)
             else:

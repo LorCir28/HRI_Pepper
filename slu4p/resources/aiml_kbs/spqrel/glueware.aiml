@@ -43,6 +43,26 @@
 </category>
 
 <category>
+	<pattern>WHATTIME *</pattern>
+	<template>
+		<think>
+			<set name="topic">WHATTIME</set>
+		</think>
+		<srai><star/></srai>
+	</template>
+</category>
+
+<category>
+	<pattern>GUIDE *</pattern>
+	<template>
+		<think>
+			<set name="topic">GUIDE</set>
+		</think>
+		<srai><star/></srai>
+	</template>
+</category>
+
+<category>
 	<pattern>REPEAT</pattern>
 	<template>
 		[SAY]

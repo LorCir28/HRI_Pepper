@@ -310,4 +310,37 @@
 	</category>
 </topic>
 
+<topic name="WHATTIME">
+
+	<category>
+		<pattern>START</pattern>
+		<template></template>
+	</category>
+	
+	<category>
+		<pattern>* TIME *</pattern>
+		<template>[WHATSTHETIME]</template>
+	</category>
+	
+	<category>
+		<pattern>* TIME</pattern>
+		<template>[WHATSTHETIME]</template>
+	</category>
+	
+	<category>
+		<pattern>TIME *</pattern>
+		<template>[WHATSTHETIME]</template>
+	</category>
+	
+	<category>
+		<pattern>TIME</pattern>
+		<template>[WHATSTHETIME]</template>
+	</category>
+	
+</topic>
+
+<topic name="WHATTIME">
+	
+</topic>
+
 </aiml>

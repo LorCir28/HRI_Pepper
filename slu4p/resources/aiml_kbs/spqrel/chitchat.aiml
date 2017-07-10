@@ -54,4 +54,58 @@
 	</template>
 </category>
 
+<category>
+	<pattern>* THANKS *</pattern>
+	<template><srai>THANKING</srai></template>
+</category>
+
+<category>
+	<pattern>THANKS *</pattern>
+	<template><srai>THANKING</srai></template>
+</category>
+
+<category>
+	<pattern>* THANKS</pattern>
+	<template><srai>THANKING</srai></template>
+</category>
+
+<category>
+	<pattern>THANKS</pattern>
+	<template><srai>THANKING</srai></template>
+</category>
+
+<category>
+	<pattern>* THANK *</pattern>
+	<template><srai>THANKING</srai></template>
+</category>
+
+<category>
+	<pattern>THANK *</pattern>
+	<template><srai>THANKING</srai></template>
+</category>
+
+<category>
+	<pattern>* THANK</pattern>
+	<template><srai>THANKING</srai></template>
+</category>
+
+<category>
+	<pattern>THANK</pattern>
+	<template><srai>THANKING</srai></template>
+</category>
+
+
+<category>
+	<pattern>THANKING</pattern>
+	<template>
+	[SAY]
+		<random>
+			<li>You're welcome!</li>
+			<li>Cheers!</li>
+			<li>It's a pleasure!</li>
+			<li>No worries!</li>
+		</random>
+	</template>
+</category>
+
 </aiml>
