@@ -585,6 +585,24 @@
 	</template>
 </category>
 
+<category>
+	<pattern>ARRIVEDCAR START</pattern>
+	<template>
+		[SAY]
+		<random>
+			<li>Hey <get name="Operator"/>, we arrived at the car!</li>
+			<li><get name="Operator"/>, here we are!</li>
+			<li>Stop <get name="Operator"/>, this is the car!</li>
+		</random>
+	</template>
+</category>
+
+<category>
+	<pattern>ARRIVEDCAR STOP</pattern>
+	<template>
+		[STOP]
+	</template>
+</category>
 
 
 </aiml>
