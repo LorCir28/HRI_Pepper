@@ -554,10 +554,36 @@
 				<li>Could you please follow me?</li>
 				<li>Can you follow me?</li>
 			</random>
+			<think>
+				<set name="topic"></set>
 		</template>
 	</category>
 	
 </topic>
+
+<category>
+	<pattern>CALLPERSON START</pattern>
+	<template>
+		[SAY]
+		<random>
+			<li>Hey <get name="Operator"/>, please pay attention!</li>
+			<li><get name="Operator"/>, please focus!</li>
+			<li>Do not distract, <get name="Operator"/>!</li>
+		</random>
+		<random>
+			<li>Our help is needed!</li>
+			<li>Someone requires our help!</li>
+			<li>Duty calls!</li>
+		</random>
+	</template>
+</category>
+
+<category>
+	<pattern>CALLPERSON STOP</pattern>
+	<template>
+		[STOP]
+	</template>
+</category>
 
 
 
