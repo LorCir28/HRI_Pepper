@@ -27,7 +27,7 @@ class ImageWidget(QWidget):
         """
         QWidget.__init__(self, parent)
         self._image = QImage()
-        self.setWindowTitle('Nao')
+        self.setWindowTitle('Pepper')
 
         self._imgWidth = 320
         self._imgHeight = 240
