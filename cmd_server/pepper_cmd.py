@@ -32,21 +32,36 @@ def stop():
 
 def forward(r=1):
 	print 'forward',r
-	
-
+    #Move in its X direction
+    x = r * 0.5
+    y = 0.0
+    theta = 0.0
+    motion_service.moveTo(x, y, theta) #blocking function
 
 def backward(r=1):
 	print 'backward',r
-	
-
+    x = -r * 0.5
+    y = 0.0
+    theta = 0.0
+    motion_service.moveTo(x, y, theta) #blocking function
 
 def left(r=1):
 	print 'left',r
+    #Turn 90deg to the left
+    x = 0.0
+    y = 0.0
+    theta = math.pi/2
+    motion_service.moveTo(x, y, theta) #blocking function
 	
 
 
 def right(r=1):
 	print 'right',r
+    #Turn 90deg to the right
+    x = 0.0
+    y = 0.0
+    theta = -math.pi/2
+    motion_service.moveTo(x, y, theta) #blocking function
 	
 
 
