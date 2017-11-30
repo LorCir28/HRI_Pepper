@@ -6,16 +6,20 @@ import socket
 
 
 session = None
+tts_service = None
+memory_service = None
+
 
 # Begin/end
 
 def begin():
+	global tts_service, memory_service
 	print 'begin'
 
-    #Starting services
-    memory_service  = session.service("ALMemory")
-
-	
+	#Starting services
+	memory_service  = session.service("ALMemory")
+	tts_service = session.service("ALTextToSpeech")
+	tts_service.setLanguage("Italian")
 
 
 def end():
@@ -70,10 +74,7 @@ def bop(r=1):
 # Speech
 
 def say(strsay):
+	global tts_service
 	print 'Say ',strsay
-
-
-
-	
-
+	tts_service.say(strsay)
 
