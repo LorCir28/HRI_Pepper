@@ -6,37 +6,6 @@ import os
 
 
 
-def phraseToSay(params):
-    if (params=='hello'):
-        return "Hello!"
-    elif (params=='greetperson'):
-        tosay = "Hello person!"
-        return tosay
-    elif (params=='starting'):
-        return "OK. Let's start!"
-    elif (params=='personnotfound'):
-        return "It seems there is nobody around here!"
-    elif (params=='goodbye'):
-        return "Goodbye! See you soon!"
-    elif (params=='carhere'):
-        return "OK! I am marking this location as the car position"
-    elif (params=='whatnow'):
-        return "What do you want me to do now?"
-    elif (params=='lookatme'):
-        return "Please, can you look at me for some seconds"
-    elif (params=='readytofollow'):
-        return "OK,I am ready to follow you. Let's go"
-    elif (params=='lookforhelp'):
-        return "I'm looking for some help, I'm coming in a while"
-    elif (params=='arrivedcar'):
-        return "We just arrived to the car, thank you for coming to help"
-    elif (params=='followme'):
-        return "Please, follow me to the car"
-    elif (params=='comehere'):
-        return "I cannot see you, could you come here please?"
-    return "Nothing to say."
-
-
 
 def main():
     parser = argparse.ArgumentParser()
@@ -69,8 +38,6 @@ def main():
     tts_service = session.service("ALTextToSpeech")
 
     tts_service.setLanguage(language)
-
-    tosay = phraseToSay(strsay)
     tts_service.say(strsay)
     print "  -- Say: "+strsay
 
