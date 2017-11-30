@@ -41,7 +41,7 @@ def left(r=1):
     #Turn 90deg to the left
     x = 0.0
     y = 0.0
-    theta = math.pi/2
+    theta = math.pi/2 * r
     motion_service.moveTo(x, y, theta) #blocking function
 
 def right(r=1):
@@ -49,27 +49,32 @@ def right(r=1):
     #Turn 90deg to the right
     x = 0.0
     y = 0.0
-    theta = -math.pi/2
+    theta = -math.pi/2 * r
     motion_service.moveTo(x, y, theta) #blocking function
 
 
 def say_command(cmd):
     global tts_service
-    if (cmd=='F'):
-        tts_service.say("Avanti")
-    if (cmd=='B'):
-        tts_service.say("Indietro")
-    if (cmd=='L'):
-        tts_service.say("Sinistra")
-    if (cmd=='R'):
-        tts_service.say("Destra")
-    if (cmd=='OK'):
-        tts_service.say("OK.")
-    if (cmd=='X'):
-        tts_service.say("Missione cancellata. Riprova.")
-    if (cmd=='A'):
-        tts_service.say("Azione")
+    if (cmd[0]=='F'):
+        strsay = "Avanti"
+    elif (cmd[0]=='B'):
+        strsay = "Indietro"        
+    elif (cmd[0]=='L'):
+        strsay = "Sinistra"
+    elif (cmd[0]=='R'):
+        strsay = "Destra"
+    elif (cmd[0]=='OK'):
+        strsay = "OK"
+    elif (cmd[0]=='X'):
+        strsay = "Missione cancellata. Riprova."
+    elif (cmd[0]=='A'):
+        strsay = "Azione"
+    if (cmd[1]>1):
+        strsay += " %d volte" %(cmd[1])
 
+    tts_service.say(strsay)
+
+            
 def say_plan(plan):
     global tts_service
     tts_service.say("Hai programmato la missione: ")
@@ -77,56 +82,72 @@ def say_plan(plan):
         say_command(p)
     tts_service.say("premi di nuovo il tasto OK per partire")
 
+    
+def compact_plan(plan):
+    splan = []
+    last = ' '
+    i=-1
+    for a in plan:
+        if (a==last):
+            splan[i][1] += 1
+        else:
+            splan.append([a,1])
+            i += 1
+        last = a
+    return splan
 
+    
 def exec_command(cmd):
     global tts_service
-    if (cmd=='F'):
-        forward()
-    if (cmd=='B'):
-        backward()
-    if (cmd=='L'):
-        left()
-    if (cmd=='R'):
-        right()
+    if (cmd[0]=='F'):
+        forward(cmd[1])
+    if (cmd[0]=='B'):
+        backward(cmd[1])
+    if (cmd[0]=='L'):
+        left(cmd[1])
+    if (cmd[0]=='R'):
+        right(cmd[1])
     if (cmd=='A'):
         tts_service.say("Azione")
 
 
 def exec_plan(plan):
     global tts_service
-    print "Execution ",plan
-    tts_service.say("Missione avviata!!!")
-    for p in plan:
-        exec_command(p)
+    print "Execution ",splan
+    tts_service.say("Missione avviata!")
+    for a in plan:
+        exec_command(a)
     tts_service.say("Missione compiuta. Pronto per una nuova missione.")
     reset()
 
+    
 # function called when the signal onTouchDown is triggered
 def onTouched(x, y):
     global tts_service
     global plan, flag_run
 
-    print "coordinates are x: ", x, " y: ", y
-    mind=200
+    #print "coordinates are x: ", x, " y: ", y
+    mind = 200
     cmd = ''
     for a in commands:
         d = abs(x - a[1]) + abs(y - a[2])
         if (d < mind):
             mind = d
             cmd = a[0]
-    print 'Sapientino key: ',cmd
+    #print 'Sapientino key: ',cmd
     say_command(cmd)
     if (cmd=='X'):
         reset()
     elif (cmd=='OK'):
+        splan = compact_plan(plan)
         if (flag_run):
-            exec_plan(plan)
+            exec_plan(splan)
         else:
-            say_plan(plan)
+            say_plan(splan)
             flag_run = True
     else:
-	plan.append(cmd)
-	print plan
+        plan.append(cmd)
+        
 
     
 def main():
