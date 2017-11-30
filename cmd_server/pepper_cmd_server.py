@@ -5,6 +5,7 @@ import os
 import socket
 import importlib
 import re
+import argparse
 import qi
 import pepper_cmd
 
@@ -20,6 +21,7 @@ def exec_fn(fn,vd):
 			fn()
 		elif (len(largs)==1):
 			if (largs[0][0]=='"'):
+				print "string argument"
 				fn(largs[0])
 			else:
 				fn(int(largs[0]))
@@ -44,8 +46,8 @@ def exec_cmd(data):
 
 def start_server(TCP_PORT):
 
-    TCP_IP = ''
-    BUFFER_SIZE = 200
+	TCP_IP = ''
+	BUFFER_SIZE = 200
 
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	s.bind((TCP_IP,TCP_PORT))
@@ -109,7 +111,7 @@ def main():
     app.start()
     pepper_cmd.session = app.session
 
-	start_server()
+    start_server(server_port)
     
 
 
