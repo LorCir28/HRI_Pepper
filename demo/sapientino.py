@@ -5,6 +5,7 @@ import argparse
 import sys
 import os
 import math
+import functools
 
 commands = [ ['F', 620, 130], ['B', 620, 500], ['L', 480, 310], ['R', 820, 310],
 ['OK', 620, 310], ['X', 480, 500], ['A', 820, 500] ]
@@ -14,11 +15,26 @@ motion_service = None
 
 plan = []
 flag_run = False
+stop_plan = True
 
 def reset():
     global plan, flag_run
     plan = []
     flag_run = False
+    moveHead(0,-0.3,1.0)
+    motion_service.stopMove()
+    
+
+def moveHead(yaw, pitch, headtime):
+    global motion_service
+    jointsNames = ["HeadYaw", "HeadPitch"]
+    # we move head to center
+    #print "Moving head to ", yaw, pitch
+    finalAngles = [yaw, pitch]
+    timeLists  = [headtime, headtime]
+    isAbsolute = True
+    motion_service.angleInterpolation(jointsNames, finalAngles, timeLists, isAbsolute)
+
 
 
 def forward(r=1):
@@ -55,6 +71,7 @@ def right(r=1):
 
 def say_command(cmd):
     global tts_service
+    print cmd
     if (cmd[0]=='F'):
         strsay = "Avanti"
     elif (cmd[0]=='B'):
@@ -82,7 +99,7 @@ def say_plan(plan):
         say_command(p)
     tts_service.say("premi di nuovo il tasto OK per partire")
 
-    
+
 def compact_plan(plan):
     splan = []
     last = ' '
@@ -98,7 +115,10 @@ def compact_plan(plan):
 
     
 def exec_command(cmd):
-    global tts_service
+    global tts_service, stop_plan
+    if (stop_plan):
+        return
+    say_command(cmd)
     if (cmd[0]=='F'):
         forward(cmd[1])
     if (cmd[0]=='B'):
@@ -107,49 +127,57 @@ def exec_command(cmd):
         left(cmd[1])
     if (cmd[0]=='R'):
         right(cmd[1])
-    if (cmd=='A'):
-        tts_service.say("Azione")
-
 
 def exec_plan(plan):
-    global tts_service
-    print "Execution ",splan
+    global tts_service, stop_plan
+    print "Execution ",plan
     tts_service.say("Missione avviata!")
+    stop_plan = False
     for a in plan:
         exec_command(a)
     tts_service.say("Missione compiuta. Pronto per una nuova missione.")
     reset()
 
-    
+
+
 # function called when the signal onTouchDown is triggered
 def onTouched(x, y):
     global tts_service
     global plan, flag_run
 
-    #print "coordinates are x: ", x, " y: ", y
-    mind = 200
+    print "coordinates are x: ", x, " y: ", y
+    mind=200
     cmd = ''
     for a in commands:
         d = abs(x - a[1]) + abs(y - a[2])
         if (d < mind):
             mind = d
             cmd = a[0]
-    #print 'Sapientino key: ',cmd
-    say_command(cmd)
-    if (cmd=='X'):
-        reset()
-    elif (cmd=='OK'):
-        splan = compact_plan(plan)
-        if (flag_run):
-            exec_plan(splan)
+    if (cmd!=''):
+        print 'Sapientino key: ',cmd
+        scmd = [cmd,1]
+        say_command(scmd)
+        if (cmd=='X'):
+            reset()
+        elif (cmd=='OK'):
+            splan = compact_plan(plan)
+            if (flag_run):
+                exec_plan(splan)
+            else:
+                say_plan(splan)
+                flag_run = True
         else:
-            say_plan(splan)
-            flag_run = True
-    else:
-        plan.append(cmd)
-        
+	    plan.append(cmd)
+	    #print plan
 
-    
+
+
+def onHeadTouched(motion_service, value):
+    global stop_plan
+    motion_service.stopMove()
+    stop_plan = True
+
+
 def main():
     global tts_service, motion_service
 
@@ -175,19 +203,32 @@ def main():
     session = app.session
 
     #Starting services
+    memory_service = session.service("ALMemory")
     motion_service = session.service("ALMotion")
     tablet_service = session.service("ALTabletService")
 
     tablet_service.showImage("http://198.18.0.1/apps/spqrel/img/sapdoc-buttons.jpg")
+    
+    motion_service.setExternalCollisionProtectionEnabled("Move", False)
 
     tts_service = session.service("ALTextToSpeech")
     tts_service.setLanguage("Italian")
+
+    #subscribe to any change on any touch sensor
+    anyTouch = memory_service.subscriber("TouchChanged")
+    idAnyTouch = anyTouch.signal.connect((functools.partial(onHeadTouched, motion_service)))
+
+    moveHead(0,-0.3,1.0)
+
     tts_service.say("ciao, sono il tuo amico Peppino.")
     tts_service.say("pronto per la programmazione.")
 
+
     idTTouch = tablet_service.onTouchDown.connect(onTouched)
     app.run()    
+    motion_service.setExternalCollisionProtectionEnabled("Move", True)
 
+    anyTouch.signal.disconnect(idAnyTouch)
 
 
 if __name__ == "__main__":
