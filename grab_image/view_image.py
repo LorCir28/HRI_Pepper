@@ -10,7 +10,10 @@ import os
 import sys
 import argparse
 
-from PyQt4.QtGui import QWidget, QImage, QApplication, QPainter
+from PyQt5.QtGui import QImage, QPainter
+from PyQt5.QtWidgets import QApplication, QWidget
+
+
 from naoqi import ALProxy
 
 # To get the constants relative to the video.
