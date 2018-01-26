@@ -13,36 +13,36 @@ status = "Idle"             # robot status sent to websocket
 
 
 def exec_fn(fn,vd):
-	largs = []
-	for i in range(1,len(vd)):
-		if (vd[i]!=''):
-			largs += [ vd[i] ]
-	print 'Executing ',fn,' with args ',largs
-	try:
-		if (len(largs)==0):
-			fn()
-		elif (len(largs)==1):
-			if (largs[0][0]=='"'):
-				print "string argument"
-				fn(largs[0])
-			else:
-				fn(int(largs[0]))
-		elif (len(largs)==2):
-			fn(int(largs[0]),int(largs[1]))
-	except:
-		print "ERROR: executing",fn," with args ",largs
+    largs = []
+    for i in range(1,len(vd)):
+        if (vd[i]!=''):
+            largs += [ vd[i] ]
+    print 'Executing ',fn,' with args ',largs
+    try:
+        if (len(largs)==0):
+            fn()
+        elif (len(largs)==1):
+            if (largs[0][0]=='"'):
+                print "string argument"
+                fn(largs[0])
+            else:
+                fn(int(largs[0]))
+        elif (len(largs)==2):
+            fn(int(largs[0]),int(largs[1]))
+    except:
+        print "ERROR: executing",fn," with args ",largs
 
 
 def exec_cmd(data):
-	print "received command:", data
-	vd = re.split('[(,)_]',data)
-	try:
-		fn = getattr(pepper_cmd, vd[0])
-	except:
-		print "ERROR: function",vd[0],"not found"
-		fn = None
-	if (not fn is None):
-		exec_fn(fn,vd)
+    print "received command:", data
+    vd = re.split('[(,)_]',data)
+    try:
+        fn = getattr(pepper_cmd, vd[0])
+    except:
+        print "ERROR: function",vd[0],"not found"
+        fn = None
+    if (not fn is None):
+        exec_fn(fn,vd)
 
 
 
@@ -67,29 +67,29 @@ def run_code(code):
 
 def start_server(TCP_PORT):
 
-	TCP_IP = ''
-	BUFFER_SIZE = 200
+    TCP_IP = ''
+    BUFFER_SIZE = 200
 
-	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.bind((TCP_IP,TCP_PORT))
-	s.listen(1)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind((TCP_IP,TCP_PORT))
+    s.listen(1)
 
-	run=True
+    run=True
 
-	while run:
-		print "Robot Program Server: waiting for connections port", TCP_PORT
-		conn, addr = s.accept()
-		print "Connection address:", addr
-		connected = True
-		while connected:
-			try:
-				data = conn.recv(BUFFER_SIZE)
-			except:
-				print "Connection closed."
-				break
-			if not data: break
-			print "Received: ",data
-			conn.send("OK\n")
+    while run:
+        print "Robot Program Server: waiting for connections port", TCP_PORT
+        conn, addr = s.accept()
+        print "Connection address:", addr
+        connected = True
+        while connected:
+            try:
+                data = conn.recv(BUFFER_SIZE)
+            except:
+                print "Connection closed."
+                break
+            if not data: break
+            print "Received: ",data
+            conn.send("OK\n")
 
             new_version = True
             if (new_version):
@@ -98,18 +98,18 @@ def start_server(TCP_PORT):
                     t.start()
             else:
                 # old version
-			    vdata = re.split("[\r\n;]",data)
-			    for i in range(0,len(vdata)):
-				    if (vdata[i]=="quit"):
-					    connected=False
-					    break
-				    else:
-					    com = vdata[i].strip()
-					    if (len(com)>0):
-						    exec_cmd(com)
+                vdata = re.split("[\r\n;]",data)
+                for i in range(0,len(vdata)):
+                    if (vdata[i]=="quit"):
+                        connected=False
+                        break
+                    else:
+                        com = vdata[i].strip()
+                        if (len(com)>0):
+                            exec_cmd(com)
 
-		conn.close()
-		print "Closed connection"
+        conn.close()
+        print "Closed connection"
 
 
 
