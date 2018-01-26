@@ -4,10 +4,13 @@ import sys
 import os
 import socket
 import importlib
+from threading import Thread
+
 import re
 import argparse
 import qi
 import pepper_cmd
+from pepper_cmd import *
 
 status = "Idle"             # robot status sent to websocket
 
@@ -78,9 +81,15 @@ def start_server(TCP_PORT):
 
     while run:
         print "Robot Program Server: waiting for connections port", TCP_PORT
-        conn, addr = s.accept()
-        print "Connection address:", addr
-        connected = True
+        connected = False
+        conn = None
+        try:
+            conn, addr = s.accept()
+            print "Connection address:", addr
+            connected = True
+        except KeyboardInterrupt:
+            print "User quit."
+            run = False
         while connected:
             try:
                 data = conn.recv(BUFFER_SIZE)
@@ -108,7 +117,8 @@ def start_server(TCP_PORT):
                         if (len(com)>0):
                             exec_cmd(com)
 
-        conn.close()
+        if (conn is not None):
+            conn.close()
         print "Closed connection"
 
 
