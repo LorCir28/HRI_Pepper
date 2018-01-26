@@ -7,6 +7,8 @@ import tornado.ioloop
 import tornado.web
 import socket
 import time
+import argparse
+import qi
 from threading import Thread
 
 #from dummy_robot import begin,end,forward,backward,left,right
@@ -14,6 +16,7 @@ from threading import Thread
 #import sys
 #sys.path.append('../program')
 
+import pepper_cmd
 from pepper_cmd import *
 
 # Global variables
