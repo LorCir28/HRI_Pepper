@@ -9,6 +9,8 @@ import argparse
 import qi
 import pepper_cmd
 
+status = "Idle"             # robot status sent to websocket
+
 
 def exec_fn(fn,vd):
 	largs = []
@@ -31,7 +33,6 @@ def exec_fn(fn,vd):
 		print "ERROR: executing",fn," with args ",largs
 
 
-
 def exec_cmd(data):
 	print "received command:", data
 	vd = re.split('[(,)_]',data)
@@ -42,6 +43,26 @@ def exec_cmd(data):
 		fn = None
 	if (not fn is None):
 		exec_fn(fn,vd)
+
+
+
+def run_code(code):
+    global status
+    if (code is None):
+        return
+    print("=== Start code run ===")
+    #code = beginend(code)
+    print("Executing")
+    print(code)
+    try:
+        status = "Executing program"
+        exec(code)
+    except Exception as e:
+        print("CODE EXECUTION ERROR")
+        print e
+    status = "Idle"
+    print("=== End code run ===")
+
 
 
 def start_server(TCP_PORT):
@@ -69,15 +90,23 @@ def start_server(TCP_PORT):
 			if not data: break
 			print "Received: ",data
 			conn.send("OK\n")
-			vdata = re.split("[\r\n;]",data)
-			for i in range(0,len(vdata)):
-				if (vdata[i]=="quit"):
-					connected=False
-					break
-				else:
-					com = vdata[i].strip()
-					if (len(com)>0):
-						exec_cmd(com)
+
+            new_version = True
+            if (new_version):
+                if (status=='Idle'):
+                    t = Thread(target=run_code, args=(data,))
+                    t.start()
+            else:
+                # old version
+			    vdata = re.split("[\r\n;]",data)
+			    for i in range(0,len(vdata)):
+				    if (vdata[i]=="quit"):
+					    connected=False
+					    break
+				    else:
+					    com = vdata[i].strip()
+					    if (len(com)>0):
+						    exec_cmd(com)
 
 		conn.close()
 		print "Closed connection"
@@ -102,7 +131,7 @@ def main():
     #Starting application
     try:
         connection_url = "tcp://" + pip + ":" + str(pport)
-        app = qi.Application(["Memory Read", "--qi-url=" + connection_url ])
+        app = qi.Application(["Program server", "--qi-url=" + connection_url ])
     except RuntimeError:
         print ("Can't connect to Naoqi at ip \"" + pip + "\" on port " + str(pport) +".\n"
                "Please check your script arguments. Run with -h option for help.")
