@@ -110,7 +110,7 @@ def main():
                         help="Robot IP address.  On robot or Local Naoqi: use '127.0.0.1'.")
     parser.add_argument("--pport", type=int, default=9559,
                         help="Naoqi port number")
-    parser.add_argument("--serverport", type=int, default=5000,
+    parser.add_argument("--serverport", type=int, default=9000,
                         help="Server port")
 
     args = parser.parse_args()

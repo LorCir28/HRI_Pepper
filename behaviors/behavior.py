@@ -48,7 +48,7 @@ def launchAndStopBehavior(managerProxy, behaviorName):
       # Launch behavior. This is a blocking call, use post if you do not
       # want to wait for the behavior to finish.
       managerProxy.post.runBehavior(behaviorName)
-      time.sleep(0.5)
+      time.sleep(10)
     else:
       print "Behavior is already running."
 
