@@ -18,7 +18,7 @@ def main():
     args = parser.parse_args()
     pip = args.pip
     pport = args.pport
-    webfile = args.webfile
+    weburl = args.url
 
     #Start working session
     session = qi.Session()
@@ -33,9 +33,8 @@ def main():
 
     # Display a local image located in img folder in the root of the web server
     # The ip of the robot from the tablet is 198.18.0.1
-    #tablet_service.showImage("http://198.18.0.1/apps/spqrel/img/%s" %(imfile))
 
-    tablet_service.showWebview("http://198.18.0.1/apps/spqrel/%s" %(webfile))
+    tablet_service.showWebview("http://198.18.0.1/apps/spqrel/%s" %(weburl))
 
     #time.sleep(10)
 
