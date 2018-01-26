@@ -22,7 +22,15 @@ def start_client(server_ip,server_port,program):
     data = f.read() 
     f.close()
 
+    print "Sending program...",
+
     s.send(data)
+
+    print(" done")
+
+    data = s.recv(BUFFER_SIZE)
+
+    print "Reply: ",data
 
     s.close()
 
@@ -46,17 +54,6 @@ def main():
     program = args.program
 
     #Starting application
-    try:
-        connection_url = "tcp://" + pip + ":" + str(pport)
-        app = qi.Application(["Send program", "--qi-url=" + connection_url ])
-    except RuntimeError:
-        print ("Can't connect to Naoqi at ip \"" + pip + "\" on port " + str(pport) +".\n"
-               "Please check your script arguments. Run with -h option for help.")
-        sys.exit(1)
-
-    app.start()
-    pepper_cmd.session = app.session
-
     start_client(server_ip,server_port,program)
     
 
