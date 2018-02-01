@@ -97,3 +97,48 @@ def say(strsay):
 	print 'Say ',strsay
 	tts_service.say(strsay)
 
+
+def stand():
+	global session, tts_service
+	print 'Stand'
+	al_service = session.service("ALAutonomousLife")
+	if al_service.getState()!='disabled':
+		al_service.setState('disabled')
+	rp_service = session.service("ALRobotPosture")
+	rp_service.goToPosture("Stand",2.0)
+	tts_service.say("Standing up")
+
+
+def disabled():
+	global session, tts_service
+	print 'Sleep'
+	tts_service.say("Bye bye")
+	al_service = session.service("ALAutonomousLife")
+	al_service.setState('disabled')
+
+
+def interact():
+	global session, tts_service
+	print 'Interactive mode'
+	tts_service.say("Interactive")
+	al_service = session.service("ALAutonomousLife")
+	al_service.setState('interactive')
+
+
+def run_behavior(bname):
+	global session
+	beh_service = session.service("ALBehaviorManager")
+	beh_service.startBehavior(bname)
+	time.sleep(10)
+	beh_service.stopBehavior(bname)
+
+
+def takephoto():
+	global session, tts_service
+	str = 'Cheeese'
+	print(str)
+	tts_service.say(str)
+	bname = 'takepicture-61492b/behavior_1'
+	run_behavior(bname)
+
+
