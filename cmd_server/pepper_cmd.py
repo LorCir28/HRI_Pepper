@@ -31,8 +31,11 @@ def end():
 # Robot motion
 
 def stop():
-	print 'stop'
-	
+    global motion_service,session
+    print 'stop'
+    motion_service.stopMove()
+    beh_service = session.service("ALBehaviorManager")
+    beh_service.stopBehavior('animated-say-5b866d/behavior_1')
 
 
 def forward(r=1):
@@ -135,10 +138,16 @@ def run_behavior(bname):
 
 def takephoto():
 	global session, tts_service
-	str = 'Cheeese'
+	str = 'Take photo'
 	print(str)
-	tts_service.say(str)
+	#tts_service.say(str)
 	bname = 'takepicture-61492b/behavior_1'
 	run_behavior(bname)
 
 
+def opendiag():
+	global session, tts_service
+	str = 'demo'
+	print(str)
+	bname = 'animated-say-5b866d/behavior_1'
+	run_behavior(bname)
