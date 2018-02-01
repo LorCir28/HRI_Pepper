@@ -27,6 +27,10 @@ server_port = 9000          # web server port
 code = None
 status = "Idle"             # robot status sent to websocket
 
+session = None
+tablet_service = None
+webview = "http://198.18.0.1/apps/spqrel/GUI.html"
+
 # Websocket server handler
 
 class MyWebSocketServer(tornado.websocket.WebSocketHandler):
@@ -64,20 +68,42 @@ class MyWebSocketServer(tornado.websocket.WebSocketHandler):
         return True
 
 
+# Touchscreen callback
+
+# function called when the signal onTouchDown is triggered
+def onTouched(x, y):
+    global session,tablet_service
+    print "coordinates are x: ", x, " y: ", y
+    al_service = session.service("ALAutonomousLife")
+    if (al_service.getState()!='disabled'):
+        tablet_service.showWebview(webview)
+
+# Hand touch callback
+
+def rhTouched(value):
+    global session,tablet_service
+    print "Right Hand value subscriber=",value
+    #al_service = session.service("ALAutonomousLife")
+    #if (al_service.getState()!='disabled'):
+    if value==1.0:
+        tablet_service.showWebview(webview)
+
+
 
 # Main loop (asynchrounous thread)
 
 def main_loop(data):
-    global run, websocket_server, status
+    global run, websocket_server, status, tablet_service
     while (run):
         time.sleep(1)
-        if (run and not websocket_server is None):
-            try:
-                websocket_server.write_message(status)
+        #if (run and not websocket_server is None):
+            #try:
+                #websocket_server.write_message(status)
                 #print(status)
-            except tornado.websocket.WebSocketClosedError:
+            #except tornado.websocket.WebSocketClosedError:
                 #print('Connection closed.')
-                websocket_server = None
+                #websocket_server = None
+
     print("Main loop quit.")
 
 
@@ -105,6 +131,8 @@ def run_code(code):
 # Main program
 
 def main():
+    global run,session,tablet_service
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--pip", type=str, default=os.environ['PEPPER_IP'],
                         help="Robot IP address.  On robot or Local Naoqi: use '127.0.0.1'.")
@@ -128,7 +156,19 @@ def main():
         sys.exit(1)
 
     app.start()
+    session = app.session
     pepper_cmd.session = app.session
+    tablet_service = app.session.service("ALTabletService")
+
+    memory_service  = session.service("ALMemory")
+
+    #Tablet touch (does not forward signal to other layers)
+    #idTTouch = tablet_service.onTouchDown.connect(onTouched)
+
+    #subscribe to any change on "HandRightBack" touch sensor
+    rhTouch = memory_service.subscriber("HandRightBackTouched")
+    idRHTouch = rhTouch.signal.connect(rhTouched)
+
 
     # Run main thread
     t = Thread(target=main_loop, args=(None,))
@@ -143,6 +183,8 @@ def main():
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(server_port)
     print("Websocket server listening on port %d" %(server_port))
+    tablet_service.showWebview(webview)
+
     try:
         tornado.ioloop.IOLoop.instance().start()
     except KeyboardInterrupt:
