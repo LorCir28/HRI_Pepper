@@ -2,53 +2,60 @@
 
 import sys
 import time
+import argparse
+import os
+import qi
 
 from naoqi import ALProxy
 
-def main(behaviorName):
-  # Create proxy to ALBehaviorManager
-  managerProxy = ALProxy("ALBehaviorManager", "127.0.0.1", 9559)
-
-  getBehaviors(managerProxy)
-
+def executeBehavior(beh_service, behaviorName):
   if (behaviorName is None):
     behaviorName = ".lastUploadedChoregrapheBehavior/behavior_1"
 
   # run the behaviot
-  launchAndStopBehavior(managerProxy, behaviorName)
+  launchAndStopBehavior(beh_service, behaviorName)
 
   #add as a default behavior 
-  #defaultBehaviors(managerProxy, behaviorName)
+  #defaultBehaviors(beh_service, behaviorName)
 
 
-def getBehaviors(managerProxy):
+def stopBehavior(beh_service, behaviorName):
+  # Stop the behavior.
+  if (beh_service.isBehaviorRunning(behaviorName)):
+    beh_service.stopBehavior(behaviorName)
+    time.sleep(1.0)
+  else:
+    print "Behavior is already stopped."
+
+
+def getBehaviors(beh_service):
   ''' Know which behaviors are on the robot '''
 
-  names = managerProxy.getInstalledBehaviors()
+  names = beh_service.getInstalledBehaviors()
   print "Behaviors on the robot:"
   print names
 
-  names = managerProxy.getDefaultBehaviors()
+  names = beh_service.getDefaultBehaviors()
   print "Default behaviors:"
   print names
 
-  names = managerProxy.getRunningBehaviors()
+  names = beh_service.getRunningBehaviors()
   print "Running behaviors:"
   print names
 
 
-def launchAndStopBehavior(managerProxy, behaviorName):
+def launchAndStopBehavior(beh_service, behaviorName):
   ''' Launch and stop a behavior, if possible. '''
 
   # Check that the behavior exists.
-  if (managerProxy.isBehaviorInstalled(behaviorName)):
+  if (beh_service.isBehaviorInstalled(behaviorName)):
 
     # Check that it is not already running.
-    if (not managerProxy.isBehaviorRunning(behaviorName)):
+    if (not beh_service.isBehaviorRunning(behaviorName)):
       # Launch behavior. This is a blocking call, use post if you do not
       # want to wait for the behavior to finish.
-      managerProxy.post.runBehavior(behaviorName)
-      time.sleep(10)
+      beh_service.startBehavior(behaviorName)
+      #time.sleep(10)
     else:
       print "Behavior is already running."
 
@@ -56,50 +63,71 @@ def launchAndStopBehavior(managerProxy, behaviorName):
     print "Behavior not found."
     return
 
-  names = managerProxy.getRunningBehaviors()
-  print "Running behaviors:"
-  print names
-
-  # Stop the behavior.
-  if (managerProxy.isBehaviorRunning(behaviorName)):
-    managerProxy.stopBehavior(behaviorName)
-    time.sleep(1.0)
-  else:
-    print "Behavior is already stopped."
-
-  names = managerProxy.getRunningBehaviors()
-  print "Running behaviors:"
-  print names
+  #names = beh_service.getRunningBehaviors()
+  #print "Running behaviors:"
+  #print names
 
 
-def defaultBehaviors(managerProxy, behaviorName):
+  #names = beh_service.getRunningBehaviors()
+  #print "Running behaviors:"
+  #print names
+
+
+def defaultBehaviors(beh_service, behaviorName):
   ''' Set a behavior as default and remove it from default behavior. '''
 
   # Get default behaviors.
-  names = managerProxy.getDefaultBehaviors()
+  names = beh_service.getDefaultBehaviors()
   print "Default behaviors:"
   print names
 
   # Add behavior to default.
-  managerProxy.addDefaultBehavior(behaviorName)
+  beh_service.addDefaultBehavior(behaviorName)
 
-  names = managerProxy.getDefaultBehaviors()
+  names = beh_service.getDefaultBehaviors()
   print "Default behaviors:"
   print names
 
   # Remove behavior from default.
-  managerProxy.removeDefaultBehavior(behaviorName)
+  beh_service.removeDefaultBehavior(behaviorName)
 
-  names = managerProxy.getDefaultBehaviors()
+  names = beh_service.getDefaultBehaviors()
   print "Default behaviors:"
   print names
 
 
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--pip", type=str, default=os.environ['PEPPER_IP'],
+                        help="Robot IP address.  On robot or Local Naoqi: use '127.0.0.1'.")
+    parser.add_argument("--pport", type=int, default=9559,
+                        help="Naoqi port number")
+    parser.add_argument("--start", type=str, default=None, help="start behavior")
+    parser.add_argument("--stop", type=str, default=None, help="stop behavior")
+    parser.add_argument('--list', help='List available behaviors', action='store_true')
+
+    args = parser.parse_args()
+
+    #Starting application
+    try:
+        connection_url = "tcp://" + args.pip + ":" + str(args.pport)
+        app = qi.Application(["Behavior ", "--qi-url=" + connection_url ])
+    except RuntimeError:
+        print ("Can't connect to Naoqi at ip \"" + args.pip + "\" on port " + str(args.pport) +".\n"
+               "Please check your script arguments. Run with -h option for help.")
+        sys.exit(1)
+
+    app.start()
+
+    beh_service = app.session.service("ALBehaviorManager")
+
+    if (args.list):
+        getBehaviors(beh_service)
+    elif (args.start is not None):
+        executeBehavior(beh_service,args.start)
+    elif (args.stop is not None):
+        stopBehavior(beh_service,args.stop)
+
 if __name__ == "__main__":
-
-  if (len(sys.argv) < 2):
-    main(None)
-  else:
-    main(sys.argv[1])
-
+    main()
 
