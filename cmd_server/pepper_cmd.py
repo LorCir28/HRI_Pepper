@@ -5,6 +5,7 @@ import os
 import socket
 import threading
 import math
+import random
 import qi
 
 app = None
@@ -12,6 +13,7 @@ session = None
 tts_service = None
 memory_service = None
 motion_service = None
+anspeech_service = None
 
 # Sensors
 headTouch = 0.0
@@ -67,13 +69,15 @@ def touchcb(value):
 # Begin/end
 
 def begin():
-    global session, tts_service, memory_service, motion_service
+    global session, tts_service, memory_service, motion_service, anspeech_service
     print 'begin'
 
     #Starting services
     memory_service  = session.service("ALMemory")
     motion_service  = session.service("ALMotion")
     tts_service = session.service("ALTextToSpeech")
+    anspeech_service = session.service("ALAnimatedSpeech")
+    print "ALAnimatedSpeech ", anspeech_service
     #tts_service.setLanguage("Italian")
     tts_service.setLanguage("English")
 
@@ -167,9 +171,28 @@ def bop(r=1):
 # Speech
 
 def say(strsay):
-	global tts_service
-	print 'Say ',strsay
-	tts_service.say(strsay)
+    global tts_service, anspeech_service
+    print 'Say ',strsay
+    #tts_service.say(strsay)
+
+    # set the local configuration
+    #configuration = {"bodyLanguageMode":"contextual"}
+
+    # say the text with the local configuration
+
+
+    vanim = ["animations/Stand/Gestures/Enthusiastic_4",
+             "animations/Stand/Gestures/Enthusiastic_5",
+            "animations/Stand/Gestures/Excited_1",
+            "animations/Stand/Gestures/Explain_1" ]
+    anim = random.choice(vanim)
+
+    if ('hello' in strsay):
+        anim = "animations/Stand/Gestures/Hey_1"
+    
+
+    anspeech_service.say("^start("+anim+") " + strsay+" ^wait("+anim+")")
+
 
 
 # Other 
@@ -182,7 +205,7 @@ def stand():
 		al_service.setState('disabled')
 	rp_service = session.service("ALRobotPosture")
 	rp_service.goToPosture("Stand",2.0)
-	tts_service.say("Standing up")
+	#tts_service.say("Standing up")
 
 
 def disabled():
