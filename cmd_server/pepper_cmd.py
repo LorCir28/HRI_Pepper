@@ -171,6 +171,11 @@ def bop(r=1):
 # Speech
 
 def say(strsay):
+    global tts_service
+    print 'Say ',strsay
+    tts_service.say(strsay)
+
+def asay(strsay):
     global tts_service, anspeech_service
     print 'Say ',strsay
     #tts_service.say(strsay)
@@ -180,7 +185,7 @@ def say(strsay):
 
     # say the text with the local configuration
 
-
+    # http://doc.aldebaran.com/2-5/naoqi/motion/alanimationplayer-advanced.html#animationplayer-list-behaviors-pepper
     vanim = ["animations/Stand/Gestures/Enthusiastic_4",
              "animations/Stand/Gestures/Enthusiastic_5",
             "animations/Stand/Gestures/Excited_1",
