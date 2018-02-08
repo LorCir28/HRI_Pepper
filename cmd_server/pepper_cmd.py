@@ -35,7 +35,9 @@ def stop():
     print 'stop'
     motion_service.stopMove()
     beh_service = session.service("ALBehaviorManager")
-    beh_service.stopBehavior('animated-say-5b866d/behavior_1')
+    bns = beh_service.getRunningBehaviors()
+    for b in bns:
+        beh_service.stopBehavior(b)
 
 
 def forward(r=1):
@@ -132,8 +134,8 @@ def run_behavior(bname):
 	global session
 	beh_service = session.service("ALBehaviorManager")
 	beh_service.startBehavior(bname)
-	time.sleep(10)
-	beh_service.stopBehavior(bname)
+	#time.sleep(10)
+	#beh_service.stopBehavior(bname)
 
 
 def takephoto():
@@ -150,4 +152,11 @@ def opendiag():
 	str = 'demo'
 	print(str)
 	bname = 'animated-say-5b866d/behavior_1'
+	run_behavior(bname)
+
+def sax():
+	global session, tts_service
+	str = 'demo'
+	print(str)
+	bname = 'saxophone-0635af/behavior_1'
 	run_behavior(bname)
