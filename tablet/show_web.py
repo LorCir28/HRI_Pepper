@@ -8,7 +8,7 @@ import os
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--pip", type=str, default="127.0.0.1",
+    parser.add_argument("--pip", type=str, default=os.environ['PEPPER_IP'],
                         help="Robot IP address. On robot or Local Naoqi: use '127.0.0.1'.")
     parser.add_argument("--pport", type=int, default=9559,
                         help="Naoqi port number")
@@ -34,7 +34,9 @@ def main():
     # Display a local image located in img folder in the root of the web server
     # The ip of the robot from the tablet is 198.18.0.1
 
-    tablet_service.showWebview("http://198.18.0.1/apps/spqrel/%s" %(weburl))
+    strurl = "http://198.18.0.1/apps/spqrel/%s" %(weburl)
+    print "URL: ",strurl
+    tablet_service.showWebview(strurl)
 
     #time.sleep(10)
 
