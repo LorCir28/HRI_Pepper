@@ -72,6 +72,9 @@ def begin():
     global session, tts_service, memory_service, motion_service, anspeech_service
     print 'begin'
 
+    if session==None:
+        return
+
     #Starting services
     memory_service  = session.service("ALMemory")
     motion_service  = session.service("ALMotion")
@@ -259,3 +262,4 @@ def sax():
 	print(str)
 	bname = 'saxophone-0635af/behavior_1'
 	run_behavior(bname)
+
