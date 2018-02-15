@@ -29,7 +29,7 @@ status = "Idle"             # robot status sent to websocket
 
 session = None
 tablet_service = None
-webview = "http://198.18.0.1/apps/spqrel/GUI.html"
+webview = "http://198.18.0.1/apps/spqrel/index.html"
 
 # Websocket server handler
 
