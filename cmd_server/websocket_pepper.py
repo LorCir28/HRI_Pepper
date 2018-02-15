@@ -31,6 +31,14 @@ session = None
 tablet_service = None
 webview = "http://198.18.0.1/apps/spqrel/index.html"
 
+RED   = "\033[1;31m"  
+BLUE  = "\033[1;34m"
+CYAN  = "\033[1;36m"
+GREEN = "\033[0;32m"
+RESET = "\033[0;0m"
+BOLD    = "\033[;1m"
+REVERSE = "\033[;7m"
+
 # Websocket server handler
 
 class MyWebSocketServer(tornado.websocket.WebSocketHandler):
@@ -182,7 +190,7 @@ def main():
         (r'/websocketserver', MyWebSocketServer),])  
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(server_port)
-    print("Websocket server listening on port %d" %(server_port))
+    print("%sWebsocket server listening on port %d%s" %(GREEN,server_port,RESET))
     tablet_service.showWebview(webview)
 
     try:

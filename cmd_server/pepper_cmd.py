@@ -69,7 +69,7 @@ def touchcb(value):
 # Begin/end
 
 def begin():
-    global session, tts_service, memory_service, motion_service, anspeech_service
+    global session, tts_service, memory_service, motion_service, anspeech_service, tablet_service
     print 'begin'
 
     if session==None:
@@ -80,15 +80,17 @@ def begin():
     motion_service  = session.service("ALMotion")
     tts_service = session.service("ALTextToSpeech")
     anspeech_service = session.service("ALAnimatedSpeech")
-    print "ALAnimatedSpeech ", anspeech_service
+    tablet_service = session.service("ALTabletService")
+
+    #print "ALAnimatedSpeech ", anspeech_service
     #tts_service.setLanguage("Italian")
     tts_service.setLanguage("English")
 
     touch_service = session.service("ALTouch")
     touchstatus = touch_service.getStatus()
-    print touchstatus
+    #print touchstatus
     touchsensorlist = touch_service.getSensorList()
-    print touchsensorlist
+    #print touchsensorlist
 
     anyTouch = memory_service.subscriber("TouchChanged")
     idAnyTouch = anyTouch.signal.connect(touchcb)
@@ -102,6 +104,15 @@ def begin():
 def end():
     print 'end'
     time.sleep(0.5) # make sure stuff ends
+
+
+# Tablet
+
+def showurl(weburl):
+    global tablet_service
+    strurl = "http://198.18.0.1/apps/spqrel/%s" %(weburl)
+    print "URL: ",strurl
+    tablet_service.showWebview(strurl)
 
 
 # Robot motion
