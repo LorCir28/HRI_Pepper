@@ -38,7 +38,7 @@ def main():
         #Loads a file and launchs the playing 5 seconds later
         fileId = ap_service.loadFile(os.path.abspath(afile))
         fileLength =ap_service.getFileLength(fileId)
-        print 'Playing '+afile+'. Duration: '+fileLength+' secs. Press Ctrl+C to stop'
+        print 'Playing '+afile+'. Duration: '+ str(fileLength) +' secs. Press Ctrl+C to stop'
         ap_service.play(fileId, _async = True)
         time.sleep(fileLength)
     except KeyboardInterrupt:
