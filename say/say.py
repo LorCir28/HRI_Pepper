@@ -16,11 +16,15 @@ def main():
                         help="Sentence to say")
     parser.add_argument("--language", type=str, default="English",
                         help="language")
+    parser.add_argument("--speed", type=int, default=100,
+                        help="speed")
+    
     args = parser.parse_args()
     pip = args.pip
     pport = args.pport
     strsay = args.sentence
     language = args.language
+    speed = args.speed
 
     #Starting application
     try:
@@ -37,6 +41,7 @@ def main():
     tts_service = session.service("ALTextToSpeech")
 
     tts_service.setLanguage(language)
+    tts_service.setParameter("speed", speed)
     tts_service.say(strsay)
     print "  -- Say: "+strsay
 
