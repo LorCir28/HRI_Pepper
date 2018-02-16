@@ -4,14 +4,13 @@ import sys
 import os
 import signal
 from functools import partial
+import time
 
 def signal_handler(ap_service, signal, frame):
         print('Quitting')
         ap_service.stopAll()
         sys.exit(0)
         
-
-
 def main():
 
     parser = argparse.ArgumentParser()
@@ -46,9 +45,8 @@ def main():
     
     #Loads a file and launchs the playing 5 seconds later
     fileId = ap_service.loadFile(os.path.abspath(afile))
-    ap_service.play(fileId)
     print 'Playing'+afile+'. Press Ctrl+C to stop'
-
+    ap_service.play(fileId)
 
 
 
