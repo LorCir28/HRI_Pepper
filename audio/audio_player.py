@@ -2,6 +2,7 @@ import qi
 import argparse
 import sys
 import os
+import time
 
 def main():
 
@@ -36,8 +37,10 @@ def main():
     try:
         #Loads a file and launchs the playing 5 seconds later
         fileId = ap_service.loadFile(os.path.abspath(afile))
-        print 'Playing '+afile+'. Press Ctrl+C to stop'
-        ap_service.play(fileId)
+        fileLength =ap_service.getFileLength(fileId)
+        print 'Playing '+afile+'. Duration: '+fileLength+' secs. Press Ctrl+C to stop'
+        ap_service.play(fileId, _async = True)
+        time.sleep(fileLength)
     except KeyboardInterrupt:
         ap_service.stopAll()
         print('Quitting')
