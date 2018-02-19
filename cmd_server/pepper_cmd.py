@@ -26,7 +26,8 @@ REVERSE = "\033[;7m"
 
 # Sensors
 headTouch = 0.0
-sonarValues = [0,0] # front, back
+handTouch = [0.0, 0.0] # left, right
+sonarValues = [0.0, 0.0] # front, back
 
 # Connect to the robot
 def robotconnect(pip=os.environ['PEPPER_IP'], pport=9559):
@@ -49,13 +50,17 @@ def robotconnect(pip=os.environ['PEPPER_IP'], pport=9559):
 def apprunThread():
     global memory_service, headTouch, sonarValues
     #app.run()
-    sonarValueList = ["Device/SubDeviceList/Platform/Front/Sonar/Sensor/Value",
+    sonarValues = ["Device/SubDeviceList/Platform/Front/Sonar/Sensor/Value",
                   "Device/SubDeviceList/Platform/Back/Sonar/Sensor/Value"]
-    hmMemoryDataValue = "Device/SubDeviceList/Head/Touch/Middle/Sensor/Value"
+    headTouchValue = "Device/SubDeviceList/Head/Touch/Middle/Sensor/Value"
+    handTouchValues = [ "Device/SubDeviceList/LHand/Touch/Back/Sensor/Value",
+                   "Device/SubDeviceList/RHand/Touch/Back/Sensor/Value" ]
+
     t = threading.currentThread()
     while getattr(t, "do_run", True):
-        headTouch = memory_service.getData(hmMemoryDataValue)
-        sonarValues = memory_service.getListData(sonarValueList)
+        headTouch = memory_service.getData(headTouchValue)
+        sonarValues = memory_service.getListData(sonarValues)
+        handTouch = memory_service.getListData(handTouchValues)
         #print "Head touch middle value=", headTouch
         #print "Sonar [Front, Back]", sonarValues
         time.sleep(1)
@@ -77,13 +82,17 @@ def touchcb(value):
 
 
 def sensorvalue(sensorname):
-    global headTouch, sonarValues
+    global sonarValues, headTouch, handTouch
     if (sensorname == 'frontsonar'):
         return sonarValues[0]
-    elif (sensorname == 'readsonar'):
+    elif (sensorname == 'rearsonar'):
         return sonarValues[1]
     elif (sensorname == 'headtouch'):
         return headTouch
+    elif (sensorname == 'lefthandtouch'):
+        return handTouch[0]
+    elif (sensorname == 'righthandtouch'):
+        return handTouch[1]
 
 
 # Begin/end
