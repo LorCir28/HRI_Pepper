@@ -16,6 +16,14 @@ motion_service = None
 anspeech_service = None
 tablet_service = None
 
+RED   = "\033[1;31m"  
+BLUE  = "\033[1;34m"
+CYAN  = "\033[1;36m"
+GREEN = "\033[0;32m"
+RESET = "\033[0;0m"
+BOLD    = "\033[;1m"
+REVERSE = "\033[;7m"
+
 # Sensors
 headTouch = 0.0
 sonarValues = [0,0] # front, back
@@ -23,17 +31,19 @@ sonarValues = [0,0] # front, back
 # Connect to the robot
 def robotconnect(pip=os.environ['PEPPER_IP'], pport=9559):
     global app, session
-    #Starting application
+    print("Connecting to robot %s:%d ..." %(pip,pport))
     try:
         connection_url = "tcp://" + pip + ":" + str(pport)
         app = qi.Application(["Pepper command", "--qi-url=" + connection_url ])
+        app.start()
     except RuntimeError:
-        print ("Can't connect to Naoqi at ip \"" + pip + "\" on port " + str(pport) +".\n")
+        print("%sCannot connect to Naoqi at %s:%d %s" %(RED,pip,pport,RESET))
         session = None
-        return        
-    app.start()
+        return False
+    print("%sConnected to robot %s:%d %s" %(GREEN,pip,pport,RESET))
     session = app.session
     begin()
+    return True
 
 
 def apprunThread():
