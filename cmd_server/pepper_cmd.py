@@ -14,6 +14,7 @@ tts_service = None
 memory_service = None
 motion_service = None
 anspeech_service = None
+tablet_service = None
 
 # Sensors
 headTouch = 0.0
@@ -64,6 +65,15 @@ def touchcb(value):
 
     print touched_bodies
 
+
+def sensorvalue(sensor):
+    global headTouch, sonarValues
+    if (sensorname == 'frontsonar'):
+        return sonarValues[0]
+    elif (sensorname == 'readsonar'):
+        return sonarValues[1]
+    elif (sensorname == 'headtouch'):
+        return headTouch
 
 
 # Begin/end
