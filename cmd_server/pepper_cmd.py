@@ -76,7 +76,7 @@ def touchcb(value):
     print touched_bodies
 
 
-def sensorvalue(sensor):
+def sensorvalue(sensorname):
     global headTouch, sonarValues
     if (sensorname == 'frontsonar'):
         return sonarValues[0]
