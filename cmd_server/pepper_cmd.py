@@ -61,9 +61,9 @@ def apprunThread():
         headTouch = memory_service.getData(headTouchValue)
         handTouch = memory_service.getListData(handTouchValues)
         sonar = memory_service.getListData(sonarValues)
-        print "Head touch middle value=", headTouch
-        print "Hand touch middle value=", handTouch
-        print "Sonar [Front, Back]", sonar
+        #print "Head touch middle value=", headTouch
+        #print "Hand touch middle value=", handTouch
+        #print "Sonar [Front, Back]", sonar
         time.sleep(1)
     #print "Exiting Thread"
 
