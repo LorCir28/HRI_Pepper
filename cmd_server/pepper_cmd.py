@@ -27,7 +27,7 @@ REVERSE = "\033[;7m"
 # Sensors
 headTouch = 0.0
 handTouch = [0.0, 0.0] # left, right
-sonarValues = [0.0, 0.0] # front, back
+sonar = [0.0, 0.0] # front, back
 
 # Connect to the robot
 def robotconnect(pip=os.environ['PEPPER_IP'], pport=9559):
@@ -48,8 +48,8 @@ def robotconnect(pip=os.environ['PEPPER_IP'], pport=9559):
 
 
 def apprunThread():
-    global memory_service, headTouch, sonarValues
-    #app.run()
+    global memory_service, headTouch, handTouch, sonar
+
     sonarValues = ["Device/SubDeviceList/Platform/Front/Sonar/Sensor/Value",
                   "Device/SubDeviceList/Platform/Back/Sonar/Sensor/Value"]
     headTouchValue = "Device/SubDeviceList/Head/Touch/Middle/Sensor/Value"
@@ -59,10 +59,11 @@ def apprunThread():
     t = threading.currentThread()
     while getattr(t, "do_run", True):
         headTouch = memory_service.getData(headTouchValue)
-        sonarValues = memory_service.getListData(sonarValues)
         handTouch = memory_service.getListData(handTouchValues)
-        #print "Head touch middle value=", headTouch
-        #print "Sonar [Front, Back]", sonarValues
+        sonar = memory_service.getListData(sonarValues)
+        print "Head touch middle value=", headTouch
+        print "Hand touch middle value=", handTouch
+        print "Sonar [Front, Back]", sonar
         time.sleep(1)
     #print "Exiting Thread"
 
@@ -82,11 +83,11 @@ def touchcb(value):
 
 
 def sensorvalue(sensorname):
-    global sonarValues, headTouch, handTouch
+    global sonar, headTouch, handTouch
     if (sensorname == 'frontsonar'):
-        return sonarValues[0]
+        return sonar[0]
     elif (sensorname == 'rearsonar'):
-        return sonarValues[1]
+        return sonar[1]
     elif (sensorname == 'headtouch'):
         return headTouch
     elif (sensorname == 'lefthandtouch'):
@@ -124,7 +125,7 @@ def begin():
     anyTouch = memory_service.subscriber("TouchChanged")
     idAnyTouch = anyTouch.signal.connect(touchcb)
 
-    #create a thead that monitors directly the signal
+    # create a thead that monitors directly the signal
     appThread = threading.Thread(target = apprunThread, args = ())
     appThread.start()
 
