@@ -353,6 +353,6 @@ class PepperRobot:
     def showurl(self, weburl):
         strurl = "http://198.18.0.1/apps/spqrel/%s" %(weburl)
         print "URL: ",strurl
-       self.tablet_service.showWebview(strurl)
+        self.tablet_service.showWebview(strurl)
 
 
