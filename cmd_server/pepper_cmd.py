@@ -121,13 +121,6 @@ def end():
     time.sleep(0.5) # make sure stuff ends
 
 
-# Tablet
-
-def showurl(weburl):
-    global tablet_service
-    strurl = "http://198.18.0.1/apps/spqrel/%s" %(weburl)
-    print "URL: ",strurl
-    tablet_service.showWebview(strurl)
 
 
 # Robot motion
@@ -353,5 +346,13 @@ class PepperRobot:
     def animation(self, interaction):
         print 'Animation ',interaction
         self.animation_player_service.run(interaction)
+
+
+    # Tablet
+
+    def showurl(self, weburl):
+        strurl = "http://198.18.0.1/apps/spqrel/%s" %(weburl)
+        print "URL: ",strurl
+       self.tablet_service.showWebview(strurl)
 
 
