@@ -29,22 +29,7 @@ headTouch = 0.0
 handTouch = [0.0, 0.0] # left, right
 sonar = [0.0, 0.0] # front, back
 
-# Connect to the robot
-def robotconnect(pip=os.environ['PEPPER_IP'], pport=9559):
-    global app, session
-    print("Connecting to robot %s:%d ..." %(pip,pport))
-    try:
-        connection_url = "tcp://" + pip + ":" + str(pport)
-        app = qi.Application(["Pepper command", "--qi-url=" + connection_url ])
-        app.start()
-    except RuntimeError:
-        print("%sCannot connect to Naoqi at %s:%d %s" %(RED,pip,pport,RESET))
-        session = None
-        return False
-    print("%sConnected to robot %s:%d %s" %(GREEN,pip,pport,RESET))
-    session = app.session
-    begin()
-    return True
+
 
 
 def apprunThread():
@@ -303,5 +288,70 @@ def sax():
 	print(str)
 	bname = 'saxophone-0635af/behavior_1'
 	run_behavior(bname)
+
+
+
+class PepperRobot:
+
+    def __init__(self):
+        pass
+
+
+    # Connect to the robot
+    def connect(self, pip=os.environ['PEPPER_IP'], pport=9559):
+        print("Connecting to robot %s:%d ..." %(pip,pport))
+        try:
+            connection_url = "tcp://" + pip + ":" + str(pport)
+            self.app = qi.Application(["Pepper command", "--qi-url=" + connection_url ])
+            self.app.start()
+        except RuntimeError:
+            print("%sCannot connect to Naoqi at %s:%d %s" %(RED,pip,pport,RESET))
+            self.session = None
+            return False
+        print("%sConnected to robot %s:%d %s" %(GREEN,pip,pport,RESET))
+        self.session = self.app.session
+
+        print("Starting services...")
+
+        #Starting services
+        self.memory_service  = self.session.service("ALMemory")
+        self.motion_service  = self.session.service("ALMotion")
+        self.tts_service = self.session.service("ALTextToSpeech")
+        self.anspeech_service = self.session.service("ALAnimatedSpeech")
+        self.tablet_service = self.session.service("ALTabletService")
+        self.animation_player_service = self.session.service("ALAnimationPlayer")
+
+        #print "ALAnimatedSpeech ", anspeech_service
+        #self.tts_service.setLanguage("Italian")
+        self.tts_service.setLanguage("English")
+
+        self.touch_service = self.session.service("ALTouch")
+        self.touchstatus = self.touch_service.getStatus()
+        #print touchstatus
+        self.touchsensorlist = self.touch_service.getSensorList()
+        #print touchsensorlist
+
+        #anyTouch = self.memory_service.subscriber("TouchChanged")
+        #idAnyTouch = anyTouch.signal.connect(touchcb)
+
+        # create a thead that monitors directly the signal
+        #appThread = threading.Thread(target = apprunThread, args = ())
+        #appThread.start()
+
+
+
+    def end():
+        print 'end'
+        time.sleep(0.5) # make sure stuff ends
+
+
+    def say(self, interaction):
+        print 'Say ',interaction
+        self.tts_service.say(interaction)
+
+
+    def animation(self, interaction):
+        print 'Animation ',interaction
+        self.animation_player_service.run(interaction)
 
 
