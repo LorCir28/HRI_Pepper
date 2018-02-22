@@ -68,6 +68,12 @@ def touchcb(value):
 
 
 def sensorvalue(sensorname):
+    global robot
+    if (robot!=None):
+        return robot.sensorvalue(sensorname)
+
+
+def sensorvalue_OLD(sensorname):
     global sonar, headTouch, handTouch
     if (sensorname == 'frontsonar'):
         return sonar[0]
@@ -84,6 +90,7 @@ def sensorvalue(sensorname):
 # Begin/end
 
 def begin():
+    global robot
     print 'begin'
     if (robot==None):
         robot=PepperRobot()
@@ -161,6 +168,7 @@ def backward(r=1):
     motion_service.moveTo(x, y, theta) #blocking function
 
 def left(r=1):
+    global robot
     if (robot!=None):
         robot.left(r)
     else:
@@ -203,10 +211,15 @@ def bop(r=1):
 
 # Speech
 
+
 def say(strsay):
-    global tts_service
+    global robot
     print 'Say ',strsay
-    tts_service.say(strsay)
+    if (robot!=None):
+        robot.say(strsay)
+    else:
+        global tts_service
+        tts_service.say(strsay)
 
 def asay(strsay):
     global tts_service, anspeech_service
@@ -320,8 +333,8 @@ class PepperRobot:
         except RuntimeError:
             print("%sCannot connect to Naoqi at %s:%d %s" %(RED,pip,pport,RESET))
             self.session = None
-
             return
+
         print("%sConnected to robot %s:%d %s" %(GREEN,pip,pport,RESET))
         self.session = self.app.session
 
