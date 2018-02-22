@@ -16,6 +16,8 @@ motion_service = None
 anspeech_service = None
 tablet_service = None
 
+robot = None        # PepperRobot object
+
 RED   = "\033[1;31m"  
 BLUE  = "\033[1;34m"
 CYAN  = "\033[1;36m"
@@ -30,11 +32,9 @@ handTouch = [0.0, 0.0] # left, right
 sonar = [0.0, 0.0] # front, back
 
 
+# Sensors
 
-
-def apprunThread():
-    global memory_service, headTouch, handTouch, sonar
-
+def sensorThread(robot):
     sonarValues = ["Device/SubDeviceList/Platform/Front/Sonar/Sensor/Value",
                   "Device/SubDeviceList/Platform/Back/Sonar/Sensor/Value"]
     headTouchValue = "Device/SubDeviceList/Head/Touch/Middle/Sensor/Value"
@@ -43,18 +43,18 @@ def apprunThread():
 
     t = threading.currentThread()
     while getattr(t, "do_run", True):
-        headTouch = memory_service.getData(headTouchValue)
-        handTouch = memory_service.getListData(handTouchValues)
-        sonar = memory_service.getListData(sonarValues)
-        #print "Head touch middle value=", headTouch
-        #print "Hand touch middle value=", handTouch
-        #print "Sonar [Front, Back]", sonar
+        robot.headTouch = robot.memory_service.getData(headTouchValue)
+        robot.handTouch = robot.memory_service.getListData(handTouchValues)
+        robot.sonar = robot.memory_service.getListData(sonarValues)
+        #print "Head touch middle value=", robot.headTouch
+        #print "Hand touch middle value=", robot.handTouch
+        #print "Sonar [Front, Back]", robot.sonar
         time.sleep(1)
     #print "Exiting Thread"
 
 
 
-# Sensors
+
 
 def touchcb(value):
     print "value=",value
@@ -84,6 +84,17 @@ def sensorvalue(sensorname):
 # Begin/end
 
 def begin():
+    print 'begin'
+    if (robot==None):
+        robot=PepperRobot()
+        robot.connect()
+
+def end():
+    print 'end'
+    time.sleep(0.5) # make sure stuff ends
+
+
+def begin_OLD():
     global session, tts_service, memory_service, motion_service, anspeech_service, tablet_service
     print 'begin'
 
@@ -116,23 +127,20 @@ def begin():
 
 
 
-def end():
-    print 'end'
-    time.sleep(0.5) # make sure stuff ends
-
-
-
 
 # Robot motion
 
 def stop():
-    global motion_service,session
-    print 'stop'
-    motion_service.stopMove()
-    beh_service = session.service("ALBehaviorManager")
-    bns = beh_service.getRunningBehaviors()
-    for b in bns:
-        beh_service.stopBehavior(b)
+    if (robot!=None):
+        robot.stop()
+    else:
+        global motion_service,session
+        print 'stop'
+        motion_service.stopMove()
+        beh_service = session.service("ALBehaviorManager")
+        bns = beh_service.getRunningBehaviors()
+        for b in bns:
+            beh_service.stopBehavior(b)
 
 
 def forward(r=1):
@@ -153,14 +161,17 @@ def backward(r=1):
     motion_service.moveTo(x, y, theta) #blocking function
 
 def left(r=1):
-    global motion_service
-    print 'left',r
-    #Turn 90deg to the left
-    x = 0.0
-    y = 0.0
-    theta = math.pi/2 * r
-    print 'motion_service = ',motion_service
-    motion_service.moveTo(x, y, theta) #blocking function
+    if (robot!=None):
+        robot.left(r)
+    else:
+        global motion_service
+        print 'left',r
+        #Turn 90deg to the left
+        x = 0.0
+        y = 0.0
+        theta = math.pi/2 * r
+        print 'motion_service = ',motion_service
+        motion_service.moveTo(x, y, theta) #blocking function
 
 def right(r=1):
     global motion_service
@@ -287,11 +298,20 @@ def sax():
 class PepperRobot:
 
     def __init__(self):
-        pass
+        self.isConnected = False
+        # Sensors
+        self.headTouch = 0.0
+        self.handTouch = [0.0, 0.0] # left, right
+        self.sonar = [0.0, 0.0] # front, back
 
 
     # Connect to the robot
     def connect(self, pip=os.environ['PEPPER_IP'], pport=9559):
+
+        if (self.isConnected):
+            print("Robot already connnected.")
+            return
+
         print("Connecting to robot %s:%d ..." %(pip,pport))
         try:
             connection_url = "tcp://" + pip + ":" + str(pport)
@@ -300,7 +320,8 @@ class PepperRobot:
         except RuntimeError:
             print("%sCannot connect to Naoqi at %s:%d %s" %(RED,pip,pport,RESET))
             self.session = None
-            return False
+
+            return
         print("%sConnected to robot %s:%d %s" %(GREEN,pip,pport,RESET))
         self.session = self.app.session
 
@@ -313,6 +334,7 @@ class PepperRobot:
         self.anspeech_service = self.session.service("ALAnimatedSpeech")
         self.tablet_service = self.session.service("ALTabletService")
         self.animation_player_service = self.session.service("ALAnimationPlayer")
+        self.beh_service = self.session.service("ALBehaviorManager")
 
         #print "ALAnimatedSpeech ", anspeech_service
         #self.tts_service.setLanguage("Italian")
@@ -328,19 +350,25 @@ class PepperRobot:
         #idAnyTouch = anyTouch.signal.connect(touchcb)
 
         # create a thead that monitors directly the signal
-        #appThread = threading.Thread(target = apprunThread, args = ())
-        #appThread.start()
+        sth = threading.Thread(target = sensorThread, args = (self, ))
+        sth.start()
+
+        self.isConnected = True
 
 
-
-    def end():
-        print 'end'
-        time.sleep(0.5) # make sure stuff ends
-
+    # Speech sounds
 
     def say(self, interaction):
         print 'Say ',interaction
         self.tts_service.say(interaction)
+
+
+    def bip(self, r=1):
+	    print 'bip -- NOT IMPLEMENTED'
+
+
+    def bop(self, r=1):
+	    print 'bop -- NOT IMPLEMENTED'
 
 
     def animation(self, interaction):
@@ -354,5 +382,68 @@ class PepperRobot:
         strurl = "http://198.18.0.1/apps/spqrel/%s" %(weburl)
         print "URL: ",strurl
         self.tablet_service.showWebview(strurl)
+
+    # Robot motion
+
+    def stop(self):
+        print 'stop'
+        self.motion_service.stopMove()
+        bns = self.beh_service.getRunningBehaviors()
+        for b in bns:
+            self.beh_service.stopBehavior(b)
+
+    def forward(self, r=1):
+        print 'forward',r
+        #Move in its X direction
+        x = r
+        y = 0.0
+        theta = 0.0
+        self.motion_service.moveTo(x, y, theta) #blocking function
+
+    def backward(self, r=1):
+        global motion_service
+        print 'backward',r
+        x = -r
+        y = 0.0
+        theta = 0.0
+        self.motion_service.moveTo(x, y, theta) #blocking function
+
+    def left(self, r=1):
+        print 'left',r
+        #Turn 90deg to the left
+        x = 0.0
+        y = 0.0
+        theta = math.pi/2 * r
+        self.motion_service.moveTo(x, y, theta) #blocking function
+
+    def right(self, r=1):
+        global motion_service
+        print 'right',r
+        #Turn 90deg to the right
+        x = 0.0
+        y = 0.0
+        theta = -math.pi/2 * r
+        self.motion_service.moveTo(x, y, theta) #blocking function
+
+    # Wait
+
+    def wait(self, r=1):
+	    print 'wait',r
+	    for i in range(0,r):
+		    time.sleep(3)
+
+    # Sensors
+
+    def sensorvalue(self, sensorname):
+        if (sensorname == 'frontsonar'):
+            return self.sonar[0]
+        elif (sensorname == 'rearsonar'):
+            return self.sonar[1]
+        elif (sensorname == 'headtouch'):
+            return self.headTouch
+        elif (sensorname == 'lefthandtouch'):
+            return self.handTouch[0]
+        elif (sensorname == 'righthandtouch'):
+            return self.handTouch[1]
 
 
