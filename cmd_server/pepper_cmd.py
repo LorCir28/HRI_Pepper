@@ -316,7 +316,7 @@ class PepperRobot:
         self.headTouch = 0.0
         self.handTouch = [0.0, 0.0] # left, right
         self.sonar = [0.0, 0.0] # front, back
-
+        self.language = "English"
 
     # Connect to the robot
     def connect(self, pip=os.environ['PEPPER_IP'], pport=9559):
@@ -350,8 +350,6 @@ class PepperRobot:
         self.beh_service = self.session.service("ALBehaviorManager")
 
         #print "ALAnimatedSpeech ", anspeech_service
-        #self.tts_service.setLanguage("Italian")
-        self.tts_service.setLanguage("English")
 
         self.touch_service = self.session.service("ALTouch")
         self.touchstatus = self.touch_service.getStatus()
@@ -370,7 +368,9 @@ class PepperRobot:
 
 
     # Speech sounds
-
+    def setLanguage(self, language):
+        self.tts_service.setLanguage(language)
+    
     def say(self, interaction):
         print 'Say ',interaction
         self.tts_service.say(interaction)
