@@ -59,12 +59,12 @@ def square(r):
 
 
 def circle(r):
-	if (r>0.1):
+    if (r>0.1):
         print 'Circle ',r
-		v = 0.3
-		dt = 2*math.pi*r/v
-		w = 2*math.pi/dt # = v/r
-		setSpeed(v,w,dt)
+	v = 0.3
+	dt = 2*math.pi*r/v
+	w = 2*math.pi/dt # = v/r
+	setSpeed(v,w,dt)
 
 
 def forward(r=1):
