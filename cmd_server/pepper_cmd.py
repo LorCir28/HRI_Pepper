@@ -373,6 +373,7 @@ class PepperRobot:
     
     def say(self, interaction):
         print 'Say ',interaction
+        self.tts_service.setParameter("speed", 80)
         self.tts_service.say(interaction)
 
 
