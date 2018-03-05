@@ -425,7 +425,13 @@ class PepperRobot:
     
     def say(self, interaction):
         self.tts_service.setParameter("speed", 80)
-        self.tts_service.say(interaction)
+        #self.tts_service.say(interaction)
+        self.asay2(interaction)
+
+    def asay2(self, interaction):
+        # set the local configuration
+        configuration = {"bodyLanguageMode":"contextual"}
+        self.anspeech_service.say(interaction, configuration)
 
     def asay(self, interaction):
         # set the local configuration
