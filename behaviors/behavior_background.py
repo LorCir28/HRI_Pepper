@@ -32,6 +32,9 @@ def main():
     ba_service = app.session.service("ALBasicAwareness")
     ba_service.setEnabled(True)
 
+    sm_service = app.session.service("ALSpeakingMovement")
+    sm_service.setEnabled(True)
+    
 if __name__ == "__main__":
     main()
 
