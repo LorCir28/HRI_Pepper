@@ -51,9 +51,9 @@ def main():
 
 
     if motion_service.robotIsWakeUp():
-        stiff_body = 0.5
+        stiff_body = 0.8
         stiff_head = 1.0
-        stiff_arms = 0.8
+        stiff_arms = 0.9
         print "   Stiffness - Body ",stiff_body," Head ",stiff_head," Arms ",stiff_arms
         
         # Valid names: Head, LArm, RArm, LHand, RHand
