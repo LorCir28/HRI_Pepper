@@ -392,7 +392,14 @@ class PepperRobot:
         self.beh_service = self.session.service("ALBehaviorManager")
         self.al_service = self.session.service("ALAutonomousLife")
         self.rp_service = self.session.service("ALRobotPosture")
+        self.bm_service = self.session.service("ALBackgroundMovement")
+        self.ba_service = self.session.service("ALBasicAwareness")
+        self.sm_service = self.session.service("ALSpeakingMovement")
 
+        self.bm_service.setEnabled(True)
+        self.ba_service.setEnabled(True)
+        self.sm_service.setEnabled(True)
+        
         webview = "http://198.18.0.1/apps/spqrel/index.html"
         self.tablet_service.showWebview(webview)
 
@@ -448,7 +455,15 @@ class PepperRobot:
 
     def animation(self, interaction):
         print 'Animation ',interaction
+        self.bm_service.setEnabled(False)
+        self.ba_service.setEnabled(False)
+        self.sm_service.setEnabled(False)
+
         self.animation_player_service.run(interaction)
+
+        self.bm_service.setEnabled(True)
+        self.ba_service.setEnabled(True)
+        self.sm_service.setEnabled(True)
 
 
     # Tablet
