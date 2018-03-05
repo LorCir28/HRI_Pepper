@@ -139,6 +139,36 @@ def run_code(code):
 # Main program
 
 def main():
+    # Run main thread
+    t = Thread(target=main_loop, args=(None,))
+    t.start()
+
+    # Run robot
+    begin()
+
+    # Run web server
+    application = tornado.web.Application([
+        (r'/websocketserver', MyWebSocketServer),])  
+    http_server = tornado.httpserver.HTTPServer(application)
+    http_server.listen(server_port)
+    print("%sWebsocket server listening on port %d%s" %(GREEN,server_port,RESET))
+
+    try:
+        tornado.ioloop.IOLoop.instance().start()
+    except KeyboardInterrupt:
+        print(" -- Keyboard interrupt --")
+
+    # Quit
+    end()
+
+    if (not websocket_server is None):
+        websocket_server.close()
+    print("Web server quit.")
+    run = False    
+    print("Waiting for main loop to quit...")
+
+
+def main_OLD():
     global run,session,tablet_service
 
     parser = argparse.ArgumentParser()
@@ -191,7 +221,7 @@ def main():
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(server_port)
     print("%sWebsocket server listening on port %d%s" %(GREEN,server_port,RESET))
-    tablet_service.showWebview(webview)
+#    tablet_service.showWebview(webview)
 
     try:
         tornado.ioloop.IOLoop.instance().start()

@@ -393,6 +393,9 @@ class PepperRobot:
         self.al_service = self.session.service("ALAutonomousLife")
         self.rp_service = self.session.service("ALRobotPosture")
 
+        webview = "http://198.18.0.1/apps/spqrel/index.html"
+        self.tablet_service.showWebview(webview)
+
         self.touch_service = self.session.service("ALTouch")
         self.touchstatus = self.touch_service.getStatus()
         #print touchstatus
