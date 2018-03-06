@@ -550,37 +550,37 @@ class PepperRobot:
             self.al_service.setState('disabled')
         self.rp_service.goToPosture("Stand",2.0)
 
-    def disabled():
+    def disabled(self):
         #self.tts_service.say("Bye bye")
         self.al_service.setState('disabled')
 
-    def interactive():
+    def interactive(self):
 	    #tts_service.say("Interactive")
 	    self.al_service.setState('interactive')
 
 
-    def run_behavior(bname):
+    def run_behavior(self, bname):
 	    self.beh_service.startBehavior(bname)
 	    #time.sleep(10)
 	    #beh_service.stopBehavior(bname)
 
-    def sax():
+    def sax(self):
 	    str = 'sax'
 	    print(str)
 	    bname = 'saxophone-0635af/behavior_1'
-	    run_behavior(bname)
+	    self.run_behavior(bname)
 
-    def takephoto():
+    def takephoto(self):
 	    str = 'take photo'
 	    print(str)
 	    #tts_service.say("Cheers")
 	    bname = 'takepicture-61492b/behavior_1'
-	    run_behavior(bname)
+	    self.run_behavior(bname)
 
-    def introduction():
+    def introduction(self):
 	    str = 'introduction'
 	    print(str)
 	    bname = 'animated-say-5b866d/behavior_1'
-	    run_behavior(bname)
+	    self.run_behavior(bname)
 
 
