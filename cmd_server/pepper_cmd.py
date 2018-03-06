@@ -341,11 +341,8 @@ def takephoto():
 
 
 def opendiag():
-	global session, tts_service
-	str = 'demo'
-	print(str)
-	bname = 'animated-say-5b866d/behavior_1'
-	run_behavior(bname)
+	global robot
+        robot.introduction()
 
 def sax():
         global robot
