@@ -291,30 +291,34 @@ def asay_OLD(strsay):
 # Other 
 
 def stand():
-	global session, tts_service
-	print 'Stand'
-	al_service = session.service("ALAutonomousLife")
-	if al_service.getState()!='disabled':
-		al_service.setState('disabled')
-	rp_service = session.service("ALRobotPosture")
-	rp_service.goToPosture("Stand",2.0)
-	#tts_service.say("Standing up")
-
+        global robot
+#	global session, tts_service
+#	print 'Stand'
+#	al_service = session.service("ALAutonomousLife")
+#	if al_service.getState()!='disabled':
+#		al_service.setState('disabled')
+#	rp_service = session.service("ALRobotPosture")
+#	rp_service.goToPosture("Stand",2.0)
+#	#tts_service.say("Standing up")
+        robot.stand()
 
 def disabled():
-	global session, tts_service
-	print 'Sleep'
-	tts_service.say("Bye bye")
-	al_service = session.service("ALAutonomousLife")
-	al_service.setState('disabled')
-
+        global robot
+#	global session, tts_service
+#	print 'Sleep'
+#	tts_service.say("Bye bye")
+#	al_service = session.service("ALAutonomousLife")
+#	al_service.setState('disabled')
+        robot.disabled()
 
 def interact():
-	global session, tts_service
-	print 'Interactive mode'
-	tts_service.say("Interactive")
-	al_service = session.service("ALAutonomousLife")
-	al_service.setState('interactive')
+        global robot
+#	global session, tts_service
+#	print 'Interactive mode'
+#	tts_service.say("Interactive")
+#	al_service = session.service("ALAutonomousLife")
+#	al_service.setState('interactive')
+        robot.interactive()
 
 
 def run_behavior(bname):
@@ -326,12 +330,14 @@ def run_behavior(bname):
 
 
 def takephoto():
-	global session, tts_service
-	str = 'Take photo'
-	print(str)
-	#tts_service.say(str)
-	bname = 'takepicture-61492b/behavior_1'
-	run_behavior(bname)
+        global robot
+#	global session, tts_service
+#	str = 'Take photo'
+#	print(str)
+#	#tts_service.say(str)
+#	bname = 'takepicture-61492b/behavior_1'
+#	run_behavior(bname)
+        robot.takephoto()
 
 
 def opendiag():
@@ -342,12 +348,13 @@ def opendiag():
 	run_behavior(bname)
 
 def sax():
-	global session, tts_service
-	str = 'demo'
-	print(str)
-	bname = 'saxophone-0635af/behavior_1'
-	run_behavior(bname)
-
+        global robot
+#	global session, tts_service
+#	str = 'demo'
+#	print(str)
+#	bname = 'saxophone-0635af/behavior_1'
+#	run_behavior(bname)
+        robot.sax()
 
 
 class PepperRobot:
