@@ -138,19 +138,49 @@ def begin_OLD():
 # Robot motion
 
 def stop():
-    if (robot!=None):
-        robot.stop()
-    else:
-        global motion_service,session
-        print 'stop'
-        motion_service.stopMove()
-        beh_service = session.service("ALBehaviorManager")
-        bns = beh_service.getRunningBehaviors()
-        for b in bns:
-            beh_service.stopBehavior(b)
-
+    global robot
+    if (robot==None):
+        begin()
+    robot.stop()
 
 def forward(r=1):
+    global robot
+    if (robot==None):
+        begin()
+    robot.forward(r)
+
+def backward(r=1):
+    global robot
+    if (robot==None):
+        begin()
+    robot.backward(r)
+
+def left(r=1):
+    global robot
+    if (robot==None):
+        begin()
+    robot.left(r)
+
+def right(r=1):
+    global robot
+    if (robot==None):
+        begin()
+    robot.right(r)
+
+
+
+# OLD style commands
+
+def stop_OLD():
+    global motion_service,session
+    print 'stop'
+    motion_service.stopMove()
+    beh_service = session.service("ALBehaviorManager")
+    bns = beh_service.getRunningBehaviors()
+    for b in bns:
+        beh_service.stopBehavior(b)
+
+def forward_OLD(r=1):
     global motion_service
     print 'forward',r
     #Move in its X direction
@@ -159,7 +189,7 @@ def forward(r=1):
     theta = 0.0
     motion_service.moveTo(x, y, theta) #blocking function
 
-def backward(r=1):
+def backward_OLD(r=1):
     global motion_service
     print 'backward',r
     x = -r * 0.5
@@ -167,21 +197,17 @@ def backward(r=1):
     theta = 0.0
     motion_service.moveTo(x, y, theta) #blocking function
 
-def left(r=1):
-    global robot
-    if (robot!=None):
-        robot.left(r)
-    else:
-        global motion_service
-        print 'left',r
-        #Turn 90deg to the left
-        x = 0.0
-        y = 0.0
-        theta = math.pi/2 * r
-        print 'motion_service = ',motion_service
-        motion_service.moveTo(x, y, theta) #blocking function
+def left_OLD(r=1):
+    global motion_service
+    print 'left',r
+    #Turn 90deg to the left
+    x = 0.0
+    y = 0.0
+    theta = math.pi/2 * r
+    print 'motion_service = ',motion_service
+    motion_service.moveTo(x, y, theta) #blocking function
 
-def right(r=1):
+def right_OLD(r=1):
     global motion_service
     print 'right',r
     #Turn 90deg to the right
@@ -209,19 +235,33 @@ def bip(r=1):
 def bop(r=1):
 	print 'bop'
 
-# Speech
 
+# Speech
 
 def say(strsay):
     global robot
     print 'Say ',strsay
-    if (robot!=None):
-        robot.say(strsay)
-    else:
-        global tts_service
-        tts_service.say(strsay)
+    if (robot==None):
+        begin()
+    robot.say(strsay)
 
 def asay(strsay):
+    global robot
+    print 'Animated Say ',strsay
+    if (robot==None):
+        begin()
+    robot.asay(strsay)
+
+
+# OLD-style speech functions
+
+def say_OLD(strsay):
+    global tts_service
+    print 'Say ',strsay
+    tts_service.say(strsay)
+
+
+def asay_OLD(strsay):
     global tts_service, anspeech_service
     print 'Say ',strsay
     #tts_service.say(strsay)
@@ -241,38 +281,44 @@ def asay(strsay):
     if ('hello' in strsay):
         anim = "animations/Stand/Gestures/Hey_1"
     
-
     anspeech_service.say("^start("+anim+") " + strsay+" ^wait("+anim+")")
+
+
+
 
 
 
 # Other 
 
 def stand():
-	global session, tts_service
-	print 'Stand'
-	al_service = session.service("ALAutonomousLife")
-	if al_service.getState()!='disabled':
-		al_service.setState('disabled')
-	rp_service = session.service("ALRobotPosture")
-	rp_service.goToPosture("Stand",2.0)
-	#tts_service.say("Standing up")
-
+        global robot
+#	global session, tts_service
+#	print 'Stand'
+#	al_service = session.service("ALAutonomousLife")
+#	if al_service.getState()!='disabled':
+#		al_service.setState('disabled')
+#	rp_service = session.service("ALRobotPosture")
+#	rp_service.goToPosture("Stand",2.0)
+#	#tts_service.say("Standing up")
+        robot.stand()
 
 def disabled():
-	global session, tts_service
-	print 'Sleep'
-	tts_service.say("Bye bye")
-	al_service = session.service("ALAutonomousLife")
-	al_service.setState('disabled')
-
+        global robot
+#	global session, tts_service
+#	print 'Sleep'
+#	tts_service.say("Bye bye")
+#	al_service = session.service("ALAutonomousLife")
+#	al_service.setState('disabled')
+        robot.disabled()
 
 def interact():
-	global session, tts_service
-	print 'Interactive mode'
-	tts_service.say("Interactive")
-	al_service = session.service("ALAutonomousLife")
-	al_service.setState('interactive')
+        global robot
+#	global session, tts_service
+#	print 'Interactive mode'
+#	tts_service.say("Interactive")
+#	al_service = session.service("ALAutonomousLife")
+#	al_service.setState('interactive')
+        robot.interactive()
 
 
 def run_behavior(bname):
@@ -284,28 +330,28 @@ def run_behavior(bname):
 
 
 def takephoto():
-	global session, tts_service
-	str = 'Take photo'
-	print(str)
-	#tts_service.say(str)
-	bname = 'takepicture-61492b/behavior_1'
-	run_behavior(bname)
+        global robot
+#	global session, tts_service
+#	str = 'Take photo'
+#	print(str)
+#	#tts_service.say(str)
+#	bname = 'takepicture-61492b/behavior_1'
+#	run_behavior(bname)
+        robot.takephoto()
 
 
 def opendiag():
-	global session, tts_service
-	str = 'demo'
-	print(str)
-	bname = 'animated-say-5b866d/behavior_1'
-	run_behavior(bname)
+	global robot
+        robot.introduction()
 
 def sax():
-	global session, tts_service
-	str = 'demo'
-	print(str)
-	bname = 'saxophone-0635af/behavior_1'
-	run_behavior(bname)
-
+        global robot
+#	global session, tts_service
+#	str = 'demo'
+#	print(str)
+#	bname = 'saxophone-0635af/behavior_1'
+#	run_behavior(bname)
+        robot.sax()
 
 
 class PepperRobot:
@@ -348,8 +394,18 @@ class PepperRobot:
         self.tablet_service = self.session.service("ALTabletService")
         self.animation_player_service = self.session.service("ALAnimationPlayer")
         self.beh_service = self.session.service("ALBehaviorManager")
+        self.al_service = self.session.service("ALAutonomousLife")
+        self.rp_service = self.session.service("ALRobotPosture")
+        self.bm_service = self.session.service("ALBackgroundMovement")
+        self.ba_service = self.session.service("ALBasicAwareness")
+        self.sm_service = self.session.service("ALSpeakingMovement")
 
-        #print "ALAnimatedSpeech ", anspeech_service
+        self.bm_service.setEnabled(True)
+        self.ba_service.setEnabled(True)
+        self.sm_service.setEnabled(True)
+        
+        webview = "http://198.18.0.1/apps/spqrel/index.html"
+        self.tablet_service.showWebview(webview)
 
         self.touch_service = self.session.service("ALTouch")
         self.touchstatus = self.touch_service.getStatus()
@@ -372,8 +428,31 @@ class PepperRobot:
         self.tts_service.setLanguage(language)
     
     def say(self, interaction):
-        print 'Say ',interaction
-        self.tts_service.say(interaction)
+        self.tts_service.setParameter("speed", 80)
+        #self.tts_service.say(interaction)
+        self.asay2(interaction)
+
+    def asay2(self, interaction):
+        # set the local configuration
+        configuration = {"bodyLanguageMode":"contextual"}
+        self.anspeech_service.say(interaction, configuration)
+
+    def asay(self, interaction):
+        # set the local configuration
+        #configuration = {"bodyLanguageMode":"contextual"}
+
+        # http://doc.aldebaran.com/2-5/naoqi/motion/alanimationplayer-advanced.html#animationplayer-list-behaviors-pepper
+        vanim = ["animations/Stand/Gestures/Enthusiastic_4",
+                 "animations/Stand/Gestures/Enthusiastic_5",
+                 "animations/Stand/Gestures/Excited_1",
+                 "animations/Stand/Gestures/Explain_1" ]
+        anim = random.choice(vanim) # random animation
+
+        if ('hello' in interaction):
+            anim = "animations/Stand/Gestures/Hey_1"
+    
+        self.anspeech_service.say("^start("+anim+") " + interaction+" ^wait("+anim+")")
+
 
 
     def bip(self, r=1):
@@ -386,7 +465,15 @@ class PepperRobot:
 
     def animation(self, interaction):
         print 'Animation ',interaction
+        self.bm_service.setEnabled(False)
+        self.ba_service.setEnabled(False)
+        self.sm_service.setEnabled(False)
+
         self.animation_player_service.run(interaction)
+
+        self.bm_service.setEnabled(True)
+        self.ba_service.setEnabled(True)
+        self.sm_service.setEnabled(True)
 
 
     # Tablet
@@ -458,5 +545,46 @@ class PepperRobot:
             return self.handTouch[0]
         elif (sensorname == 'righthandtouch'):
             return self.handTouch[1]
+
+
+    # Behaviors
+
+    def stand(self):
+        if self.al_service.getState()!='disabled':
+            self.al_service.setState('disabled')
+        self.rp_service.goToPosture("Stand",2.0)
+
+    def disabled(self):
+        #self.tts_service.say("Bye bye")
+        self.al_service.setState('disabled')
+
+    def interactive(self):
+	    #tts_service.say("Interactive")
+	    self.al_service.setState('interactive')
+
+
+    def run_behavior(self, bname):
+	    self.beh_service.startBehavior(bname)
+	    #time.sleep(10)
+	    #beh_service.stopBehavior(bname)
+
+    def sax(self):
+	    str = 'sax'
+	    print(str)
+	    bname = 'saxophone-0635af/behavior_1'
+	    self.run_behavior(bname)
+
+    def takephoto(self):
+	    str = 'take photo'
+	    print(str)
+	    #tts_service.say("Cheers")
+	    bname = 'takepicture-61492b/behavior_1'
+	    self.run_behavior(bname)
+
+    def introduction(self):
+	    str = 'introduction'
+	    print(str)
+	    bname = 'animated-say-5b866d/behavior_1'
+	    self.run_behavior(bname)
 
 
