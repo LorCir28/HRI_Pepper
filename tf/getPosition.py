@@ -29,6 +29,13 @@ def main(session, sensor, frame):
     print "Translation (x,y,z) = [", result[0],",", result[1],",", result[2],"]"
     print "Rotation    (x,y,z) = [", result[3],",", result[4],",", result[5],"]"
 
+    print "Transformation: "
+    result = motion_service.getTransform(name, frame, useSensorValues)
+    for i in range(0, 4):
+        for j in range(0, 4):
+            print result[4*i + j],
+        print ''
+    
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
