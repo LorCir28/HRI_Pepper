@@ -12,6 +12,8 @@ def main():
                         help="Robot IP address.  On robot or Local Naoqi: use '127.0.0.1'.")
     parser.add_argument("--pport", type=int, default=9559,
                         help="Naoqi port number")
+    parser.add_argument("--enable", type=int, default=1,
+                        help="(0=deactivate, 1=activate)")
     
     args = parser.parse_args()
 
@@ -26,14 +28,16 @@ def main():
 
     app.start()
 
+    enable = args.enable
+    
     bm_service = app.session.service("ALBackgroundMovement")
-    bm_service.setEnabled(True)
+    bm_service.setEnabled(enable)
 
     ba_service = app.session.service("ALBasicAwareness")
-    ba_service.setEnabled(True)
+    ba_service.setEnabled(enable)
 
     sm_service = app.session.service("ALSpeakingMovement")
-    sm_service.setEnabled(True)
+    sm_service.setEnabled(enable)
     
 if __name__ == "__main__":
     main()
