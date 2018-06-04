@@ -23,7 +23,7 @@ from pepper_cmd import *
 
 websocket_server = None     # websocket handler
 run = True                  # main_loop run flag
-server_port = 9000          # web server port
+server_port = 9010          # web server port
 code = None
 status = "Idle"             # robot status sent to websocket
 
@@ -52,7 +52,7 @@ class MyWebSocketServer(tornado.websocket.WebSocketHandler):
         global code, status
         if (message=='stop'):
             print('Stop code and robot')
-            robot_stop_request()
+            stop()
         else:
             print('Code received:\n%s' % message)
             if (status=='Idle'):
