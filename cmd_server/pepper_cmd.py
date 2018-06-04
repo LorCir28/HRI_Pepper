@@ -95,6 +95,7 @@ def begin():
     if (robot==None):
         robot=PepperRobot()
         robot.connect()
+    robot.begin()
 
 def end():
     print 'end'
@@ -103,10 +104,13 @@ def end():
 
 def begin_OLD():
     global session, tts_service, memory_service, motion_service, anspeech_service, tablet_service
+
     print 'begin'
 
     if session==None:
         return
+
+    stop_request = False
 
     #Starting services
     memory_service  = session.service("ALMemory")
@@ -167,55 +171,12 @@ def right(r=1):
         begin()
     robot.right(r)
 
+def robot_stop_request(): # stop until next begin()
+    if (robot!=None):
+        robot.stop_request = True
+        robot.stop()
+        print("stop request")
 
-
-# OLD style commands
-
-def stop_OLD():
-    global motion_service,session
-    print 'stop'
-    motion_service.stopMove()
-    beh_service = session.service("ALBehaviorManager")
-    bns = beh_service.getRunningBehaviors()
-    for b in bns:
-        beh_service.stopBehavior(b)
-
-def forward_OLD(r=1):
-    global motion_service
-    print 'forward',r
-    #Move in its X direction
-    x = r * 0.5
-    y = 0.0
-    theta = 0.0
-    motion_service.moveTo(x, y, theta) #blocking function
-
-def backward_OLD(r=1):
-    global motion_service
-    print 'backward',r
-    x = -r * 0.5
-    y = 0.0
-    theta = 0.0
-    motion_service.moveTo(x, y, theta) #blocking function
-
-def left_OLD(r=1):
-    global motion_service
-    print 'left',r
-    #Turn 90deg to the left
-    x = 0.0
-    y = 0.0
-    theta = math.pi/2 * r
-    print 'motion_service = ',motion_service
-    motion_service.moveTo(x, y, theta) #blocking function
-
-def right_OLD(r=1):
-    global motion_service
-    print 'right',r
-    #Turn 90deg to the right
-    x = 0.0
-    y = 0.0
-    theta = -math.pi/2 * r
-    motion_service.moveTo(x, y, theta) #blocking function
-	
 
 
 # Wait
@@ -251,40 +212,6 @@ def asay(strsay):
     if (robot==None):
         begin()
     robot.asay(strsay)
-
-
-# OLD-style speech functions
-
-def say_OLD(strsay):
-    global tts_service
-    print 'Say ',strsay
-    tts_service.say(strsay)
-
-
-def asay_OLD(strsay):
-    global tts_service, anspeech_service
-    print 'Say ',strsay
-    #tts_service.say(strsay)
-
-    # set the local configuration
-    #configuration = {"bodyLanguageMode":"contextual"}
-
-    # say the text with the local configuration
-
-    # http://doc.aldebaran.com/2-5/naoqi/motion/alanimationplayer-advanced.html#animationplayer-list-behaviors-pepper
-    vanim = ["animations/Stand/Gestures/Enthusiastic_4",
-             "animations/Stand/Gestures/Enthusiastic_5",
-            "animations/Stand/Gestures/Excited_1",
-            "animations/Stand/Gestures/Explain_1" ]
-    anim = random.choice(vanim)
-
-    if ('hello' in strsay):
-        anim = "animations/Stand/Gestures/Hey_1"
-    
-    anspeech_service.say("^start("+anim+") " + strsay+" ^wait("+anim+")")
-
-
-
 
 
 
@@ -363,6 +290,7 @@ class PepperRobot:
         self.handTouch = [0.0, 0.0] # left, right
         self.sonar = [0.0, 0.0] # front, back
         self.language = "English"
+        self.stop_request = False
 
     # Connect to the robot
     def connect(self, pip=os.environ['PEPPER_IP'], pport=9559):
@@ -427,17 +355,26 @@ class PepperRobot:
     def setLanguage(self, language):
         self.tts_service.setLanguage(language)
     
+    def begin(self):
+        self.stop_request = False
+
     def say(self, interaction):
+        if self.stop_request:
+            return
         self.tts_service.setParameter("speed", 80)
         #self.tts_service.say(interaction)
         self.asay2(interaction)
 
     def asay2(self, interaction):
+        if self.stop_request:
+            return
         # set the local configuration
         configuration = {"bodyLanguageMode":"contextual"}
         self.anspeech_service.say(interaction, configuration)
 
     def asay(self, interaction):
+        if self.stop_request:
+            return
         # set the local configuration
         #configuration = {"bodyLanguageMode":"contextual"}
 
@@ -464,6 +401,8 @@ class PepperRobot:
 
 
     def animation(self, interaction):
+        if self.stop_request:
+            return
         print 'Animation ',interaction
         self.bm_service.setEnabled(False)
         self.ba_service.setEnabled(False)
@@ -493,6 +432,8 @@ class PepperRobot:
             self.beh_service.stopBehavior(b)
 
     def forward(self, r=1):
+        if self.stop_request:
+            return
         print 'forward',r
         #Move in its X direction
         x = r
@@ -501,7 +442,8 @@ class PepperRobot:
         self.motion_service.moveTo(x, y, theta) #blocking function
 
     def backward(self, r=1):
-        global motion_service
+        if self.stop_request:
+            return
         print 'backward',r
         x = -r
         y = 0.0
@@ -509,6 +451,8 @@ class PepperRobot:
         self.motion_service.moveTo(x, y, theta) #blocking function
 
     def left(self, r=1):
+        if self.stop_request:
+            return
         print 'left',r
         #Turn 90deg to the left
         x = 0.0
@@ -517,7 +461,8 @@ class PepperRobot:
         self.motion_service.moveTo(x, y, theta) #blocking function
 
     def right(self, r=1):
-        global motion_service
+        if self.stop_request:
+            return
         print 'right',r
         #Turn 90deg to the right
         x = 0.0

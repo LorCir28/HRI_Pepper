@@ -52,7 +52,7 @@ class MyWebSocketServer(tornado.websocket.WebSocketHandler):
         global code, status
         if (message=='stop'):
             print('Stop code and robot')
-            stop()
+            robot_stop_request()
         else:
             print('Code received:\n%s' % message)
             if (status=='Idle'):
