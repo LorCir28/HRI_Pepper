@@ -182,19 +182,19 @@ def robot_stop_request(): # stop until next begin()
 # Wait
 
 def wait(r=1):
-	print 'wait',r
-	for i in range(0,r):
-		time.sleep(3)
+    print 'wait',r
+    for i in range(0,r):
+        time.sleep(3)
 
 
 # Sounds
 
 def bip(r=1):
-	print 'bip'
+    print 'bip'
 
 
 def bop(r=1):
-	print 'bop'
+    print 'bop'
 
 
 # Speech
@@ -217,67 +217,72 @@ def asay(strsay):
 
 # Other 
 
+# Alive behaviors
+def setAlive(alive):
+    global robot
+    robot.setEnableAlive(alive)
+
 def stand():
-        global robot
-#	global session, tts_service
-#	print 'Stand'
-#	al_service = session.service("ALAutonomousLife")
-#	if al_service.getState()!='disabled':
-#		al_service.setState('disabled')
-#	rp_service = session.service("ALRobotPosture")
-#	rp_service.goToPosture("Stand",2.0)
-#	#tts_service.say("Standing up")
-        robot.stand()
+    global robot
+#    global session, tts_service
+#    print 'Stand'
+#    al_service = session.service("ALAutonomousLife")
+#    if al_service.getState()!='disabled':
+#        al_service.setState('disabled')
+#    rp_service = session.service("ALRobotPosture")
+#    rp_service.goToPosture("Stand",2.0)
+#    #tts_service.say("Standing up")
+    robot.stand()
 
 def disabled():
-        global robot
-#	global session, tts_service
-#	print 'Sleep'
-#	tts_service.say("Bye bye")
-#	al_service = session.service("ALAutonomousLife")
-#	al_service.setState('disabled')
-        robot.disabled()
+    global robot
+#    global session, tts_service
+#    print 'Sleep'
+#    tts_service.say("Bye bye")
+#    al_service = session.service("ALAutonomousLife")
+#    al_service.setState('disabled')
+    robot.disabled()
 
 def interact():
-        global robot
-#	global session, tts_service
-#	print 'Interactive mode'
-#	tts_service.say("Interactive")
-#	al_service = session.service("ALAutonomousLife")
-#	al_service.setState('interactive')
-        robot.interactive()
+    global robot
+#    global session, tts_service
+#    print 'Interactive mode'
+#    tts_service.say("Interactive")
+#    al_service = session.service("ALAutonomousLife")
+#    al_service.setState('interactive')
+    robot.interactive()
 
 
 def run_behavior(bname):
-	global session
-	beh_service = session.service("ALBehaviorManager")
-	beh_service.startBehavior(bname)
-	#time.sleep(10)
-	#beh_service.stopBehavior(bname)
+    global session
+    beh_service = session.service("ALBehaviorManager")
+    beh_service.startBehavior(bname)
+    #time.sleep(10)
+    #beh_service.stopBehavior(bname)
 
 
 def takephoto():
-        global robot
-#	global session, tts_service
-#	str = 'Take photo'
-#	print(str)
-#	#tts_service.say(str)
-#	bname = 'takepicture-61492b/behavior_1'
-#	run_behavior(bname)
-        robot.takephoto()
+    global robot
+#    global session, tts_service
+#    str = 'Take photo'
+#    print(str)
+#    #tts_service.say(str)
+#    bname = 'takepicture-61492b/behavior_1'
+#    run_behavior(bname)
+    robot.takephoto()
 
 
 def opendiag():
-	global robot
-        robot.introduction()
+    global robot
+    robot.introduction()
 
 def sax():
         global robot
-#	global session, tts_service
-#	str = 'demo'
-#	print(str)
-#	bname = 'saxophone-0635af/behavior_1'
-#	run_behavior(bname)
+#    global session, tts_service
+#    str = 'demo'
+#    print(str)
+#    bname = 'saxophone-0635af/behavior_1'
+#    run_behavior(bname)
         robot.sax()
 
 
@@ -293,7 +298,7 @@ class PepperRobot:
         self.stop_request = False
 
     # Connect to the robot
-    def connect(self, pip=os.environ['PEPPER_IP'], pport=9559):
+    def connect(self, pip=os.environ['PEPPER_IP'], pport=9559, alive=False):
 
         if (self.isConnected):
             print("Robot already connnected.")
@@ -328,9 +333,12 @@ class PepperRobot:
         self.ba_service = self.session.service("ALBasicAwareness")
         self.sm_service = self.session.service("ALSpeakingMovement")
 
-        self.bm_service.setEnabled(True)
-        self.ba_service.setEnabled(True)
-        self.sm_service.setEnabled(True)
+        self.alive = alive
+        print('Alive behaviors: %r' %self.alive)
+
+        self.bm_service.setEnabled(self.alive)
+        self.ba_service.setEnabled(self.alive)
+        self.sm_service.setEnabled(self.alive)
         
         webview = "http://198.18.0.1/apps/spqrel/index.html"
         self.tablet_service.showWebview(webview)
@@ -345,11 +353,17 @@ class PepperRobot:
         #idAnyTouch = anyTouch.signal.connect(touchcb)
 
         # create a thead that monitors directly the signal
-        sth = threading.Thread(target = sensorThread, args = (self, ))
-        sth.start()
+        self.sth = threading.Thread(target = sensorThread, args = (self, ))
+        self.sth.start()
 
         self.isConnected = True
 
+
+    def quit(self):
+        print "Quit Pepper robot."
+        self.sth.do_run = False
+        time.sleep(1)
+        self.app.stop()
 
     # Speech sounds
     def setLanguage(self, language):
@@ -393,11 +407,11 @@ class PepperRobot:
 
 
     def bip(self, r=1):
-	    print 'bip -- NOT IMPLEMENTED'
+        print 'bip -- NOT IMPLEMENTED'
 
 
     def bop(self, r=1):
-	    print 'bop -- NOT IMPLEMENTED'
+        print 'bop -- NOT IMPLEMENTED'
 
 
     def animation(self, interaction):
@@ -410,10 +424,18 @@ class PepperRobot:
 
         self.animation_player_service.run(interaction)
 
-        self.bm_service.setEnabled(True)
-        self.ba_service.setEnabled(True)
-        self.sm_service.setEnabled(True)
+        self.bm_service.setEnabled(self.alive)
+        self.ba_service.setEnabled(self.alive)
+        self.sm_service.setEnabled(self.alive)
 
+    # Alive behaviors
+
+    def setEnableAlive(self, alive):
+        self.alive = alive
+        print('Alive behaviors: %r' %self.alive)
+        self.bm_service.setEnabled(self.alive)
+        self.ba_service.setEnabled(self.alive)
+        self.sm_service.setEnabled(self.alive)
 
     # Tablet
 
@@ -473,9 +495,9 @@ class PepperRobot:
     # Wait
 
     def wait(self, r=1):
-	    print 'wait',r
-	    for i in range(0,r):
-		    time.sleep(3)
+        print 'wait',r
+        for i in range(0,r):
+            time.sleep(3)
 
     # Sensors
 
@@ -504,32 +526,32 @@ class PepperRobot:
         self.al_service.setState('disabled')
 
     def interactive(self):
-	    #tts_service.say("Interactive")
-	    self.al_service.setState('interactive')
+        #tts_service.say("Interactive")
+        self.al_service.setState('interactive')
 
 
     def run_behavior(self, bname):
-	    self.beh_service.startBehavior(bname)
-	    #time.sleep(10)
-	    #beh_service.stopBehavior(bname)
+        self.beh_service.startBehavior(bname)
+        #time.sleep(10)
+        #beh_service.stopBehavior(bname)
 
     def sax(self):
-	    str = 'sax'
-	    print(str)
-	    bname = 'saxophone-0635af/behavior_1'
-	    self.run_behavior(bname)
+        str = 'sax'
+        print(str)
+        bname = 'saxophone-0635af/behavior_1'
+        self.run_behavior(bname)
 
     def takephoto(self):
-	    str = 'take photo'
-	    print(str)
-	    #tts_service.say("Cheers")
-	    bname = 'takepicture-61492b/behavior_1'
-	    self.run_behavior(bname)
+        str = 'take photo'
+        print(str)
+        #tts_service.say("Cheers")
+        bname = 'takepicture-61492b/behavior_1'
+        self.run_behavior(bname)
 
     def introduction(self):
-	    str = 'introduction'
-	    print(str)
-	    bname = 'animated-say-5b866d/behavior_1'
-	    self.run_behavior(bname)
+        str = 'introduction'
+        print(str)
+        bname = 'animated-say-5b866d/behavior_1'
+        self.run_behavior(bname)
 
 
