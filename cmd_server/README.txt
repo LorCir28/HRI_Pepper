@@ -21,3 +21,16 @@ Use IP of the robot or 198.18.0.1 from the robot tablet.
 
 
 * Enjoy Pepper-Blockly programming.
+
+
+### Command server/client
+
+* Server:
+
+    python pepper_cmd_server.py 
+
+* Client:
+
+    python pepper_send_program.py --program test.py
+
+

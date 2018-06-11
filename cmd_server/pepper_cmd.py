@@ -66,11 +66,25 @@ def touchcb(value):
 
     print touched_bodies
 
+asr_word = ''
+asr_confidence = 0
+asr_timestamp = 0
+
+def onWordRecognized(value):
+    global asr_word, asr_confidence, asr_timestamp
+    print "ASR value = ",value,time.time()
+    if (value[1]>0):
+        asr_word = value[0]
+        asr_confidence = value[1]
+        asr_timestamp = time.time()
 
 def sensorvalue(sensorname):
     global robot
     if (robot!=None):
         return robot.sensorvalue(sensorname)
+
+
+
 
 
 def sensorvalue_OLD(sensorname):
@@ -253,6 +267,12 @@ def interact():
     robot.interactive()
 
 
+def showurl(url):
+    global robot
+    if (robot!=None):
+        return robot.showurl(url)
+
+
 def run_behavior(bname):
     global session
     beh_service = session.service("ALBehaviorManager")
@@ -332,6 +352,7 @@ class PepperRobot:
         self.bm_service = self.session.service("ALBackgroundMovement")
         self.ba_service = self.session.service("ALBasicAwareness")
         self.sm_service = self.session.service("ALSpeakingMovement")
+        self.asr_service = self.session.service("ALSpeechRecognition")
 
         self.alive = alive
         print('Alive behaviors: %r' %self.alive)
@@ -404,6 +425,37 @@ class PepperRobot:
     
         self.anspeech_service.say("^start("+anim+") " + interaction+" ^wait("+anim+")")
 
+
+    def asr(self, timeout=5):
+        global asr_word, asr_confidence, asr_timestamp
+        #establishing test vocabulary
+        vocabulary = ["yes", "no", "hello", "goodbye", "name", "kitchen"]
+        self.asr_service.setVocabulary(vocabulary, False)
+
+        # Start the speech recognition engine with user Test_ASR
+        self.asr_service.subscribe("Test_ASR")
+        print 'Speech recognition engine started'
+
+        #subscribe to event WordRecognized
+        subWordRecognized = self.memory_service.subscriber("WordRecognized")
+        idSubWordRecognized = subWordRecognized.signal.connect(onWordRecognized)
+
+        asr_word = ''
+        i = 0
+        dt = 0.5
+        while (i<timeout and asr_word==''):
+            time.sleep(dt)
+            i += dt
+
+        #Disconnecting callbacks and subscribers
+        self.asr_service.unsubscribe("Test_ASR")
+        subWordRecognized.signal.disconnect(idSubWordRecognized)
+
+        dt = time.time() - asr_timestamp
+        if (dt<timeout and asr_confidence>0.3):
+            return asr_word
+        else:
+            return ''
 
 
     def bip(self, r=1):

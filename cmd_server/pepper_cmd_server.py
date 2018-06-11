@@ -14,6 +14,7 @@ from pepper_cmd import *
 
 status = "Idle"             # robot status sent to websocket
 
+robot = pepper_cmd.robot
 
 def exec_fn(fn,vd):
     largs = []
@@ -91,13 +92,26 @@ def start_server(TCP_PORT):
         except KeyboardInterrupt:
             print "User quit."
             run = False
-        while connected:
-            try:
-                data = conn.recv(BUFFER_SIZE)
-            except:
-                print "Connection closed."
+
+        while (run and connected):
+            data = ''
+            while (run and connected and ((data=='') or (data[0]!='*' and data[0]!='[' and (not '###ooo###' in data)))):
+                try:
+                    d = conn.recv(BUFFER_SIZE)
+                except:
+                    print "Pepper Cmd Server: connection closed."
+                    connected = False
+                    break
+                if (d==''):
+                    break
+                data = data + d
+                #print "Received partial data: ",data
+
+            if (not connected):
                 break
-            if not data: break
+            if (not data or data==''):
+                break
+
             print "Received: ",data
             conn.send("OK\n")
 
@@ -127,31 +141,31 @@ def start_server(TCP_PORT):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--pip", type=str, default=os.environ['PEPPER_IP'],
-                        help="Robot IP address.  On robot or Local Naoqi: use '127.0.0.1'.")
-    parser.add_argument("--pport", type=int, default=9559,
-                        help="Naoqi port number")
+    #parser.add_argument("--pip", type=str, default=os.environ['PEPPER_IP'],
+    #                    help="Robot IP address.  On robot or Local Naoqi: use '127.0.0.1'.")
+    #parser.add_argument("--pport", type=int, default=9559,
+    #                    help="Naoqi port number")
     parser.add_argument("--serverport", type=int, default=5000,
                         help="Server port")
 
     args = parser.parse_args()
-    pip = args.pip
-    pport = args.pport
-    server_port = args.serverport 
+    #pip = args.pip
+    #pport = args.pport
+    #server_port = args.serverport 
 
     #Starting application
-    try:
-        connection_url = "tcp://" + pip + ":" + str(pport)
-        app = qi.Application(["Program server", "--qi-url=" + connection_url ])
-    except RuntimeError:
-        print ("Can't connect to Naoqi at ip \"" + pip + "\" on port " + str(pport) +".\n"
-               "Please check your script arguments. Run with -h option for help.")
-        sys.exit(1)
+    #try:
+    #    connection_url = "tcp://" + pip + ":" + str(pport)
+    #    app = qi.Application(["Program server", "--qi-url=" + connection_url ])
+    #except RuntimeError:
+    #    print ("Can't connect to Naoqi at ip \"" + pip + "\" on port " + str(pport) +".\n"
+    #           "Please check your script arguments. Run with -h option for help.")
+    #    sys.exit(1)
 
-    app.start()
-    pepper_cmd.session = app.session
+    #app.start()
+    #pepper_cmd.session = app.session
 
-    start_server(server_port)
+    start_server(args.serverport)
     
 
 

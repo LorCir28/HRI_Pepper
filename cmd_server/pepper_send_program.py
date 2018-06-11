@@ -14,6 +14,8 @@ def start_client(server_ip,server_port,program):
     TCP_IP = ''
     BUFFER_SIZE = 200
 
+    print "Connecting to %s:%d..." %(server_ip,server_port)
+
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     s.connect((server_ip,server_port))
@@ -24,7 +26,7 @@ def start_client(server_ip,server_port,program):
 
     print "Sending program...",
 
-    s.send(data)
+    s.send(data+ "\n###ooo###\n")
 
     print(" done")
 
