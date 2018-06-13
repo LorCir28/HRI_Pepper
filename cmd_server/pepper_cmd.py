@@ -429,11 +429,11 @@ class PepperRobot:
     def asr(self, vocabulary, timeout=5):
         global asr_word, asr_confidence, asr_timestamp
         #establishing vocabulary
-        self.asr_service.setPause(True)
+        self.asr_service.pause(True)
         self.asr_service.setVocabulary(vocabulary, False)
-        self.asr_service.setPause(False)
+        self.asr_service.pause(False)
         # Start the speech recognition engine with user Test_ASR
-        self.asr_service.subscribe("Test_ASR")
+        self.asr_service.subscribe("asr_pepper_cmd")
         print 'Speech recognition engine started'
 
         #subscribe to event WordRecognized
@@ -448,7 +448,7 @@ class PepperRobot:
             i += dt
 
         #Disconnecting callbacks and subscribers
-        self.asr_service.unsubscribe("Test_ASR")
+        self.asr_service.unsubscribe("asr_pepper_cmd")
         subWordRecognized.signal.disconnect(idSubWordRecognized)
 
         dt = time.time() - asr_timestamp
