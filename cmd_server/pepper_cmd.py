@@ -426,12 +426,12 @@ class PepperRobot:
         self.anspeech_service.say("^start("+anim+") " + interaction+" ^wait("+anim+")")
 
 
-    def asr(self, timeout=5):
+    def asr(self, vocabulary, timeout=5):
         global asr_word, asr_confidence, asr_timestamp
-        #establishing test vocabulary
-        vocabulary = ["yes", "no", "hello", "goodbye", "name", "kitchen"]
+        #establishing vocabulary
+        self.asr_service.setPause(True)
         self.asr_service.setVocabulary(vocabulary, False)
-
+        self.asr_service.setPause(False)
         # Start the speech recognition engine with user Test_ASR
         self.asr_service.subscribe("Test_ASR")
         print 'Speech recognition engine started'
