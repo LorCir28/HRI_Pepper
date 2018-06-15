@@ -344,31 +344,35 @@ class PepperRobot:
         self.motion_service  = self.session.service("ALMotion")
         self.tts_service = self.session.service("ALTextToSpeech")
         self.anspeech_service = self.session.service("ALAnimatedSpeech")
-        self.tablet_service = self.session.service("ALTabletService")
-        self.animation_player_service = self.session.service("ALAnimationPlayer")
-        self.beh_service = self.session.service("ALBehaviorManager")
-        self.al_service = self.session.service("ALAutonomousLife")
-        self.rp_service = self.session.service("ALRobotPosture")
-        self.bm_service = self.session.service("ALBackgroundMovement")
-        self.ba_service = self.session.service("ALBasicAwareness")
-        self.sm_service = self.session.service("ALSpeakingMovement")
-        self.asr_service = self.session.service("ALSpeechRecognition")
+        try:
+            self.tablet_service = self.session.service("ALTabletService")
+            self.animation_player_service = self.session.service("ALAnimationPlayer")
+            self.beh_service = self.session.service("ALBehaviorManager")
+            self.al_service = self.session.service("ALAutonomousLife")
+            self.rp_service = self.session.service("ALRobotPosture")
+            self.bm_service = self.session.service("ALBackgroundMovement")
+            self.ba_service = self.session.service("ALBasicAwareness")
+            self.sm_service = self.session.service("ALSpeakingMovement")
+            self.asr_service = self.session.service("ALSpeechRecognition")
 
-        self.alive = alive
-        print('Alive behaviors: %r' %self.alive)
+            self.alive = alive
+            print('Alive behaviors: %r' %self.alive)
 
-        self.bm_service.setEnabled(self.alive)
-        self.ba_service.setEnabled(self.alive)
-        self.sm_service.setEnabled(self.alive)
-        
-        webview = "http://198.18.0.1/apps/spqrel/index.html"
-        self.tablet_service.showWebview(webview)
+            self.bm_service.setEnabled(self.alive)
+            self.ba_service.setEnabled(self.alive)
+            self.sm_service.setEnabled(self.alive)
+            
+            webview = "http://198.18.0.1/apps/spqrel/index.html"
+            self.tablet_service.showWebview(webview)
 
-        self.touch_service = self.session.service("ALTouch")
-        self.touchstatus = self.touch_service.getStatus()
-        #print touchstatus
-        self.touchsensorlist = self.touch_service.getSensorList()
-        #print touchsensorlist
+            self.touch_service = self.session.service("ALTouch")
+            self.touchstatus = self.touch_service.getStatus()
+            #print touchstatus
+            self.touchsensorlist = self.touch_service.getSensorList()
+            #print touchsensorlist
+
+        except:
+            print "Services not available."
 
         #anyTouch = self.memory_service.subscriber("TouchChanged")
         #idAnyTouch = anyTouch.signal.connect(touchcb)
