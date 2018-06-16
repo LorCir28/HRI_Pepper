@@ -34,7 +34,10 @@ def main():
     # Display a local image located in img folder in the root of the web server
     # The ip of the robot from the tablet is 198.18.0.1
 
-    strurl = "http://198.18.0.1/apps/spqrel/%s" %(weburl)
+    if weburl.startswith('http'):
+        strurl=weburl
+    else:
+        strurl = "http://198.18.0.1/apps/spqrel/%s" %(weburl)
     print "URL: ",strurl
     tablet_service.showWebview(strurl)
 
