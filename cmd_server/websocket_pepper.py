@@ -139,6 +139,8 @@ def run_code(code):
 # Main program
 
 def main():
+    global run
+
     # Run main thread
     t = Thread(target=main_loop, args=(None,))
     t.start()

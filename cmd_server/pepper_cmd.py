@@ -344,6 +344,8 @@ class PepperRobot:
         self.motion_service  = self.session.service("ALMotion")
         self.tts_service = self.session.service("ALTextToSpeech")
         self.anspeech_service = self.session.service("ALAnimatedSpeech")
+        self.asr_service = None
+        self.tablet_service = None
         try:
             self.tablet_service = self.session.service("ALTabletService")
             self.animation_player_service = self.session.service("ALAnimationPlayer")
@@ -433,6 +435,8 @@ class PepperRobot:
     def asr(self, vocabulary, timeout=5):
         global asr_word, asr_confidence, asr_timestamp
         #establishing vocabulary
+        if (self.asr_service is None):
+            return ''
         self.asr_service.pause(True)
         self.asr_service.setVocabulary(vocabulary, False)
         self.asr_service.pause(False)
