@@ -49,7 +49,7 @@ def showNaoImage(IP, PORT):
   array = naoImage[6]
 
   # Create a PIL Image from our pixel array.
-  im = Image.fromstring("RGB", (imageWidth, imageHeight), array)
+  im = Image.frombytes("RGB", (imageWidth, imageHeight), array)
 
   # Save the image.
   im.save("camImage.png", "PNG")

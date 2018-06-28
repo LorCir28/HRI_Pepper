@@ -26,6 +26,8 @@ class JointAnglesGUI:
         self.motion_service = motion_service
 
         useSensors = True
+        self.motion_service.setStiffnesses('Head', 1.0)
+        self.motion_service.setStiffnesses('Body', 1.0)
         
         self.labels = []
         self.scalewidgets = []
