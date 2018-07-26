@@ -561,17 +561,17 @@ class PepperRobot:
         initAngles = [1.6, -0.2]
         timeLists  = [5.0, 5.0]
         isAbsolute = True
-        motion_service.angleInterpolation(jointNames, initAngles, timeLists, isAbsolute)
+        self.motion_service.angleInterpolation(jointNames, initAngles, timeLists, isAbsolute)
 
         # look right
         finalAngles = [-1.6, -0.2]
         timeLists  = [10.0, 10.0]
-        motion_service.angleInterpolation(jointNames, finalAngles, timeLists, isAbsolute)
+        self.motion_service.angleInterpolation(jointNames, finalAngles, timeLists, isAbsolute)
 
         # look ahead center
         finalAngles = [0.0, -0.2]
         timeLists  = [5.0, 5.0]
-        motion_service.angleInterpolation(jointNames, finalAngles, timeLists, isAbsolute)
+        self.motion_service.angleInterpolation(jointNames, finalAngles, timeLists, isAbsolute)
         
 
     # Wait
