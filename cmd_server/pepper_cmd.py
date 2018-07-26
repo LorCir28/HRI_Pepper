@@ -552,6 +552,28 @@ class PepperRobot:
         theta = -math.pi/2 * r
         self.motion_service.moveTo(x, y, theta) #blocking function
 
+    # Head motion
+
+    def headscan(self):
+        jointsNames = ["HeadYaw", "HeadPitch"]
+
+        # look left
+        initAngles = [1.6, -0.2]
+        timeLists  = [5.0, 5.0]
+        isAbsolute = True
+        motion_service.angleInterpolation(jointNames, initAngles, timeLists, isAbsolute)
+
+        # look right
+        finalAngles = [-1.6, -0.2]
+        timeLists  = [10.0, 10.0]
+        motion_service.angleInterpolation(jointNames, finalAngles, timeLists, isAbsolute)
+
+        # look ahead center
+        finalAngles = [0.0, -0.2]
+        timeLists  = [5.0, 5.0]
+        motion_service.angleInterpolation(jointNames, finalAngles, timeLists, isAbsolute)
+        
+
     # Wait
 
     def wait(self, r=1):
