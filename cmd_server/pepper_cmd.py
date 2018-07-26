@@ -574,7 +574,21 @@ class PepperRobot:
             return self.handTouch[1]
 
 
+    def sensorvaluestring(self):
+        return '%f,%f,%d,%d,%d' %(self.sensorvalue('frontsonar'),self.sensorvalue('rearsonar'),self.sensorvalue('headtouch'),self.sensorvalue('lefthandtouch'),self.sensorvalue('righthandtouch'))
+
+
+
     # Behaviors
+
+    def normalPosture(self):
+        jointNames = ["HeadYaw", "HeadPitch",
+               "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw",
+               "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+        jointValues = [0.00, -0.21, 1.55, 0.13, -1.24, -0.52, 0.01, 1.56, -0.14, 1.22, 0.52, -0.01]
+        self.motion_service.angleInterpolation(jointNames, jointValues, 3.0, isAbsolute)
+
+
 
     def stand(self):
         if self.al_service.getState()!='disabled':
