@@ -392,12 +392,21 @@ class PepperRobot:
         time.sleep(1)
         self.app.stop()
 
-    # Speech sounds
-    def setLanguage(self, language):
-        self.tts_service.setLanguage(language)
-    
+    # general commands
+
     def begin(self):
         self.stop_request = False
+
+    def exec_cmd(self, params):
+        cmdstr = "self."+params
+        print "Executing %s" %(cmdstr)
+        eval(cmdstr)    
+
+
+    # Speech
+
+    def setLanguage(self, language):
+        self.tts_service.setLanguage(language)
 
     def say(self, interaction):
         if self.stop_request:
@@ -553,6 +562,14 @@ class PepperRobot:
         self.motion_service.moveTo(x, y, theta) #blocking function
 
     # Head motion
+
+    def headPose(self, yaw, pitch):
+        jointNames = ["HeadYaw", "HeadPitch"]
+        initAngles = [yaw, pitch]
+        timeLists  = [3.0, 3.0]
+        isAbsolute = True
+        self.motion_service.angleInterpolation(jointNames, initAngles, timeLists, isAbsolute)
+
 
     def headscan(self):
         jointNames = ["HeadYaw", "HeadPitch"]
