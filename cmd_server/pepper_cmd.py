@@ -563,10 +563,10 @@ class PepperRobot:
 
     # Head motion
 
-    def headPose(self, yaw, pitch):
+    def headPose(self, yaw, pitch, tm):
         jointNames = ["HeadYaw", "HeadPitch"]
         initAngles = [yaw, pitch]
-        timeLists  = [3.0, 3.0]
+        timeLists  = [tm, tm]
         isAbsolute = True
         self.motion_service.angleInterpolation(jointNames, initAngles, timeLists, isAbsolute)
 
