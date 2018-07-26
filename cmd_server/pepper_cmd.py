@@ -555,7 +555,7 @@ class PepperRobot:
     # Head motion
 
     def headscan(self):
-        jointsNames = ["HeadYaw", "HeadPitch"]
+        jointNames = ["HeadYaw", "HeadPitch"]
 
         # look left
         initAngles = [1.6, -0.2]
