@@ -629,6 +629,13 @@ class PepperRobot:
         self.motion_service.angleInterpolation(jointNames, jointValues, 3.0, isAbsolute)
 
 
+    def setPosture(self, jointValues):
+        jointNames = ["HeadYaw", "HeadPitch",
+               "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw",
+               "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+        isAbsolute = True
+        self.motion_service.angleInterpolation(jointNames, jointValues, 3.0, isAbsolute)
+
 
     def stand(self):
         if self.al_service.getState()!='disabled':
