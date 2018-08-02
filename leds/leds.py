@@ -29,19 +29,18 @@ def main():
 
 
     leds_service = session.service("ALLeds")
+    
     leds_service.randomEyes(5)
-    time.sleep(3)
+    time.sleep(1)
     leds_service.rasta(5)
-    time.sleep(3)
+    time.sleep(1)
     leds_service.rotateEyes(0x00802020, 1, 5)
-    time.sleep(3)
+    time.sleep(1)
     leds_service.off('AllLeds')
-    time.sleep(3)
+    time.sleep(1)
     leds_service.on('AllLeds')
-    time.sleep(3)
+    time.sleep(1)
     leds_service.reset('AllLeds')
-    time.sleep(3)
-
 
 if __name__ == "__main__":
 
