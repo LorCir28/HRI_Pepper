@@ -30,18 +30,11 @@ def main():
                         help="Robot IP address.  On robot or Local Naoqi: use '127.0.0.1'.")
     parser.add_argument("--pport", type=int, default=9559,
                         help="Naoqi port number")
-    parser.add_argument("--value", type=float, default=0.8,
-                        help="Stiffness value")
-
+    
     args = parser.parse_args()
     pip = args.pip
     pport = args.pport
-    sval = args.value
-
-    if (sval==None):
-        print 'No stiffness value'
-        sys.exit(0)
-
+    
     #Starting session
     session = qi.Session()
     try:
@@ -51,39 +44,14 @@ def main():
                "Please check your script arguments. Run with -h option for help.")
         sys.exit(1)
 
-    print "Set stiffness value: ", sval
-    isAbsolute = True
-
     #Starting services
-    motion_service  = session.service("ALMotion")
+    motion_service  = session.service("ALMotion")   
+    useSensors = True         
+    jointValues = motion_service.getAngles(jointsNames, useSensors)
 
-    
-   
-    names = "Body"
-    stiffnessLists = sval
-    timeLists = 1.0
-    motion_service.stiffnessInterpolation(names, stiffnessLists, timeLists)
+    print "Read joint values: ", jointValues
 
-    time.sleep(3)
-
-    print motion_service.getSummary()
-
-    #print motion_service.getSummary()
-
-    #names = "Body"
-    #stiffnessLists = 1.0
-    #timeLists = 1.0
-    #motion_service.stiffnessInterpolation(names, stiffnessLists, timeLists)
-
-    #time.sleep(3)
-
-    #print motion_service.getSummary()
-
-    #motion_service.angleInterpolation(jointsNames, jointValues, 3.0, isAbsolute)
-    
-    
 
 if __name__ == "__main__":
 
     main()
-

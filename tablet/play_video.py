@@ -6,9 +6,15 @@ import sys
 import time
 import os
 
+run = False
 
+def onVideoFinished():
+    global run
+    print "Video play finished."
+    run = False
 
 def main():
+    global run
     parser = argparse.ArgumentParser()
     parser.add_argument("--pip", type=str, default=os.environ['PEPPER_IP'],
                         help="Robot IP address. On robot or Local Naoqi: use '127.0.0.1'.")
@@ -39,22 +45,21 @@ def main():
         strurl = "http://198.18.0.1/apps/spqrel/%s" %(weburl)
     print "URL: ",strurl
 
+    #strurl = weburl
     tablet_service.playVideo(strurl) # non blocking
 
     run = True
 
-    def onVideoFinished():
-        print "Video play finished."
-        run = False
+    
 
     idVF = tablet_service.videoFinished.connect(onVideoFinished)
-    app.start()
+    #app.start()
 
     while (run):
         time.sleep(0.5)
 
-    tablet_service.videoFinished.connect(idVF)
-    app.stop()
+    tablet_service.videoFinished.disconnect(idVF)
+    #app.stop()
 
 
 if __name__ == "__main__":

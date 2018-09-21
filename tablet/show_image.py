@@ -13,12 +13,15 @@ def main():
     parser.add_argument("--pport", type=int, default=9559,
                         help="Naoqi port number")
     parser.add_argument("--image", type=str, default="default.jpg",
-                        help="Image to show (in spqrel_apps/html/img folder)")
+                        help="Image to show (in spqrel_apps/html/ folder)")
+    parser.add_argument("--folder", type=str, default=None,
+                        help="Folder with images to show")
 
     args = parser.parse_args()
     pip = args.pip
     pport = args.pport
     imfile = args.image
+    folder = args.folder
 
     #Start working session
     session = qi.Session()
@@ -31,16 +34,25 @@ def main():
 
     tablet_service = session.service("ALTabletService")
 
-    # Display a local image located in img folder in the root of the web server
-    # The ip of the robot from the tablet is 198.18.0.1
-    tablet_service.showImage("http://198.18.0.1/apps/spqrel/img/%s" %(imfile))
+    if folder==None:
 
-    #tablet_service.showWebview("http://198.18.0.1/apps/spqrel")
+        # Display a local image located in img folder in the root of the web server
+        # The ip of the robot from the tablet is 198.18.0.1
+        imgurl = "http://198.18.0.1/apps/spqrel/%s" %(imfile)
+        print imgurl
+        tablet_service.showImage(imgurl)
 
-    #time.sleep(10)
+        # tablet_service.hideImage()    
 
-    # Hide the web view
-    # tablet_service.hideImage()
+    else:
+
+        n = 6
+        for i in range(0,n):
+            imgurl = "http://198.18.0.1/apps/spqrel/%s/%03d.jpg" %(folder,i)
+            print imgurl
+            tablet_service.showImage(imgurl)
+            time.sleep(2)
+
 
 if __name__ == "__main__":
     main()

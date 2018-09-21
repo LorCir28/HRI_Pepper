@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+# animations
+# http://doc.aldebaran.com/2-5/naoqi/motion/alanimationplayer-advanced.html#animationplayer-list-behaviors-pepper
+
 import time
 import os
 import socket
