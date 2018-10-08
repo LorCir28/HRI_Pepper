@@ -59,7 +59,7 @@ def main():
 
     
    
-    names = "Body"
+    names = ["Head", "LArm", "RArm"]
     stiffnessLists = sval
     timeLists = 1.0
     motion_service.stiffnessInterpolation(names, stiffnessLists, timeLists)

@@ -10,23 +10,45 @@ import time
 import threading
 import os
 
-def rhMonitorThread (memory_service):
+
+def check_event(touch_service):
+    larm = False
+    rarm = False
+    s = touch_service.getStatus()
+    for e in s:
+        if e[0]=='LArm' and e[1]:
+            larm = True
+        if e[0]=='RArm' and e[1]:
+            rarm = True
+    return larm and rarm
+
+
+def rhMonitorThread (memory_service, touch_service):
     rhMemoryDataValue = "Device/SubDeviceList/RHand/Touch/Back/Sensor/Value"
     t = threading.currentThread()
     while getattr(t, "do_run", True):
         print "Right Hand value thread=", memory_service.getData(rhMemoryDataValue)
+        b = check_event(touch_service)
+        print "Two hands touched: ",b
         time.sleep(1)
     print "Exiting Thread"
 
+
+
+touchstatus = { }
+
 def onTouched(value):
-    print "value=",value
+    global touchstatus
+    print "Touch value=",value
 
     touched_bodies = []
     for p in value:
         if p[1]:
             touched_bodies.append(p[0])
+        touchstatus[p[0]] = p[1]
 
     print touched_bodies
+    print 'Status: ', touchstatus
 
 
 def rhTouched(value):
@@ -73,7 +95,7 @@ def main():
     idRHTouch = rhTouch.signal.connect(rhTouched)
 
     #create a thead that monitors directly the signal
-    monitorThread = threading.Thread(target = rhMonitorThread, args = (memory_service,))
+    monitorThread = threading.Thread(target = rhMonitorThread, args = (memory_service,touch_service))
     monitorThread.start()
 
     #Program stays at this point until we stop it
