@@ -502,7 +502,7 @@ class PepperRobot:
 
     # Alive behaviors
 
-    def setEnableAlive(self, alive):
+    def setAlive(self, alive):
         self.alive = alive
         print('Alive behaviors: %r' %self.alive)
         self.bm_service.setEnabled(self.alive)
