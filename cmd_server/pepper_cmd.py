@@ -237,7 +237,7 @@ def asay(strsay):
 # Alive behaviors
 def setAlive(alive):
     global robot
-    robot.setEnableAlive(alive)
+    robot.setAlive(alive)
 
 def stand():
     global robot
