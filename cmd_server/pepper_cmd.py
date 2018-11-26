@@ -645,7 +645,7 @@ class PepperRobot:
         self.motion_service.angleInterpolation(jointNames, jointValues, 3.0, isAbsolute)
 
 
-    def raiseArm(which='R'): # or 'R'/'L' for right/left arm
+    def raiseArm(self, which='R'): # or 'R'/'L' for right/left arm
         if (which=='R'):
             jointNames = ["RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
             jointValues = [ -1.0, -0.3, 1.22, 0.52, -1.08]
