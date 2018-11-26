@@ -408,8 +408,13 @@ class PepperRobot:
 
     # Speech
 
-    def setLanguage(self, language):
-        self.tts_service.setLanguage(language)
+    # English, Italian, French
+    def setLanguage(self, lang):
+        lang = lang.lower()
+        languages = {"en" : "English", "it": "Italian"}
+        if  (lang in languages.keys()):
+            lang = languages[lang]
+        self.tts_service.setLanguage(lang)
 
     def say(self, interaction):
         if self.stop_request:
@@ -636,6 +641,18 @@ class PepperRobot:
         jointNames = ["HeadYaw", "HeadPitch",
                "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw",
                "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+        isAbsolute = True
+        self.motion_service.angleInterpolation(jointNames, jointValues, 3.0, isAbsolute)
+
+
+    def raiseArm(which='R'): # or 'R'/'L' for right/left arm
+        if (which=='R'):
+            jointNames = ["RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+            jointValues = [ -1.0, -0.3, 1.22, 0.52, -1.08]
+        else:
+            jointNames = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+            jointValues = [ -1.0, 0.3, -1.22, -0.52, -1.08]
+
         isAbsolute = True
         self.motion_service.angleInterpolation(jointNames, jointValues, 3.0, isAbsolute)
 
