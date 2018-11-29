@@ -410,7 +410,6 @@ class PepperRobot:
 
     # English, Italian, French
     def setLanguage(self, lang):
-        lang = lang.lower()
         languages = {"en" : "English", "it": "Italian"}
         if  (lang in languages.keys()):
             lang = languages[lang]
@@ -651,7 +650,7 @@ class PepperRobot:
             jointValues = [ -1.0, -0.3, 1.22, 0.52, -1.08]
         else:
             jointNames = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
-            jointValues = [ -1.0, 0.3, -1.22, -0.52, -1.08]
+            jointValues = [ -1.0, 0.3, -1.22, -0.52, 1.08]
 
         isAbsolute = True
         self.motion_service.angleInterpolation(jointNames, jointValues, 3.0, isAbsolute)
