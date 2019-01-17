@@ -30,7 +30,7 @@ class HumanGreeter(object):
         self.memory = session.service("ALMemory")
         # Connect the event callback.
         self.subscriber = self.memory.subscriber("FaceDetected")
-        self.subscriber.signal.connect(self.on_human_tracked)
+        self.ch1 = self.subscriber.signal.connect(self.on_human_tracked)
         # Get the services ALTextToSpeech and ALFaceDetection.
         self.tts = session.service("ALTextToSpeech")
         self.face_detection = session.service("ALFaceDetection")
@@ -115,6 +115,7 @@ class HumanGreeter(object):
             print "Interrupted by user, stopping HumanGreeter"
             self.face_detection.unsubscribe("HumanGreeter")
             self.camProxy.unsubscribe(self.videoClient)
+            self.frsub.signal.disconnect(self.ch1)
             #stop
             sys.exit(0)
 
@@ -139,3 +140,4 @@ if __name__ == "__main__":
     human_greeter = HumanGreeter(app)
     human_greeter.connect_camera(args.ip, args.port)
     human_greeter.run()
+

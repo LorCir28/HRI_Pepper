@@ -11,6 +11,12 @@ import math
 import random
 import qi
 
+from naoqi import ALProxy
+
+# Python Image Library
+import Image
+
+
 app = None
 session = None
 tts_service = None
@@ -115,9 +121,11 @@ def begin():
     robot.begin()
 
 def end():
+    global robot
     print 'end'
     time.sleep(0.5) # make sure stuff ends
-
+    if (robot!=None):
+        robot.quit()
 
 def begin_OLD():
     global session, tts_service, memory_service, motion_service, anspeech_service, tablet_service
@@ -323,6 +331,8 @@ class PepperRobot:
     # Connect to the robot
     def connect(self, pip=os.environ['PEPPER_IP'], pport=9559, alive=False):
 
+        self.ip = pip
+        self.port = pport
         if (self.isConnected):
             print("Robot already connnected.")
             return
@@ -404,6 +414,90 @@ class PepperRobot:
         cmdstr = "self."+params
         print "Executing %s" %(cmdstr)
         eval(cmdstr)    
+
+
+    # Camera
+
+    def start_face_recording(self):
+
+        # Connect to camera
+        self.camProxy = ALProxy("ALVideoDevice", self.ip, self.port)
+        resolution = 2    # VGA
+        colorSpace = 11   # RGB
+        self.videoClient = self.camProxy.subscribe("vision_faceDetection", resolution, colorSpace, 5)
+
+        # Connect the event callback.
+        self.frsub = self.memory_service.subscriber("FaceDetected")
+        self.ch1 = self.frsub.signal.connect(self.on_human_tracked)
+        # Get the service ALFaceDetection.
+        #self.face_detection = self.session.service("ALFaceDetection")
+        #self.face_detection.subscribe("RobotCmd")
+        self.got_face = False
+        self.savedfaces = []
+
+
+    def stop_face_recording(self):
+        #self.face_detection.unsubscribe("RobotCmd")
+        self.frsub.signal.disconnect(self.ch1)
+        self.camProxy.unsubscribe(self.videoClient)
+
+
+    def on_human_tracked(self, value):
+        """
+        Callback for event FaceDetected.
+        """
+        faceID = -1
+
+        if value == []:  # empty value when the face disappears
+            self.got_face = False
+        elif not self.got_face:  # only speak the first time a face appears
+            self.got_face = True
+            #print "I saw a face!"
+            #self.tts.say("Hello, you!")
+            # First Field = TimeStamp.
+            timeStamp = value[0]
+            #print "TimeStamp is: " + str(timeStamp)
+
+            # Second Field = array of face_Info's.
+            faceInfoArray = value[1]
+            for j in range( len(faceInfoArray)-1 ):
+                faceInfo = faceInfoArray[j]
+
+                # First Field = Shape info.
+                faceShapeInfo = faceInfo[0]
+
+                # Second Field = Extra info (empty for now).
+                faceExtraInfo = faceInfo[1]
+
+                faceID = faceExtraInfo[0]
+
+                #print "Face Infos :  alpha %.3f - beta %.3f" % (faceShapeInfo[1], faceShapeInfo[2])
+                #print "Face Infos :  width %.3f - height %.3f" % (faceShapeInfo[3], faceShapeInfo[4])
+                #print "Face Extra Infos :" + str(faceExtraInfo)
+
+                print "Face ID: %d" %faceID
+
+        if self.camProxy!=None and faceID>=0 and faceID not in self.savedfaces:
+            # Get the image 
+            img = self.camProxy.getImageRemote(self.videoClient)
+
+            # Get the image size and pixel array.
+            imageWidth = img[0]
+            imageHeight = img[1]
+            array = img[6]
+
+            # Create a PIL Image from our pixel array.
+            im = Image.frombytes("RGB", (imageWidth, imageHeight), array)
+
+            # Save the image.
+            fname = "face_%03d.png" %faceID
+            im.save(fname, "PNG")
+            print "Image face %d saved." %faceID
+
+            self.savedfaces.append(faceID)
+
+
+
 
 
     # Speech
