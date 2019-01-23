@@ -29,7 +29,15 @@ def main():
 
 
     leds_service = session.service("ALLeds")
+
+
+    time.sleep(3)
+
+    leds_service.on('FaceLeds')
+
+    sys.exit(1)
     
+
     leds_service.randomEyes(5)
     time.sleep(1)
     leds_service.rasta(5)

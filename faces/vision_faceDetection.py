@@ -28,9 +28,13 @@ class HumanGreeter(object):
         session = app.session
         # Get the service ALMemory.
         self.memory = session.service("ALMemory")
+        self.ba_service = session.service("ALBasicAwareness")
+        self.ba_service.setEnabled(True)
+        self.leds_service = session.service("ALLeds")
+        self.leds_service.on('FaceLeds') # reset to white
         # Connect the event callback.
-        self.subscriber = self.memory.subscriber("FaceDetected")
-        self.ch1 = self.subscriber.signal.connect(self.on_human_tracked)
+        self.fdsub = self.memory.subscriber("FaceDetected")
+        self.ch1 = self.fdsub.signal.connect(self.on_human_tracked)
         # Get the services ALTextToSpeech and ALFaceDetection.
         self.tts = session.service("ALTextToSpeech")
         self.face_detection = session.service("ALFaceDetection")
@@ -56,32 +60,42 @@ class HumanGreeter(object):
 
         if value == []:  # empty value when the face disappears
             self.got_face = False
-        elif not self.got_face:  # only speak the first time a face appears
-            self.got_face = True
-            print "I saw a face!"
-            #self.tts.say("Hello, you!")
-            # First Field = TimeStamp.
-            timeStamp = value[0]
-            print "TimeStamp is: " + str(timeStamp)
+            # white face leds
+            self.leds_service.on('FaceLeds')
 
-            # Second Field = array of face_Info's.
-            faceInfoArray = value[1]
-            for j in range( len(faceInfoArray)-1 ):
-                faceInfo = faceInfoArray[j]
+        else:
+            # green face leds
+            self.leds_service.off('LeftFaceLedsRed')
+            self.leds_service.off('LeftFaceLedsBlue')
+            self.leds_service.off('RightFaceLedsRed')
+            self.leds_service.off('RightFaceLedsBlue')
 
-                # First Field = Shape info.
-                faceShapeInfo = faceInfo[0]
+            if not self.got_face:  # only the first time a face appears
 
-                # Second Field = Extra info (empty for now).
-                faceExtraInfo = faceInfo[1]
+                self.got_face = True
+                print "I saw a face!"
+                #self.tts.say("Hello, you!")
+                # First Field = TimeStamp.
+                timeStamp = value[0]
+                print "TimeStamp is: " + str(timeStamp)
 
-                faceID = faceExtraInfo[0]
+                # Second Field = array of face_Info's.
+                faceInfoArray = value[1]
+                for j in range( len(faceInfoArray)-1 ):
+                    faceInfo = faceInfoArray[j]
 
-                print "Face Infos :  alpha %.3f - beta %.3f" % (faceShapeInfo[1], faceShapeInfo[2])
-                print "Face Infos :  width %.3f - height %.3f" % (faceShapeInfo[3], faceShapeInfo[4])
-                print "Face Extra Infos :" + str(faceExtraInfo)
+                    # First Field = Shape info.
+                    faceShapeInfo = faceInfo[0]
 
-                print "Face ID: %d" %faceID
+                    # Second Field = Extra info (empty for now).
+                    faceExtraInfo = faceInfo[1]
+
+                    faceID = faceExtraInfo[0]
+
+                    #print "Face Infos :  alpha %.3f - beta %.3f" % (faceShapeInfo[1], faceShapeInfo[2])
+                    #print "Face Infos :  width %.3f - height %.3f" % (faceShapeInfo[3], faceShapeInfo[4])
+                    #print "Face Extra Infos :" + str(faceExtraInfo)
+                    #print "Face ID: %d" %faceID
 
         if self.camProxy!=None and faceID>=0 and faceID not in self.savedfaces:
             # Get the image 
@@ -103,6 +117,14 @@ class HumanGreeter(object):
             self.savedfaces.append(faceID)
 
 
+    def close(self):
+        self.face_detection.unsubscribe("HumanGreeter")
+        self.camProxy.unsubscribe(self.videoClient)
+        self.fdsub.signal.disconnect(self.ch1)
+        self.ba_service.setEnabled(False)
+        self.leds_service.on('FaceLeds') # reset to white
+
+
     def run(self):
         """
         Loop on, wait for events until manual interruption.
@@ -110,13 +132,13 @@ class HumanGreeter(object):
         print "Starting HumanGreeter"
         try:
             while True:
+                #val = self.memory.getData('FaceDetection/FaceDetected')
+                #if len(val)>0:
+                #    print('Memory value %r' %val)
                 time.sleep(1)
         except KeyboardInterrupt:
-            print "Interrupted by user, stopping HumanGreeter"
-            self.face_detection.unsubscribe("HumanGreeter")
-            self.camProxy.unsubscribe(self.videoClient)
-            self.frsub.signal.disconnect(self.ch1)
-            #stop
+            print "Interrupted by user, stopping all behaviors"
+            self.close()
             sys.exit(0)
 
 
