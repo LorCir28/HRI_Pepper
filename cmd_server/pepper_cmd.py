@@ -327,6 +327,7 @@ class PepperRobot:
         self.sonar = [0.0, 0.0] # front, back
         self.language = "English"
         self.stop_request = False
+        self.face_recording = False
 
     # Connect to the robot
     def connect(self, pip=os.environ['PEPPER_IP'], pport=9559, alive=False):
@@ -357,6 +358,7 @@ class PepperRobot:
         self.motion_service  = self.session.service("ALMotion")
         self.tts_service = self.session.service("ALTextToSpeech")
         self.anspeech_service = self.session.service("ALAnimatedSpeech")
+        self.leds_service = session.service("ALLeds")
         self.asr_service = None
         self.tablet_service = None
         try:
@@ -416,10 +418,27 @@ class PepperRobot:
         eval(cmdstr)    
 
 
+    # Leds
+
+    def white_eyes(self):
+        # white face leds
+        self.leds_service.on('FaceLeds')
+
+
+    def green_eyes(self):
+        # green face leds
+        self.leds_service.off('LeftFaceLedsRed')
+        self.leds_service.off('LeftFaceLedsBlue')
+        self.leds_service.off('RightFaceLedsRed')
+        self.leds_service.off('RightFaceLedsBlue')
+
+
     # Camera
 
     def start_face_recording(self):
 
+        if self.face_recording:
+            return
         # Connect to camera
         self.camProxy = ALProxy("ALVideoDevice", self.ip, self.port)
         resolution = 2    # VGA
@@ -434,13 +453,14 @@ class PepperRobot:
         #self.face_detection.subscribe("RobotCmd")
         self.got_face = False
         self.savedfaces = []
+        self.face_recording = True
 
 
     def stop_face_recording(self):
         #self.face_detection.unsubscribe("RobotCmd")
         self.frsub.signal.disconnect(self.ch1)
         self.camProxy.unsubscribe(self.videoClient)
-
+        self.face_recording = False
 
     def on_human_tracked(self, value):
         """
@@ -450,8 +470,10 @@ class PepperRobot:
 
         if value == []:  # empty value when the face disappears
             self.got_face = False
+            self.white_eyes()
         elif not self.got_face:  # only speak the first time a face appears
             self.got_face = True
+            self.green_eyes()
             #print "I saw a face!"
             #self.tts.say("Hello, you!")
             # First Field = TimeStamp.
