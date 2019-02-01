@@ -358,7 +358,7 @@ class PepperRobot:
         self.motion_service  = self.session.service("ALMotion")
         self.tts_service = self.session.service("ALTextToSpeech")
         self.anspeech_service = self.session.service("ALAnimatedSpeech")
-        self.leds_service = session.service("ALLeds")
+        self.leds_service = self.session.service("ALLeds")
         self.asr_service = None
         self.tablet_service = None
         try:
