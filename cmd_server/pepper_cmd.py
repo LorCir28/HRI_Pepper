@@ -435,7 +435,7 @@ class PepperRobot:
 
     # Camera
 
-    def start_face_recording(self):
+    def startFaceTracking(self):
 
         if self.face_recording:
             return
@@ -456,7 +456,7 @@ class PepperRobot:
         self.face_recording = True
 
 
-    def stop_face_recording(self):
+    def stopFaceTracking(self):
         #self.face_detection.unsubscribe("RobotCmd")
         self.frsub.signal.disconnect(self.ch1)
         self.camProxy.unsubscribe(self.videoClient)
@@ -809,5 +809,8 @@ class PepperRobot:
         print(str)
         bname = 'animated-say-5b866d/behavior_1'
         self.run_behavior(bname)
+
+
+
 
 

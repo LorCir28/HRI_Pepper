@@ -14,7 +14,7 @@ def main():
                         help="Robot IP address.  On robot or Local Naoqi: use '127.0.0.1'.")
     parser.add_argument("--pport", type=int, default=9559,
                         help="Naoqi port number")
-    parser.add_argument("--key", type=str, default="memory_test",
+    parser.add_argument("--key", type=str, default="Dialog/MyRobotName",
                         help="Memory key to read")
     args = parser.parse_args()
     pip = args.pip
