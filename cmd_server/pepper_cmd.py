@@ -328,6 +328,7 @@ class PepperRobot:
         self.language = "English"
         self.stop_request = False
         self.face_recording = False
+        self.sth = None
 
     # Connect to the robot
     def connect(self, pip=os.environ['PEPPER_IP'], pport=9559, alive=False):
@@ -403,7 +404,8 @@ class PepperRobot:
 
     def quit(self):
         print "Quit Pepper robot."
-        self.sth.do_run = False
+        if self.sth != None:
+            self.sth.do_run = False
         time.sleep(1)
         self.app.stop()
 
