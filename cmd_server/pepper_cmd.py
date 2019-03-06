@@ -566,6 +566,7 @@ class PepperRobot:
         self.anspeech_service.say("^start("+anim+") " + interaction+" ^wait("+anim+")")
 
 
+    # vocabulary = list of keywords, e.g. ["yes", "no", "please"]
     def asr(self, vocabulary, timeout=5):
         global asr_word, asr_confidence, asr_timestamp
         #establishing vocabulary
@@ -797,6 +798,12 @@ class PepperRobot:
         str = 'sax'
         print(str)
         bname = 'saxophone-0635af/behavior_1'
+        self.run_behavior(bname)
+
+    def dance(self):
+        str = 'sax'
+        print(str)
+        bname = 'dance/behavior_1'
         self.run_behavior(bname)
 
     def takephoto(self):
