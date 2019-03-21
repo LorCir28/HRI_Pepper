@@ -501,7 +501,7 @@ class PepperRobot:
 
                 print "Face ID: %d" %faceID
 
-        if self.camProxy!=None and faceID>=0 and faceID not in self.savedfaces:
+        if self.camProxy!=None and faceID>=0 and faceID not in self.savedfaces and self.face_recording:
             # Get the image 
             img = self.camProxy.getImageRemote(self.videoClient)
 
