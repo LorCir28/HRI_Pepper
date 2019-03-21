@@ -455,7 +455,7 @@ class PepperRobot:
         #self.face_detection.subscribe("RobotCmd")
         self.got_face = False
         self.savedfaces = []
-        self.face_recording = True
+        self.face_recording = False
 
 
     def stopFaceTracking(self):
