@@ -3,6 +3,15 @@
 # animations
 # http://doc.aldebaran.com/2-5/naoqi/motion/alanimationplayer-advanced.html#animationplayer-list-behaviors-pepper
 
+# How to use
+
+# export PEPPER_IP=<...>
+# python
+# >>> import pepper_cmd
+# >>> from pepper_cmd import *
+# >>> begin()
+# >>> pepper_cmd.robot.<fn>()
+
 import time
 import os
 import socket
@@ -801,7 +810,7 @@ class PepperRobot:
         self.run_behavior(bname)
 
     def dance(self):
-        str = 'sax'
+        str = 'dance'
         print(str)
         bname = 'dance/behavior_1'
         self.run_behavior(bname)
