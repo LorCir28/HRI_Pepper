@@ -5,7 +5,7 @@ import sys
 import time
 import os
 
-jointsNames = ["HeadYaw", "HeadPitch"]
+jointNames = ["HeadYaw", "HeadPitch"]
 
 def main():
     parser = argparse.ArgumentParser()
@@ -33,17 +33,17 @@ def main():
     initAngles = [1.6, -0.2]
     timeLists  = [5.0, 5.0]
     isAbsolute = True
-    motion_service.angleInterpolation(jointsNames, initAngles, timeLists, isAbsolute)
+    motion_service.angleInterpolation(jointNames, initAngles, timeLists, isAbsolute)
 
     #we move head to look right
     finalAngles = [-1.6, -0.2]
     timeLists  = [10.0, 10.0]
-    motion_service.angleInterpolation(jointsNames, finalAngles, timeLists, isAbsolute)
+    motion_service.angleInterpolation(jointNames, finalAngles, timeLists, isAbsolute)
 
     #we move head to center
     finalAngles = [0.0, -0.2]
     timeLists  = [5.0, 5.0]
-    motion_service.angleInterpolation(jointsNames, finalAngles, timeLists, isAbsolute)
+    motion_service.angleInterpolation(jointNames, finalAngles, timeLists, isAbsolute)
     
 
 if __name__ == "__main__":

@@ -81,10 +81,14 @@ def main():
       
     #Testing some functions from the ALTouch module
     touch_service = session.service("ALTouch")
-    touchstatus = touch_service.getStatus()
-    print touchstatus
-    touchsensorlist = touch_service.getSensorList()
+
+    touchsensorlist = touch_service.getSensorList() # vector of sensor names
     print touchsensorlist
+    # ['Head/Touch/Front', 'Head/Touch/Middle', 'Head/Touch/Rear', 'LHand/Touch/Back', 'RHand/Touch/Back', 'Bumper/Back', 'Bumper/FrontLeft', 'Bumper/FrontRight']
+
+    touchstatus = touch_service.getStatus()  # vector of [name, bool, []]
+    print touchstatus
+    #[['Head', False, []], ['LArm', False, []], ['Leg', False, []], ['RArm', False, []], ['LHand', False, []], ['RHand', False, []], ['Bumper/Back', False, []], ['Bumper/FrontLeft', False, []], ['Bumper/FrontRight', False, []], ['Head/Touch/Front', False, []], ['Head/Touch/Middle', False, []], ['Head/Touch/Rear', False, []], ['LHand/Touch/Back', False, []], ['RHand/Touch/Back', False, []], ['Base', False, []]]
 
     #subscribe to any change on any touch sensor
     anyTouch = memory_service.subscriber("TouchChanged")
