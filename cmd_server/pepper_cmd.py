@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+f#!/usr/bin/env python
 
 # animations
 # http://doc.aldebaran.com/2-5/naoqi/motion/alanimationplayer-advanced.html#animationplayer-list-behaviors-pepper
@@ -379,7 +379,7 @@ class PepperRobot:
 
     # Camera
 
-    def startFaceTracking(self):
+    def startFaceDetection(self):
 
         if self.face_recording:
             return
@@ -391,22 +391,18 @@ class PepperRobot:
 
         # Connect the event callback.
         self.frsub = self.memory_service.subscriber("FaceDetected")
-        self.ch1 = self.frsub.signal.connect(self.on_human_tracked)
-        # Get the service ALFaceDetection.
-        #self.face_detection = self.session.service("ALFaceDetection")
-        #self.face_detection.subscribe("RobotCmd")
+        self.ch1 = self.frsub.signal.connect(self.on_facedetected)
         self.got_face = False
         self.savedfaces = []
         self.face_recording = False
 
 
-    def stopFaceTracking(self):
-        #self.face_detection.unsubscribe("RobotCmd")
+    def stopFaceDetection(self):
         self.frsub.signal.disconnect(self.ch1)
         self.camProxy.unsubscribe(self.videoClient)
         self.face_recording = False
 
-    def on_human_tracked(self, value):
+    def on_facedetected(self, value):
         """
         Callback for event FaceDetected.
         """
