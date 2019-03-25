@@ -103,22 +103,6 @@ def sensorvalue(sensorname):
 
 
 
-
-
-def sensorvalue_OLD(sensorname):
-    global sonar, headTouch, handTouch
-    if (sensorname == 'frontsonar'):
-        return sonar[0]
-    elif (sensorname == 'rearsonar'):
-        return sonar[1]
-    elif (sensorname == 'headtouch'):
-        return headTouch
-    elif (sensorname == 'lefthandtouch'):
-        return handTouch[0]
-    elif (sensorname == 'righthandtouch'):
-        return handTouch[1]
-
-
 # Begin/end
 
 def begin():
@@ -135,42 +119,6 @@ def end():
     time.sleep(0.5) # make sure stuff ends
     if (robot!=None):
         robot.quit()
-
-def begin_OLD():
-    global session, tts_service, memory_service, motion_service, anspeech_service, tablet_service
-
-    print 'begin'
-
-    if session==None:
-        return
-
-    stop_request = False
-
-    #Starting services
-    memory_service  = session.service("ALMemory")
-    motion_service  = session.service("ALMotion")
-    tts_service = session.service("ALTextToSpeech")
-    anspeech_service = session.service("ALAnimatedSpeech")
-    tablet_service = session.service("ALTabletService")
-
-    #print "ALAnimatedSpeech ", anspeech_service
-    #tts_service.setLanguage("Italian")
-    tts_service.setLanguage("English")
-
-    touch_service = session.service("ALTouch")
-    touchstatus = touch_service.getStatus()
-    #print touchstatus
-    touchsensorlist = touch_service.getSensorList()
-    #print touchsensorlist
-
-    anyTouch = memory_service.subscriber("TouchChanged")
-    idAnyTouch = anyTouch.signal.connect(touchcb)
-
-    # create a thead that monitors directly the signal
-    appThread = threading.Thread(target = apprunThread, args = ())
-    appThread.start()
-
-
 
 
 # Robot motion
@@ -258,32 +206,14 @@ def setAlive(alive):
 
 def stand():
     global robot
-#    global session, tts_service
-#    print 'Stand'
-#    al_service = session.service("ALAutonomousLife")
-#    if al_service.getState()!='disabled':
-#        al_service.setState('disabled')
-#    rp_service = session.service("ALRobotPosture")
-#    rp_service.goToPosture("Stand",2.0)
-#    #tts_service.say("Standing up")
     robot.stand()
 
 def disabled():
     global robot
-#    global session, tts_service
-#    print 'Sleep'
-#    tts_service.say("Bye bye")
-#    al_service = session.service("ALAutonomousLife")
-#    al_service.setState('disabled')
     robot.disabled()
 
 def interact():
     global robot
-#    global session, tts_service
-#    print 'Interactive mode'
-#    tts_service.say("Interactive")
-#    al_service = session.service("ALAutonomousLife")
-#    al_service.setState('interactive')
     robot.interactive()
 
 
@@ -338,6 +268,9 @@ class PepperRobot:
         self.stop_request = False
         self.face_recording = False
         self.sth = None
+        self.jointNames = ["HeadYaw", "HeadPitch",
+               "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw",
+               "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
 
     # Connect to the robot
     def connect(self, pip=os.environ['PEPPER_IP'], pport=9559, alive=False):
@@ -726,6 +659,18 @@ class PepperRobot:
         self.motion_service.angleInterpolation(jointNames, finalAngles, timeLists, isAbsolute)
         
 
+    # Arms stiffness [0,1]
+    def setArmsStiffness(self, stiff_arms):
+        names = "LArm"
+        stiffnessLists = stiff_arms
+        timeLists = 1.0
+        self.motion_service.stiffnessInterpolation(names, stiffnessLists, timeLists)
+
+        names = "RArm"
+        self.motion_service.stiffnessInterpolation(names, stiffnessLists, timeLists)
+
+
+
     # Wait
 
     def wait(self, r=1):
@@ -756,20 +701,20 @@ class PepperRobot:
     # Behaviors
 
     def normalPosture(self):
-        jointNames = ["HeadYaw", "HeadPitch",
-               "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw",
-               "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
         jointValues = [0.00, -0.21, 1.55, 0.13, -1.24, -0.52, 0.01, 1.56, -0.14, 1.22, 0.52, -0.01]
         isAbsolute = True
-        self.motion_service.angleInterpolation(jointNames, jointValues, 3.0, isAbsolute)
+        self.motion_service.angleInterpolation(self.jointNames, jointValues, 3.0, isAbsolute)
 
 
     def setPosture(self, jointValues):
-        jointNames = ["HeadYaw", "HeadPitch",
-               "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw",
-               "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
         isAbsolute = True
-        self.motion_service.angleInterpolation(jointNames, jointValues, 3.0, isAbsolute)
+        self.motion_service.angleInterpolation(self.jointNames, jointValues, 3.0, isAbsolute)
+
+    def getPosture(self):
+        useSensors = True
+        pose = self.motion_service.getAngles(self.jointNames, useSensors)
+        return pose
+
 
 
     def raiseArm(self, which='R'): # or 'R'/'L' for right/left arm
