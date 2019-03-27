@@ -266,7 +266,8 @@ class PepperRobot:
         self.sonar = [0.0, 0.0] # front, back
         self.language = "English"
         self.stop_request = False
-        self.face_recording = False
+        self.frame_grabber = False
+        self.face_detection = False
         self.sth = None
         self.jointNames = ["HeadYaw", "HeadPitch",
                "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw",
@@ -379,28 +380,62 @@ class PepperRobot:
 
     # Camera
 
-    def startFaceDetection(self):
-
-        if self.face_recording:
-            return
+    def startFrameGrabber(self):
         # Connect to camera
         self.camProxy = ALProxy("ALVideoDevice", self.ip, self.port)
         resolution = 2    # VGA
         colorSpace = 11   # RGB
-        self.videoClient = self.camProxy.subscribe("vision_faceDetection", resolution, colorSpace, 5)
+        self.videoClient = self.camProxy.subscribe("grab_images", resolution, colorSpace, 5)
+        self.frame_grabber = True
+
+    def stopFrameGrabber(self):
+        # Connect to camera
+        self.camProxy.unsubscribe(self.videoClient)
+        self.frame_grabber = False
+
+
+    def saveImage(self, filename):
+
+        # Get a camera image.
+        # image[6] contains the image data passed as an array of ASCII chars.
+        img = self.camProxy.getImageRemote(self.videoClient)
+
+
+        # Get the image size and pixel array.
+        imageWidth = img[0]
+        imageHeight = img[1]
+        imageArray = img[6]
+
+        # Create a PIL Image from our pixel array.
+        imx = Image.frombytes("RGB", (imageWidth, imageHeight), imageArray)
+
+        # Save the image.
+        imx.save(filename, "PNG")
+
+
+    def startFaceDetection(self):
+
+        if self.face_detection:  # already active
+            return
+
+        # Connect to camera
+        self.startFrameGrabber()
 
         # Connect the event callback.
         self.frsub = self.memory_service.subscriber("FaceDetected")
         self.ch1 = self.frsub.signal.connect(self.on_facedetected)
         self.got_face = False
         self.savedfaces = []
-        self.face_recording = False
+        self.face_detection = True
+        self.face_recording = False # if images are saved on file
 
 
     def stopFaceDetection(self):
         self.frsub.signal.disconnect(self.ch1)
         self.camProxy.unsubscribe(self.videoClient)
         self.face_recording = False
+        self.face_detection = False
+
 
     def on_facedetected(self, value):
         """
