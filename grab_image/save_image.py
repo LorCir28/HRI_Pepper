@@ -9,8 +9,8 @@ import time
 import argparse
 
 
-# Python Image Library
-import Image
+# Python Image Library  - pip install Pillow ???
+from PIL import Image
 
 from naoqi import ALProxy
 
