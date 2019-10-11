@@ -559,7 +559,7 @@ class PepperRobot:
         asr_word = ''
         i = 0
         dt = 0.5
-        while (i<timeout and asr_word==''):
+        while ((timeout<0 or i<timeout) and asr_word==''):
             time.sleep(dt)
             i += dt
 
@@ -568,7 +568,7 @@ class PepperRobot:
         subWordRecognized.signal.disconnect(idSubWordRecognized)
 
         dt = time.time() - asr_timestamp
-        if (dt<timeout and asr_confidence>0.3):
+        if ((timeout<0 or dt<timeout) and asr_confidence>0.3):
             return asr_word
         else:
             return ''
