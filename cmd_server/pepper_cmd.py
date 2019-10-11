@@ -472,7 +472,7 @@ class PepperRobot:
                 #print "Face Infos :  width %.3f - height %.3f" % (faceShapeInfo[3], faceShapeInfo[4])
                 #print "Face Extra Infos :" + str(faceExtraInfo)
 
-                print "Face ID: %d" %faceID
+                #print "Face ID: %d" %faceID
 
         if self.camProxy!=None and faceID>=0 and faceID not in self.savedfaces and self.face_recording:
             # Get the image 
