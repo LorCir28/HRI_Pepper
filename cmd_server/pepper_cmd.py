@@ -372,11 +372,21 @@ class PepperRobot:
 
     def green_eyes(self):
         # green face leds
+        self.leds_service.on('LeftFaceLedsGreen')
         self.leds_service.off('LeftFaceLedsRed')
         self.leds_service.off('LeftFaceLedsBlue')
+        self.leds_service.on('RightFaceLedsGreen')
         self.leds_service.off('RightFaceLedsRed')
         self.leds_service.off('RightFaceLedsBlue')
 
+    def red_eyes(self):
+        # red face leds
+        self.leds_service.off('LeftFaceLedsGreen')
+        self.leds_service.on('LeftFaceLedsRed')
+        self.leds_service.off('LeftFaceLedsBlue')
+        self.leds_service.off('RightFaceLedsGreen')
+        self.leds_service.on('RightFaceLedsRed')
+        self.leds_service.off('RightFaceLedsBlue')
 
     # Camera
 
@@ -385,7 +395,7 @@ class PepperRobot:
         self.camProxy = ALProxy("ALVideoDevice", self.ip, self.port)
         resolution = 2    # VGA
         colorSpace = 11   # RGB
-        self.videoClient = self.camProxy.subscribe("grab_images", resolution, colorSpace, 5)
+        self.videoClient = self.camProxy.subscribe("grab2_images", resolution, colorSpace, 5)
         self.frame_grabber = True
 
     def stopFrameGrabber(self):
@@ -475,7 +485,7 @@ class PepperRobot:
                 print "Face ID: %d" %faceID
 
         if self.camProxy!=None and faceID>=0 and faceID not in self.savedfaces and self.face_recording:
-            # Get the image 
+            # Get the image
             img = self.camProxy.getImageRemote(self.videoClient)
 
             # Get the image size and pixel array.
@@ -696,10 +706,8 @@ class PepperRobot:
         stiffnessLists = stiff_arms
         timeLists = 1.0
         self.motion_service.stiffnessInterpolation(names, stiffnessLists, timeLists)
-
         names = "RArm"
         self.motion_service.stiffnessInterpolation(names, stiffnessLists, timeLists)
-
 
 
     # Wait
