@@ -23,7 +23,7 @@ from pepper_cmd import *
 
 websocket_server = None     # websocket handler
 run = True                  # main_loop run flag
-server_port = 9010          # web server port
+server_port = 9020          # web server port
 code = None
 status = "Idle"             # robot status sent to websocket
 

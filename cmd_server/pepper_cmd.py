@@ -482,7 +482,7 @@ class PepperRobot:
                 #print "Face Infos :  width %.3f - height %.3f" % (faceShapeInfo[3], faceShapeInfo[4])
                 #print "Face Extra Infos :" + str(faceExtraInfo)
 
-                print "Face ID: %d" %faceID
+                #print "Face ID: %d" %faceID
 
         if self.camProxy!=None and faceID>=0 and faceID not in self.savedfaces and self.face_recording:
             # Get the image
@@ -569,7 +569,7 @@ class PepperRobot:
         asr_word = ''
         i = 0
         dt = 0.5
-        while (i<timeout and asr_word==''):
+        while ((timeout<0 or i<timeout) and asr_word==''):
             time.sleep(dt)
             i += dt
 
@@ -578,7 +578,7 @@ class PepperRobot:
         subWordRecognized.signal.disconnect(idSubWordRecognized)
 
         dt = time.time() - asr_timestamp
-        if (dt<timeout and asr_confidence>0.3):
+        if ((timeout<0 or dt<timeout) and asr_confidence>0.3):
             return asr_word
         else:
             return ''
