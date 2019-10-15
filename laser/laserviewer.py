@@ -129,6 +129,12 @@ class LaserViewer(PyGLWidget):
         glPushMatrix()
         glPushAttrib(GL_COLOR|GL_POINT_SIZE)
 
+        glPointSize(15)
+        glBegin(GL_POINTS)
+        glColor3f(0.0, 0.0, 0.0)
+        glVertex3f(0, 0, 0)
+        glEnd()
+
         glPointSize(5)
         glBegin(GL_POINTS)
         for i in range(0,len(self.laserpoints)):
@@ -136,12 +142,19 @@ class LaserViewer(PyGLWidget):
             d = math.sqrt(point[0]*point[0]+point[1]*point[1])
             if d >= MAX_RANGE:
                 continue
-            glColor3f(1.0, 0.0, 0.0)
+            if (i<15): # right
+                glColor3f(0.0, 1.0, 0.0)
+            elif (i<30): # front
+                glColor3f(1.0, 0.0, 0.0)
+            else: # left
+                glColor3f(0.0, 0.0, 1.0)
             glVertex3f(point[0], point[1], 0)
         glEnd()
 
         glPopAttrib()
         glPopMatrix()
+
+        
         
     def setLaserPoints(self, laserpoints):
         self.laserpoints = laserpoints
@@ -175,21 +188,21 @@ def rawPointsToRobotFrame (rawPoints):
         rawPoint = rawPoints[i]
         if i < 15:
             #Right Laser Point
-            lX = -0.01800; lY = -0.08990; lt = -1.57079;
+            lX = -0.01800; lY = -0.08990; lt = -1.57079 + math.pi/2;
             tX = rawPoint[0]*math.cos(lt) - rawPoint[1]*math.sin(lt) + lX
             tY = rawPoint[0]*math.sin(lt) + rawPoint[1]*math.cos(lt) + lY
             pointsInRobotFrame[i] = (tX,tY)
             continue
         if i < 30:
             #Front Laser Point
-            lX = 0.05620; lY = 0.0; lt = 0.0;
+            lX = 0.05620; lY = 0.0; lt = 0.0 + math.pi/2;
             tX = rawPoint[0]*math.cos(lt) - rawPoint[1]*math.sin(lt) + lX
             tY = rawPoint[0]*math.sin(lt) + rawPoint[1]*math.cos(lt) + lY
             pointsInRobotFrame[i] = (tX,tY)
             continue
         if i < 45:
             #Left Laser Point
-            lX = -0.01800; lY = 0.08990; lt = 1.57079;
+            lX = -0.01800; lY = 0.08990; lt = 1.57079 + math.pi/2;
             tX = rawPoint[0]*math.cos(lt) - rawPoint[1]*math.sin(lt) + lX
             tY = rawPoint[0]*math.sin(lt) + rawPoint[1]*math.cos(lt) + lY
             pointsInRobotFrame[i] = (tX,tY)

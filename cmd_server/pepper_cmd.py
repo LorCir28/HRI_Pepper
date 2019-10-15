@@ -11,6 +11,7 @@
 # >>> from pepper_cmd import *
 # >>> begin()
 # >>> pepper_cmd.robot.<fn>()
+# >>> end()
 
 import time
 import os
@@ -19,11 +20,110 @@ import threading
 import math
 import random
 import qi
+from datetime import datetime
 
 from naoqi import ALProxy
 
 # Python Image Library
 import Image
+
+
+
+laserValueList = [
+  # RIGHT LASER
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg01/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg01/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg02/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg02/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg03/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg03/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg04/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg04/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg05/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg05/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg06/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg06/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg07/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg07/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg08/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg08/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg09/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg09/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg10/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg10/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg11/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg11/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg12/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg12/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg13/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg13/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg14/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg14/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg15/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg15/Y/Sensor/Value",
+  # FRONT LASER
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg01/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg01/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg02/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg02/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg03/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg03/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg04/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg04/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg05/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg05/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg06/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg06/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg07/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg07/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg08/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg08/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg09/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg09/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg10/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg10/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg11/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg11/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg12/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg12/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg13/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg13/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg14/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg14/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg15/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg15/Y/Sensor/Value",
+  # LEFT LASER
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg01/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg01/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg02/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg02/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg03/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg03/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg04/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg04/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg05/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg05/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg06/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg06/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg07/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg07/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg08/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg08/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg09/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg09/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg10/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg10/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg11/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg11/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg12/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg12/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg13/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg13/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg14/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg14/Y/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg15/X/Sensor/Value",
+  "Device/SubDeviceList/Platform/LaserSensor/Left/Horizontal/Seg15/Y/Sensor/Value"
+]
 
 
 app = None
@@ -58,16 +158,39 @@ def sensorThread(robot):
     headTouchValue = "Device/SubDeviceList/Head/Touch/Middle/Sensor/Value"
     handTouchValues = [ "Device/SubDeviceList/LHand/Touch/Back/Sensor/Value",
                    "Device/SubDeviceList/RHand/Touch/Back/Sensor/Value" ]
-
+    frontLaserValues = [ 
+      "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg07/X/Sensor/Value",
+      "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg07/Y/Sensor/Value",
+      "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg08/X/Sensor/Value",
+      "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg08/Y/Sensor/Value",
+      "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg09/X/Sensor/Value",
+      "Device/SubDeviceList/Platform/LaserSensor/Front/Horizontal/Seg09/Y/Sensor/Value" ]
+ 
     t = threading.currentThread()
     while getattr(t, "do_run", True):
         robot.headTouch = robot.memory_service.getData(headTouchValue)
         robot.handTouch = robot.memory_service.getListData(handTouchValues)
         robot.sonar = robot.memory_service.getListData(sonarValues)
+        laserValues = robot.memory_service.getListData(frontLaserValues)
+        dd = 0 # average distance
+        c = 0
+        for i in range(0,len(laserValues),2):
+            px = laserValues[i]
+            py = laserValues[i+1]
+            d = math.sqrt(px*px+py*py)
+            if d<3:
+                dd = dd + d
+                c = c+1
+        
+        if (c>0):
+            robot.frontlaser = dd / c
+        else:
+            robot.frontlaser = 10.0
+
         #print "Head touch middle value=", robot.headTouch
         #print "Hand touch middle value=", robot.handTouch
         #print "Sonar [Front, Back]", robot.sonar
-        time.sleep(1)
+        time.sleep(0.2)
     #print "Exiting Thread"
 
 
@@ -101,6 +224,29 @@ def sensorvalue(sensorname):
     if (robot!=None):
         return robot.sensorvalue(sensorname)
 
+
+touchcnt = 0
+
+# function called when the signal onTouchDown is triggered
+def touch_cb(x, y):
+    global robot, touchcnt
+    print "Touch coordinates are x: ", x, " y: ", y
+    robot.screenTouch = (x,y)
+    touchcnt = touchcnt + 1
+    time.sleep(1)
+    touchcnt = touchcnt - 1
+    if touchcnt == 0:
+        robot.screenTouch = (0.0,0.0)
+
+
+
+def laserMonitorThread (memory_service):
+    t = threading.currentThread()
+    while getattr(t, "do_run", True):
+        laserValues =  memory_service.getListData(laserValueList)
+        print laserValues[44],laserValues[45] #X,Y values of central point
+        time.sleep(0.2)
+    print "Exiting Thread"
 
 
 # Begin/end
@@ -233,12 +379,6 @@ def run_behavior(bname):
 
 def takephoto():
     global robot
-#    global session, tts_service
-#    str = 'Take photo'
-#    print(str)
-#    #tts_service.say(str)
-#    bname = 'takepicture-61492b/behavior_1'
-#    run_behavior(bname)
     robot.takephoto()
 
 
@@ -247,13 +387,8 @@ def opendiag():
     robot.introduction()
 
 def sax():
-        global robot
-#    global session, tts_service
-#    str = 'demo'
-#    print(str)
-#    bname = 'saxophone-0635af/behavior_1'
-#    run_behavior(bname)
-        robot.sax()
+    global robot
+    robot.sax()
 
 
 class PepperRobot:
@@ -264,11 +399,17 @@ class PepperRobot:
         self.headTouch = 0.0
         self.handTouch = [0.0, 0.0] # left, right
         self.sonar = [0.0, 0.0] # front, back
+        self.frontlaser = 0.0
+        self.screenTouch = (0,0)
         self.language = "English"
         self.stop_request = False
         self.frame_grabber = False
         self.face_detection = False
-        self.sth = None
+        self.got_face = False
+
+        self.sensorThread = None
+        self.laserThread = None
+
         self.jointNames = ["HeadYaw", "HeadPitch",
                "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw",
                "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
@@ -307,6 +448,7 @@ class PepperRobot:
         self.tablet_service = None
         try:
             self.tablet_service = self.session.service("ALTabletService")
+            self.touch_service = self.session.service("ALTouch")
             self.animation_player_service = self.session.service("ALAnimationPlayer")
             self.beh_service = self.session.service("ALBehaviorManager")
             self.al_service = self.session.service("ALAutonomousLife")
@@ -315,6 +457,9 @@ class PepperRobot:
             self.ba_service = self.session.service("ALBasicAwareness")
             self.sm_service = self.session.service("ALSpeakingMovement")
             self.asr_service = self.session.service("ALSpeechRecognition")
+            self.audiorec_service = self.session.service("ALAudioRecorder")
+            self.audio_service = self.session.service("ALAudioDevice")
+
 
             self.alive = alive
             print('Alive behaviors: %r' %self.alive)
@@ -325,8 +470,8 @@ class PepperRobot:
             
             webview = "http://198.18.0.1/apps/spqrel/index.html"
             self.tablet_service.showWebview(webview)
+            self.touchsignalID = self.tablet_service.onTouchDown.connect(touch_cb)
 
-            self.touch_service = self.session.service("ALTouch")
             self.touchstatus = self.touch_service.getStatus()
             #print touchstatus
             self.touchsensorlist = self.touch_service.getSensorList()
@@ -338,30 +483,47 @@ class PepperRobot:
         #anyTouch = self.memory_service.subscriber("TouchChanged")
         #idAnyTouch = anyTouch.signal.connect(touchcb)
 
-        # create a thead that monitors directly the signal
-        self.sth = threading.Thread(target = sensorThread, args = (self, ))
-        self.sth.start()
-
         self.isConnected = True
 
 
     def quit(self):
         print "Quit Pepper robot."
-        if self.sth != None:
-            self.sth.do_run = False
+        self.sensorThread = None
+        self.laserThread = None
+        if self.sensorThread != None:
+            self.sensorThread.do_run = False
+            self.sensorThread = None
+        if self.laserThread != None:
+            self.laserThread.do_run = False
+            self.laserThread = None
+        self.tablet_service.onTouchDown.disconnect(self.touchsignalID)
         time.sleep(1)
         self.app.stop()
+        
 
     # general commands
 
     def begin(self):
         self.stop_request = False
+        self.ears_led(False)
+        self.white_eyes()
 
     def exec_cmd(self, params):
         cmdstr = "self."+params
         print "Executing %s" %(cmdstr)
         eval(cmdstr)    
 
+    # Network
+
+    def networkstatus(self):
+        # TODO
+        #self.tablet_service.configureWifi(const std::string& security, const std::string& ssid, const std::string& key)
+        #connectWifi(const std::string& ssid)
+        return self.tablet_service.getWifiStatus()
+
+
+    def robotIp(self):
+        return self.tablet_service.robotIp() # just tablet IP ...
 
     # Leds
 
@@ -387,6 +549,50 @@ class PepperRobot:
         self.leds_service.off('RightFaceLedsGreen')
         self.leds_service.on('RightFaceLedsRed')
         self.leds_service.off('RightFaceLedsBlue')
+
+    def blue_eyes(self):
+        # red face leds
+        self.leds_service.off('LeftFaceLedsGreen')
+        self.leds_service.off('LeftFaceLedsRed')
+        self.leds_service.on('LeftFaceLedsBlue')
+        self.leds_service.off('RightFaceLedsGreen')
+        self.leds_service.off('RightFaceLedsRed')
+        self.leds_service.on('RightFaceLedsBlue')
+
+
+    def ears_led(self, enable):
+        # Ears leds
+        if enable:
+            self.leds_service.on('EarLeds')
+        else:
+            self.leds_service.off('EarLeds')
+
+
+    # Touch/distance sensors
+
+    def startSensorMonitor(self):
+        if self.sensorThread == None:
+            # create a thead that monitors directly the signal
+            self.sensorThread = threading.Thread(target = sensorThread, args = (self, ))
+            self.sensorThread.start()
+
+    def stopSensorMonitor(self):
+        self.sensorThread.do_run = False
+        self.sensorThread = None
+
+
+    # Laser
+
+    def startLaserMonitor(self):
+        if self.laserThread==None:
+            #create a thead that monitors directly the signal
+            self.laserThread = threading.Thread(target = laserMonitorThread, args = (self.memory_service,))
+            self.laserThread.start()
+
+    def stopLaserMonitor(self):
+        self.laserThread.do_run = False
+        self.laserThread = None
+
 
     # Camera
 
@@ -424,7 +630,6 @@ class PepperRobot:
 
 
     def startFaceDetection(self):
-
         if self.face_detection:  # already active
             return
 
@@ -445,6 +650,11 @@ class PepperRobot:
         self.camProxy.unsubscribe(self.videoClient)
         self.face_recording = False
         self.face_detection = False
+        self.white_eyes()
+
+
+    def setFaceRecording(self,enable):
+         self.face_recording = enable
 
 
     def on_facedetected(self, value):
@@ -456,7 +666,7 @@ class PepperRobot:
         if value == []:  # empty value when the face disappears
             self.got_face = False
             self.white_eyes()
-        elif not self.got_face:  # only speak the first time a face appears
+        elif not self.got_face:  # only the first time a face appears
             self.got_face = True
             self.green_eyes()
             #print "I saw a face!"
@@ -504,6 +714,28 @@ class PepperRobot:
             self.savedfaces.append(faceID)
 
 
+    # Audio settings
+
+    def getVolume(self):
+        return self.audio_service.getOutputVolume()
+
+    def setVolume(self, v):
+        self.audio_service.setOutputVolume(v)
+
+
+    # Audio recording
+
+    def startAudioRecording(self):
+        audiofile = '/home/nao/audio/audiorec_%s.wav' %(datetime.now().strftime("%Y%m%d_%H%M%S"))
+
+        # Configures the channels that need to be recorded.
+        channels = [0,0,1,0]  # Left, Right, Front, Rear
+        self.audiorec_service.startMicrophonesRecording(audiofile, 'wav', 16000, channels)
+        self.ears_led(True)
+
+    def stopAudioRecording(self):
+        self.audiorec_service.stopMicrophonesRecording()
+        self.ears_led(False)
 
 
 
@@ -516,11 +748,16 @@ class PepperRobot:
             lang = languages[lang]
         self.tts_service.setLanguage(lang)
 
+    def tts(self, interaction):
+        if self.stop_request:
+            return
+        self.tts_service.setParameter("speed", 80)
+        self.tts_service.say(interaction)
+
     def say(self, interaction):
         if self.stop_request:
             return
         self.tts_service.setParameter("speed", 80)
-        #self.tts_service.say(interaction)
         self.asay2(interaction)
 
     def asay2(self, interaction):
@@ -592,9 +829,14 @@ class PepperRobot:
         print 'bop -- NOT IMPLEMENTED'
 
 
+    # animations/Stand/Gestures/
+    # Please_1
+    # Hey_1; Hey_3; Hey_4
     def animation(self, interaction):
         if self.stop_request:
             return
+        if interaction[0:4]!='anim':
+            interaction = 'animations/Stand/Gestures/' + interaction
         print 'Animation ',interaction
         self.bm_service.setEnabled(False)
         self.ba_service.setEnabled(False)
@@ -618,9 +860,10 @@ class PepperRobot:
     # Tablet
 
     def showurl(self, weburl):
-        strurl = "http://198.18.0.1/apps/spqrel/%s" %(weburl)
-        print "URL: ",strurl
-        self.tablet_service.showWebview(strurl)
+        if weburl[0:4]!='http':
+            weburl = "http://198.18.0.1/apps/spqrel/%s" %(weburl)
+        print "URL: ",weburl
+        self.tablet_service.showWebview(weburl)
 
     # Robot motion
 
@@ -669,6 +912,26 @@ class PepperRobot:
         y = 0.0
         theta = -math.pi/2 * r
         self.motion_service.moveTo(x, y, theta) #blocking function
+
+    def turn(self, r):
+        if self.stop_request:
+            return
+        print 'turn',r
+        #Turn r deg
+        vx = 0.0
+        vy = 0.0
+        vth = r * math.pi / 180 
+        self.motion_service.moveTo(vx, vy, vth) #blocking function
+
+    def setSpeed(self,vx,vy,vth,tm,stopOnEnd=False):
+        if self.stop_request:
+            return
+        self.motion_service.move(vx, vy, vth)
+        time.sleep(tm)
+        if stopOnEnd:
+            self.motion_service.move(0, 0, 0)
+            self.motion_service.stopMove()
+
 
     # Head motion
 
@@ -719,7 +982,7 @@ class PepperRobot:
 
     # Sensors
 
-    def sensorvalue(self, sensorname):
+    def sensorvalue(self, sensorname='all'):
         if (sensorname == 'frontsonar'):
             return self.sonar[0]
         elif (sensorname == 'rearsonar'):
@@ -730,10 +993,15 @@ class PepperRobot:
             return self.handTouch[0]
         elif (sensorname == 'righthandtouch'):
             return self.handTouch[1]
+        elif (sensorname == 'frontlaser'):
+            return self.frontlaser
+        elif (sensorname == 'all'):
+            return [self.frontlaser,  self.sonar[0],  self.sonar[1],
+                self.headTouch, self.handTouch[0], self.handTouch[1] ]
 
 
     def sensorvaluestring(self):
-        return '%f,%f,%d,%d,%d' %(self.sensorvalue('frontsonar'),self.sensorvalue('rearsonar'),self.sensorvalue('headtouch'),self.sensorvalue('lefthandtouch'),self.sensorvalue('righthandtouch'))
+        return '%.1f,%.1f,%.1f,%d,%d,%d' %(self.sensorvalue('frontlaser'),self.sensorvalue('frontsonar'),self.sensorvalue('rearsonar'),self.sensorvalue('headtouch'),self.sensorvalue('lefthandtouch'),self.sensorvalue('righthandtouch'))
 
 
 
