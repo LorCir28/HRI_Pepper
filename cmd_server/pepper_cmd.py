@@ -27,8 +27,6 @@ from naoqi import ALProxy
 # Python Image Library
 import Image
 
-
-
 laserValueList = [
   # RIGHT LASER
   "Device/SubDeviceList/Platform/LaserSensor/Right/Horizontal/Seg01/X/Sensor/Value",
@@ -609,13 +607,54 @@ class PepperRobot:
         self.camProxy.unsubscribe(self.videoClient)
         self.frame_grabber = False
 
+    def sendImage(self, ip, port):
+        # Get a camera image.
+        # image[6] contains the image data passed as an array of ASCII chars.
+        img = self.camProxy.getImageRemote(self.videoClient)
+
+        # Get the image size and pixel array.
+        imageWidth = img[0]
+        imageHeight = img[1]
+        imageArray = img[6]
+
+        # Create a PIL Image from our pixel array.
+        imx = Image.frombytes("RGB", (imageWidth, imageHeight), imageArray)
+
+        # Convert to grayscale
+        img = imx.convert('L')
+    
+        aimg = img.tobytes()
+
+        print("Connecting to %s:%d ..." %(ip,port))
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((ip,port))
+            #print("OK")
+
+            print("Sending image ...")
+            #print("Image size: %d %d" %(imageWidth * imageHeight, len(aimg)))
+
+            msg = '%9d\n' %len(aimg)
+            s.send(msg.encode())
+            s.send(aimg)
+
+            data = s.recv(80)
+            rcv_msg = data.decode()
+            print("Reply: %s" %rcv_msg)
+
+            s.close()
+            #print("Connection closed ")
+            return rcv_msg
+        except:
+            print("Connection error")
+            return 'ERROR'
+
 
     def saveImage(self, filename):
 
         # Get a camera image.
         # image[6] contains the image data passed as an array of ASCII chars.
         img = self.camProxy.getImageRemote(self.videoClient)
-
 
         # Get the image size and pixel array.
         imageWidth = img[0]
