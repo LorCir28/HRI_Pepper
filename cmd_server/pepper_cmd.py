@@ -599,7 +599,7 @@ class PepperRobot:
         self.camProxy = ALProxy("ALVideoDevice", self.ip, self.port)
         resolution = 2    # VGA
         colorSpace = 11   # RGB
-        self.videoClient = self.camProxy.subscribe("grab2_images", resolution, colorSpace, 5)
+        self.videoClient = self.camProxy.subscribe("grab3_images", resolution, colorSpace, 5)
         self.frame_grabber = True
 
     def stopFrameGrabber(self):
@@ -612,6 +612,9 @@ class PepperRobot:
         # image[6] contains the image data passed as an array of ASCII chars.
         img = self.camProxy.getImageRemote(self.videoClient)
 
+        if img is None:
+            return 'ERROR'
+
         # Get the image size and pixel array.
         imageWidth = img[0]
         imageHeight = img[1]
@@ -621,8 +624,7 @@ class PepperRobot:
         imx = Image.frombytes("RGB", (imageWidth, imageHeight), imageArray)
 
         # Convert to grayscale
-        img = imx.convert('L')
-    
+        img = imx.convert('L')   
         aimg = img.tobytes()
 
         print("Connecting to %s:%d ..." %(ip,port))
