@@ -20,6 +20,7 @@ import threading
 import math
 import random
 import qi
+import datetime
 from datetime import datetime
 
 from naoqi import ALProxy
@@ -405,8 +406,14 @@ class PepperRobot:
         self.face_detection = False
         self.got_face = False
 
+        self.FER_server_IP = None
+        self.FER_server_port = 5678
+
+        self.logfile = None
+
         self.sensorThread = None
         self.laserThread = None
+        self.lthr = None # log thread
 
         self.jointNames = ["HeadYaw", "HeadPitch",
                "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw",
@@ -1122,6 +1129,66 @@ class PepperRobot:
         self.run_behavior(bname)
 
 
+    # Logging functions
+
+    def logenable(self,enable=True):
+        if enable:
+            if (self.logfile is None):
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                logfilename = '/tmp/pepper_%s.log' %timestamp
+                self.logfile = open(logfilename,'a')
+                self.lthr = threading.Thread(target = self.logthread)
+                self.lthr.start()
+                print('Log enabled.')
+        else:
+            if (self.logfile is not None):
+                self.logclose()
+                self.lthr.do_run = False
+                self.lthr = None
+                print('Log disabled.')
 
 
+    def logdata(self, data):
+        if (self.logfile is not None):
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            self.logfile.write("%s;%r\n" %(timestamp, data))
+            self.logfile.flush()
+
+    def logclose(self):
+        if (self.logfile != None):
+            self.logfile.close()
+            self.logfile = None
+
+
+    def logthread(self):
+        t = threading.currentThread()
+        while getattr(t, "do_run", True):
+            z = self.getState()
+            self.logdata(z)
+            time.sleep(1)
+
+
+    def setFERserver(ip,port=5678):
+        self.FER_server_IP = ip
+        self.FER_server_port = port
+
+    def getState(self):
+        # frontlaser, frontsonar, backsonar, headtouch, lefthandtouch, 
+        # righthandtouch, screenx, screeny, face, happy
+        z = self.sensorvalue()
+        z.append(self.screenTouch[0])
+        z.append(self.screenTouch[1])
+        z.append(1.0 if self.got_face else 0.0)
+        if self.FER_server_IP is not None:
+            r = self.sendImage(self.FER_server_IP,self.FER_server_port)
+        else:
+            r = None
+        v = []
+        if r is not None and type(r)!=type('str'):
+            v = eval(r)
+        h = 0.0
+        for c in v:
+            h = max(h,c[1])
+        z.append(h)    
+        return z
 
