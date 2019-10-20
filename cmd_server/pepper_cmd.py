@@ -634,13 +634,13 @@ class PepperRobot:
         img = imx.convert('L')   
         aimg = img.tobytes()
 
-        print("Connecting to %s:%d ..." %(ip,port))
+        #print("Connecting to %s:%d ..." %(ip,port))
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((ip,port))
             #print("OK")
 
-            print("Sending image ...")
+            #print("Sending image ...")
             #print("Image size: %d %d" %(imageWidth * imageHeight, len(aimg)))
 
             msg = '%9d\n' %len(aimg)
@@ -649,7 +649,7 @@ class PepperRobot:
 
             data = s.recv(80)
             rcv_msg = data.decode()
-            print("Reply: %s" %rcv_msg)
+            #print("Reply: %s" %rcv_msg)
 
             s.close()
             #print("Connection closed ")
@@ -1163,19 +1163,31 @@ class PepperRobot:
     def logthread(self):
         t = threading.currentThread()
         while getattr(t, "do_run", True):
-            z = self.getState()
-            self.logdata(z)
+            try:
+                z = self.getState()
+                self.logdata(z)
+            except:
+                pass
             time.sleep(1)
 
 
-    def setFERserver(ip,port=5678):
+    def setFERserver(self,ip,port=5678):
         self.FER_server_IP = ip
         self.FER_server_port = port
 
     def getState(self):
+        # v0
         # frontlaser, frontsonar, backsonar, headtouch, lefthandtouch, 
         # righthandtouch, screenx, screeny, face, happy
-        z = self.sensorvalue()
+        # v1
+        # frontlaser, frontsonar, backsonar, headtouch, lefthandtouch, 
+        # righthandtouch, head_yaw, head_pitch, screenx, screeny, face, happy
+        
+        z = self.sensorvalue() # frontlaser...handtouch
+        useSensors = True
+        headpose = self.motion_service.getAngles(["HeadYaw", "HeadPitch"],
+                                                 useSensors)
+        z.append(headPose)
         z.append(self.screenTouch[0])
         z.append(self.screenTouch[1])
         z.append(1.0 if self.got_face else 0.0)
