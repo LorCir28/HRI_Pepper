@@ -1185,9 +1185,10 @@ class PepperRobot:
         
         z = self.sensorvalue() # frontlaser...handtouch
         useSensors = True
-        headpose = self.motion_service.getAngles(["HeadYaw", "HeadPitch"],
+        headPose = self.motion_service.getAngles(["HeadYaw", "HeadPitch"],
                                                  useSensors)
-        z.append(headPose)
+        z.append(headPose[0])
+        z.append(headPose[1])
         z.append(self.screenTouch[0])
         z.append(self.screenTouch[1])
         z.append(1.0 if self.got_face else 0.0)
