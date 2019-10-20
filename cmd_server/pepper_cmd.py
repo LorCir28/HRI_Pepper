@@ -195,7 +195,6 @@ def sensorThread(robot):
 
 
 
-
 def touchcb(value):
     print "value=",value
 
@@ -1175,13 +1174,14 @@ class PepperRobot:
         self.FER_server_IP = ip
         self.FER_server_port = port
 
+
     def getState(self):
-        # v0
-        # frontlaser, frontsonar, backsonar, headtouch, lefthandtouch, 
-        # righthandtouch, screenx, screeny, face, happy
         # v1
         # frontlaser, frontsonar, backsonar, headtouch, lefthandtouch, 
-        # righthandtouch, head_yaw, head_pitch, screenx, screeny, face, happy
+        # righthandtouch, screenx, screeny, face, happy
+        # v2
+        # frontlaser, frontsonar, backsonar, headtouch, lefthandtouch, 
+        # righthandtouch, head_yaw, head_pitch, screenx, screeny, touchcnt, face, happy
         
         z = self.sensorvalue() # frontlaser...handtouch
         useSensors = True
@@ -1191,6 +1191,7 @@ class PepperRobot:
         z.append(headPose[1])
         z.append(self.screenTouch[0])
         z.append(self.screenTouch[1])
+        z.append(touchcnt)
         z.append(1.0 if self.got_face else 0.0)
         if self.FER_server_IP is not None:
             r = self.sendImage(self.FER_server_IP,self.FER_server_port)
