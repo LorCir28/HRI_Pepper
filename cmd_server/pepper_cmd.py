@@ -648,7 +648,7 @@ class PepperRobot:
             #print("Connection closed ")
             return rcv_msg
         except:
-            print("Connection error")
+            print("Send image: connection error")
             return 'ERROR'
 
 
@@ -763,6 +763,9 @@ class PepperRobot:
     def setVolume(self, v):
         self.audio_service.setOutputVolume(v)
 
+
+    def timestamp(self):
+        return datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # Audio recording
 
