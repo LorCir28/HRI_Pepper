@@ -656,7 +656,7 @@ class PepperRobot:
             #print("Connection closed ")
             return rcv_msg
         except:
-            print("Connection error")
+            print("Send image: connection error")
             return 'ERROR'
 
 
@@ -771,6 +771,9 @@ class PepperRobot:
     def setVolume(self, v):
         self.audio_service.setOutputVolume(v)
 
+
+    def timestamp(self):
+        return datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # Audio recording
 
@@ -1171,7 +1174,7 @@ class PepperRobot:
                 self.logfile = open(logfilename,'a')
                 self.lthr = threading.Thread(target = self.logthread)
                 self.lthr.start()
-                print('Log enabled.')
+                print('Log enabled on file %s.' %logfilename)
         else:
             if (self.logfile is not None):
                 self.logclose()
