@@ -463,6 +463,8 @@ class PepperRobot:
             self.asr_service = self.session.service("ALSpeechRecognition")
             self.audiorec_service = self.session.service("ALAudioRecorder")
             self.audio_service = self.session.service("ALAudioDevice")
+            self.battery_service = self.session.service("ALBattery")
+            self.people_service = self.session.service("ALPeoplePerception")
 
 
             self.alive = alive
@@ -1126,6 +1128,37 @@ class PepperRobot:
         print(str)
         bname = 'animated-say-5b866d/behavior_1'
         self.run_behavior(bname)
+
+
+    # People
+
+    def getPeopleInfo(self):
+        pl = self.memory_service.getData('PeoplePerception/PeopleList')
+            # PeoplePerception/PeopleList
+        print('People list: %s' %str(pl))
+        r = []
+        for id in pl:
+            print('Person ID %d' %id)
+            gekey = 'PeoplePerception/Person/%d/GenderProperties' %id
+            smkey = 'PeoplePerception/Person/%d/SmileProperties' %id
+            agkey = 'PeoplePerception/Person/%d/AgeProperties' %id
+
+            ge = self.memory_service.getData(gekey)  # 0 female, 1 male, confidence
+            sm = self.memory_service.getData(smkey)  # 0-1 smile, confidence
+            ag = self.memory_service.getData(agkey)  # age, confidence
+            d = {}
+            d['gender'] = ge
+            d['age'] = ag
+            d['smile'] = sm
+            r.append(d) 
+            #rstr= "gender: %s, age: %s, smile: %s" %(str(ge),str(ag),str(sm))
+            #print(rtrs)
+        return r
+
+    # Battery
+
+    def getBatteryCharge(self):
+        return self.battery_service.getBatteryCharge()
 
 
     # Logging functions
