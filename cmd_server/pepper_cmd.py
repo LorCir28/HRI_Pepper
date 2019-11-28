@@ -1141,7 +1141,7 @@ class PepperRobot:
                 self.logfile = open(logfilename,'a')
                 self.lthr = threading.Thread(target = self.logthread)
                 self.lthr.start()
-                print('Log enabled.')
+                print('Log enabled on file %s.' %logfilename)
         else:
             if (self.logfile is not None):
                 self.logclose()
