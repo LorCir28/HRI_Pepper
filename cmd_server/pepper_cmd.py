@@ -418,6 +418,9 @@ class PepperRobot:
                "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw",
                "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
 
+        self.fakeASRkey = 'FakeRobot/ASR'
+        self.fakeASRtimekey = 'FakeRobot/ASRtime'
+
 
     def session_service(self,name):
         try:
@@ -854,36 +857,54 @@ class PepperRobot:
         self.anspeech_service.say("^start("+anim+") " + interaction+" ^wait("+anim+")")
 
 
+    def fake_asr(self):
+        global asr_word, asr_confidence, asr_timestamp
+        try:
+            r = self.memory_service.getData(self.fakeASRkey)
+            if r!='':
+                asr_word = r
+                asr_confidence = 1.0
+                asr_timestamp = self.memory_service.getData(self.fakeASRtimekey)
+                self.memory_service.insertData(self.fakeASRkey,'')
+                # print('fake ASR: [%s], %r' %(asr_word,asr_timestamp))
+        except:
+            pass
+
+
     # vocabulary = list of keywords, e.g. ["yes", "no", "please"]
     # blocking until timeout
     def asr(self, vocabulary, timeout=5):
         global asr_word, asr_confidence, asr_timestamp
         #establishing vocabulary
-        if (self.asr_service is None):
-            #print('ASR service not available.')
-            val = raw_input('Enter ASR text: ')
-            return val
-        self.asr_service.pause(True)
-        self.asr_service.setVocabulary(vocabulary, False)
-        self.asr_service.pause(False)
-        # Start the speech recognition engine with user Test_ASR
-        self.asr_service.subscribe("asr_pepper_cmd")
-        print 'Speech recognition engine started'
+        if (self.asr_service != None):
+            self.asr_service.pause(True)
+            self.asr_service.setVocabulary(vocabulary, False)
+            self.asr_service.pause(False)
+            # Start the speech recognition engine with user Test_ASR
+            self.asr_service.subscribe("asr_pepper_cmd")
+            print 'Speech recognition engine started'
 
-        #subscribe to event WordRecognized
-        subWordRecognized = self.memory_service.subscriber("WordRecognized")
-        idSubWordRecognized = subWordRecognized.signal.connect(onWordRecognized)
+            #subscribe to event WordRecognized
+            subWordRecognized = self.memory_service.subscriber("WordRecognized")
+            idSubWordRecognized = subWordRecognized.signal.connect(onWordRecognized)
+        else:
+            print('ASR service not available. Use %s memory key to say something' %self.fakeASRkey)
+            #val = raw_input('Enter ASR text: ')
+            #return val
+
 
         asr_word = ''
         i = 0
         dt = 0.5
         while ((timeout<0 or i<timeout) and asr_word==''):
+            self.fake_asr()
             time.sleep(dt)
             i += dt
 
-        #Disconnecting callbacks and subscribers
-        self.asr_service.unsubscribe("asr_pepper_cmd")
-        subWordRecognized.signal.disconnect(idSubWordRecognized)
+        if (self.asr_service != None):
+            #Disconnecting callbacks and subscribers
+            self.asr_service.unsubscribe("asr_pepper_cmd")
+            subWordRecognized.signal.disconnect(idSubWordRecognized)
 
         dt = time.time() - asr_timestamp
         if ((timeout<0 or dt<timeout) and asr_confidence>0.3):
@@ -1122,7 +1143,8 @@ class PepperRobot:
 
 
     def run_behavior(self, bname):
-        self.beh_service.startBehavior(bname)
+        if self.beh_service!=None:
+            self.beh_service.startBehavior(bname)
         #time.sleep(10)
         #beh_service.stopBehavior(bname)
 
