@@ -416,7 +416,8 @@ class PepperRobot:
 
         self.jointNames = ["HeadYaw", "HeadPitch",
                "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw",
-               "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+               "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw",
+               "LHand", "RHand", "HipRoll", "HipPitch", "KneePitch"]
 
         self.fakeASRkey = 'FakeRobot/ASR'
         self.fakeASRtimekey = 'FakeRobot/ASRtime'
@@ -821,12 +822,11 @@ class PepperRobot:
     def say(self, interaction):
         if self.stop_request:
             return
+        print('Say: %s' %interaction)
         if self.tts_service!=None:
             self.tts_service.setParameter("speed", 80)
             self.asay2(interaction)
-        else:
-            print('Say: %s' %interaction)
-
+ 
     def asay2(self, interaction):
         if self.stop_request:
             return
@@ -908,6 +908,7 @@ class PepperRobot:
 
         dt = time.time() - asr_timestamp
         if ((timeout<0 or dt<timeout) and asr_confidence>0.3):
+            print("ASR: %s" %asr_word)
             return asr_word
         else:
             return ''
@@ -1099,7 +1100,8 @@ class PepperRobot:
     # Behaviors
 
     def normalPosture(self):
-        jointValues = [0.00, -0.21, 1.55, 0.13, -1.24, -0.52, 0.01, 1.56, -0.14, 1.22, 0.52, -0.01]
+        jointValues = [0.00, -0.21, 1.55, 0.13, -1.24, -0.52, 0.01, 1.56, -0.14, 1.22, 0.52, -0.01,
+                       0, 0, 0, 0, 0]
         isAbsolute = True
         self.motion_service.angleInterpolation(self.jointNames, jointValues, 3.0, isAbsolute)
 

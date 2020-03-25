@@ -1,8 +1,7 @@
-# Touch simulation using memory keys
+# Sonar simulation using memory keys
 #
-# Device/SubDeviceList/Head/Touch/Middle/Sensor/Value
-# Device/SubDeviceList/LHand/Touch/Back/Sensor/Value
-# Device/SubDeviceList/RHand/Touch/Back/Sensor/Value
+# Device/SubDeviceList/Platform/Front/Sonar/Sensor/Value
+# Device/SubDeviceList/Platform/Back/Sonar/Sensor/Value
 
 import qi
 import argparse
@@ -13,9 +12,8 @@ import os
 
 
 memkey = {
-    'HeadMiddle': 'Device/SubDeviceList/Head/Touch/Middle/Sensor/Value' ,
-    'LHand':      'Device/SubDeviceList/LHand/Touch/Back/Sensor/Value' ,
-    'RHand':      'Device/SubDeviceList/RHand/Touch/Back/Sensor/Value' }
+    'SonarFront': 'Device/SubDeviceList/Platform/Front/Sonar/Sensor/Value',
+    'SonarBack':  'Device/SubDeviceList/Platform/Back/Sonar/Sensor/Value' }
 
 
 def main():
@@ -24,8 +22,10 @@ def main():
                         help="Robot IP address.  On robot or Local Naoqi: use '127.0.0.1'.")
     parser.add_argument("--pport", type=int, default=9559,
                         help="Naoqi port number")
-    parser.add_argument("--sensor", type=str, default="HeadMiddle",
-                        help="Sensor: HeadMiddle, LHand, RHand")
+    parser.add_argument("--sensor", type=str, default="SonarFront",
+                        help="Sensor: SonarFront, SonarBack")
+    parser.add_argument("--value", type=float, default=0.75,
+                        help="Sensor measurement")
     parser.add_argument("--duration", type=float, default=3.0,
                         help="Duration of the event")
 
@@ -36,7 +36,7 @@ def main():
     #Starting application
     try:
         connection_url = "tcp://" + pip + ":" + str(pport)
-        app = qi.Application(["TouchSim", "--qi-url=" + connection_url ])
+        app = qi.Application(["SonarSim", "--qi-url=" + connection_url ])
     except RuntimeError:
         print ("Can't connect to Naoqi at ip \"" + pip + "\" on port " + str(pport) +".\n"
                "Please check your script arguments. Run with -h option for help.")
@@ -47,14 +47,20 @@ def main():
 
     #Starting services
     memory_service  = session.service("ALMemory")
-    
+
+    val = None
+    try:
+        val = float(args.value)
+    except:
+        print("ERROR: value not numerical")
+        return
+
     try:
         mkey = memkey[args.sensor]
-        print("Touching %s ..." %args.sensor)
-        memory_service.insertData(mkey,1.0)
+        print("Sonar %s = %f" %(args.sensor,val))
+        memory_service.insertData(mkey,val)
         time.sleep(args.duration)
         memory_service.insertData(mkey,0.0)
-        print("Touching %s ... done" %args.sensor)
     except:
         print("ERROR: Sensor %s unknown" %args.sensor)
 
