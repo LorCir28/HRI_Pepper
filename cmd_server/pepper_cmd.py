@@ -1146,9 +1146,12 @@ class PepperRobot:
 
     def run_behavior(self, bname):
         if self.beh_service!=None:
-            self.beh_service.startBehavior(bname)
-        #time.sleep(10)
-        #beh_service.stopBehavior(bname)
+            try:
+                self.beh_service.startBehavior(bname)
+                #time.sleep(10)
+                #self.beh_service.stopBehavior(bname)
+            except:
+                pass
 
     def sax(self):
         str = 'sax'
