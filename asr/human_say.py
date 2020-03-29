@@ -37,13 +37,12 @@ def main():
     fakeASRevent = 'FakeRobot/ASRevent'
     fakeASRtimekey = 'FakeRobot/ASRtime'
 
+    tm = int(time.time())  # does not work with float!!!
     memory_service.raiseEvent(fakeASRevent, args.sentence)
     memory_service.insertData(fakeASRkey, args.sentence)
-    memory_service.insertData(fakeASRtimekey, time.time())
+    memory_service.insertData(fakeASRtimekey, tm)
 
-    print("Human Say: %s" %args.sentence)
-
-
+    print("Human Say: %s at time %d" %(args.sentence,tm))
 
 if __name__ == "__main__":
     main()

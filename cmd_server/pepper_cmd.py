@@ -509,8 +509,8 @@ class PepperRobot:
         if self.laserThread != None:
             self.laserThread.do_run = False
             self.laserThread = None
-      
-        if self.tablet_service!=None:
+        
+        if self.session!=None and self.tablet_service!=None:
             self.tablet_service.onTouchDown.disconnect(self.touchsignalID)
         time.sleep(1)
         self.app.stop()
@@ -857,6 +857,9 @@ class PepperRobot:
         self.anspeech_service.say("^start("+anim+") " + interaction+" ^wait("+anim+")")
 
 
+    def reset_fake_asr(self):
+        self.memory_service.insertData(self.fakeASRkey,'')
+
     def fake_asr(self):
         global asr_word, asr_confidence, asr_timestamp
         try:
@@ -865,11 +868,14 @@ class PepperRobot:
                 asr_word = r
                 asr_confidence = 1.0
                 asr_timestamp = self.memory_service.getData(self.fakeASRtimekey)
-                self.memory_service.insertData(self.fakeASRkey,'')
-                # print('fake ASR: [%s], %r' %(asr_word,asr_timestamp))
+                print('fake ASR: [%s], %r' %(asr_word,asr_timestamp))
+                self.reset_fake_asr()
         except:
             pass
 
+
+    def asr_cancel(self):
+        self.asr_cancel_flag = True
 
     # vocabulary = list of keywords, e.g. ["yes", "no", "please"]
     # blocking until timeout
@@ -889,14 +895,16 @@ class PepperRobot:
             idSubWordRecognized = subWordRecognized.signal.connect(onWordRecognized)
         else:
             print('ASR service not available. Use %s memory key to say something' %self.fakeASRkey)
+            self.reset_fake_asr()
             #val = raw_input('Enter ASR text: ')
             #return val
 
 
+        self.asr_cancel_flag = False
         asr_word = ''
         i = 0
         dt = 0.5
-        while ((timeout<0 or i<timeout) and asr_word==''):
+        while ((timeout<0 or i<timeout) and asr_word=='' and not self.asr_cancel_flag):
             self.fake_asr()
             time.sleep(dt)
             i += dt
@@ -906,11 +914,17 @@ class PepperRobot:
             self.asr_service.unsubscribe("asr_pepper_cmd")
             subWordRecognized.signal.disconnect(idSubWordRecognized)
 
+        
+
         dt = time.time() - asr_timestamp
+
+        print("dt %r %r  -  %f %f" %(time.time(),asr_timestamp, dt, timeout))
+
         if ((timeout<0 or dt<timeout) and asr_confidence>0.3):
             print("ASR: %s" %asr_word)
             return asr_word
         else:
+            print("ASR: none")
             return ''
 
 
@@ -935,7 +949,10 @@ class PepperRobot:
         self.ba_service.setEnabled(False)
         self.sm_service.setEnabled(False)
 
-        self.animation_player_service.run(interaction)
+        try:
+            self.animation_player_service.run(interaction)
+        except:
+            print("Error in executing gesture %s" %interaction)
 
         self.bm_service.setEnabled(self.alive)
         self.ba_service.setEnabled(self.alive)
