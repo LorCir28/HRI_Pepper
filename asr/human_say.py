@@ -42,7 +42,7 @@ def main():
     memory_service.insertData(fakeASRkey, args.sentence)
     memory_service.insertData(fakeASRtimekey, tm)
 
-    print("Human Say: %s at time %d" %(args.sentence,tm))
+    print("Human Say: '%s' at time %d" %(args.sentence,tm))
 
 if __name__ == "__main__":
     main()
