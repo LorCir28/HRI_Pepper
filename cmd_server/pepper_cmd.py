@@ -26,7 +26,7 @@ import qi
 from naoqi import ALProxy
 
 # Python Image Library
-import Image
+from PIL import Image
 
 laserValueList = [
   # RIGHT LASER
@@ -634,7 +634,8 @@ class PepperRobot:
         self.camProxy = ALProxy("ALVideoDevice", self.ip, self.port)
         resolution = 2    # VGA
         colorSpace = 11   # RGB
-        self.videoClient = self.camProxy.subscribe("grab3_images", resolution, colorSpace, 5)
+        # self.videoClient = self.camProxy.subscribe("grab3_images", resolution, colorSpace, 5)
+        self.videoClient = self.camProxy.subscribeCamera("grab3_images", 0, resolution, colorSpace, 5)
         self.frame_grabber = True
 
     def stopFrameGrabber(self):
@@ -997,8 +998,12 @@ class PepperRobot:
         if self.tablet_service!=None:
             if weburl[0:4]!='http':
                 weburl = "http://198.18.0.1/apps/spqrel/%s" %(weburl)
-            print "URL: ",weburl
-            self.tablet_service.showWebview(weburl)
+            print("URL: %s" %weburl)
+            if weburl[-3:]=='jpg' or weburl[-3:]=='png':
+                self.tablet_service.showImage(weburl)
+            else:
+                self.tablet_service.showWebview(weburl)
+
 
     # Robot motion
 
