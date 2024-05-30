@@ -434,25 +434,31 @@ class PepperRobot:
 
 
     # Connect to the robot
-    def connect(self, pip=os.environ['PEPPER_IP'], pport=9559, alive=False):
+    def connect(self, pip=os.environ['PEPPER_IP'], pport=None, alive=False):
 
         self.ip = pip
-        self.port = pport
+        if pport is not None:
+            self.port = pport
+        elif 'PEPPER_PORT' in os.environ:
+            self.port = int(os.environ['PEPPER_PORT'])
+        else:
+            self.port = 9559
+
         if (self.isConnected):
             print("Robot already connnected.")
             return
 
-        print("Connecting to robot %s:%d ..." %(pip,pport))
+        print("Connecting to robot %s:%d ..." %(self.ip,self.port))
         try:
-            connection_url = "tcp://" + pip + ":" + str(pport)
+            connection_url = "tcp://" + self.ip + ":" + str(self.port)
             self.app = qi.Application(["Pepper command", "--qi-url=" + connection_url ])
             self.app.start()
         except RuntimeError:
-            print("%sCannot connect to Naoqi at %s:%d %s" %(RED,pip,pport,RESET))
+            print("%sCannot connect to Naoqi at %s:%d %s" %(RED,self.ip,self.port,RESET))
             self.session = None
             return
 
-        print("%sConnected to robot %s:%d %s" %(GREEN,pip,pport,RESET))
+        print("%sConnected to robot %s:%d %s" %(GREEN,self.ip,self.port,RESET))
         self.session = self.app.session
 
         print("Starting services...")
