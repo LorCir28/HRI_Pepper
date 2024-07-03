@@ -10,10 +10,14 @@ import os
 import argparse
 
 # Python Image Library
-# import Image
 from PIL import Image
 
 from naoqi import ALProxy
+
+
+
+
+
 
 class HumanGreeter(object):
     """
@@ -38,12 +42,16 @@ class HumanGreeter(object):
         self.ch1 = self.fdsub.signal.connect(self.on_human_tracked)
         # Get the services ALTextToSpeech and ALFaceDetection.
         self.tts = session.service("ALTextToSpeech")
-        self.face_detection = session.service("ALFaceDetection")
-        self.face_detection.subscribe("HumanGreeter")
+        try:
+            self.face_detection = session.service("ALFaceDetection")
+            self.face_detection.subscribe("HumanGreeter")
+        except RuntimeError as e:
+            print("Error: Cannot find service 'ALFaceDetection': {}".format(e))
+            self.face_detection = None
+
         self.got_face = False
         self.camProxy = None
         self.savedfaces = []
-
 
     def connect_camera(self, ip, port):
         # Connect to camera
@@ -51,7 +59,7 @@ class HumanGreeter(object):
         resolution = 2    # VGA
         colorSpace = 11   # RGB
         self.videoClient = self.camProxy.subscribe("vision_faceDetection", resolution, colorSpace, 5)
-
+        print("Camera connected and subscribed to vision_faceDetection.")
 
     def on_human_tracked(self, value):
         """
@@ -72,17 +80,16 @@ class HumanGreeter(object):
             self.leds_service.off('RightFaceLedsBlue')
 
             if not self.got_face:  # only the first time a face appears
-
                 self.got_face = True
-                print "I saw a face!"
-                #self.tts.say("Hello, you!")
+                print("I saw a face!")
+                self.tts.say("Hello, I see you!")
                 # First Field = TimeStamp.
                 timeStamp = value[0]
-                print "TimeStamp is: " + str(timeStamp)
+                print("TimeStamp is: " + str(timeStamp))
 
                 # Second Field = array of face_Info's.
                 faceInfoArray = value[1]
-                for j in range( len(faceInfoArray)-1 ):
+                for j in range(len(faceInfoArray) - 1):
                     faceInfo = faceInfoArray[j]
 
                     # First Field = Shape info.
@@ -93,13 +100,8 @@ class HumanGreeter(object):
 
                     faceID = faceExtraInfo[0]
 
-                    #print "Face Infos :  alpha %.3f - beta %.3f" % (faceShapeInfo[1], faceShapeInfo[2])
-                    #print "Face Infos :  width %.3f - height %.3f" % (faceShapeInfo[3], faceShapeInfo[4])
-                    #print "Face Extra Infos :" + str(faceExtraInfo)
-                    #print "Face ID: %d" %faceID
-
-        if self.camProxy!=None and faceID>=0 and faceID not in self.savedfaces:
-            # Get the image 
+        if self.camProxy is not None and faceID >= 0 and faceID not in self.savedfaces:
+            # Get the image
             img = self.camProxy.getImageRemote(self.videoClient)
 
             # Get the image size and pixel array.
@@ -111,37 +113,33 @@ class HumanGreeter(object):
             im = Image.frombytes("RGB", (imageWidth, imageHeight), array)
 
             # Save the image.
-            fname = "face_%03d.png" %faceID
+            fname = "face_%03d.png" % faceID
             im.save(fname, "PNG")
-            print "Image face %d saved." %faceID
+            print("Image face %d saved." % faceID)
 
             self.savedfaces.append(faceID)
 
-
     def close(self):
-        self.face_detection.unsubscribe("HumanGreeter")
-        self.camProxy.unsubscribe(self.videoClient)
+        if self.face_detection:
+            self.face_detection.unsubscribe("HumanGreeter")
+        if self.camProxy:
+            self.camProxy.unsubscribe(self.videoClient)
         self.fdsub.signal.disconnect(self.ch1)
         self.ba_service.setEnabled(False)
         self.leds_service.on('FaceLeds') # reset to white
-
 
     def run(self):
         """
         Loop on, wait for events until manual interruption.
         """
-        print "Starting HumanGreeter"
+        print("Starting HumanGreeter")
         try:
             while True:
-                #val = self.memory.getData('FaceDetection/FaceDetected')
-                #if len(val)>0:
-                #    print('Memory value %r' %val)
                 time.sleep(1)
         except KeyboardInterrupt:
-            print "Interrupted by user, stopping all behaviors"
+            print("Interrupted by user, stopping all behaviors")
             self.close()
             sys.exit(0)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -156,11 +154,88 @@ if __name__ == "__main__":
         connection_url = "tcp://" + args.ip + ":" + str(args.port)
         app = qi.Application(["HumanGreeter", "--qi-url=" + connection_url])
     except RuntimeError:
-        print ("Can't connect to Naoqi at ip \"" + args.ip + "\" on port " + str(args.port) +".\n"
-               "Please check your script arguments. Run with -h option for help.")
+        print("Can't connect to Naoqi at ip \"" + args.ip + "\" on port " + str(args.port) + ".\n"
+              "Please check your script arguments. Run with -h option for help.")
         sys.exit(1)
 
     human_greeter = HumanGreeter(app)
     human_greeter.connect_camera(args.ip, args.port)
     human_greeter.run()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# class HumanGreeter(object):
+#     def __init__(self, app):
+#         super(HumanGreeter, self).__init__()
+#         app.start()
+#         session = app.session
+#         self.memory = session.service("ALMemory")
+#         self.ba_service = session.service("ALBasicAwareness")
+#         self.tts = session.service("ALTextToSpeech")
+#         self.ba_service.setEnabled(True)
+#         self.got_face = False
+
+#         # Use BasicAwareness for human detection
+#         self.fdsub = self.memory.subscriber("ALBasicAwareness/HumanTracked")
+#         self.ch1 = self.fdsub.signal.connect(self.on_human_tracked)
+
+#     def on_human_tracked(self, value):
+#         if value != -1:  # A human is tracked
+#             if not self.got_face:
+#                 self.got_face = True
+#                 print("I see a person!")
+#                 self.tts.say("Hello, I see you!")
+#         else:
+#             self.got_face = False
+
+#     def run(self):
+#         print("Starting HumanGreeter")
+#         try:
+#             while True:
+#                 time.sleep(1)
+#         except KeyboardInterrupt:
+#             print("Interrupted by user, stopping all behaviors")
+#             self.ba_service.setEnabled(False)
+#             self.fdsub.signal.disconnect(self.ch1)
+#             sys.exit(0)
+
+# if __name__ == "__main__":
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument("--ip", type=str, default='127.0.0.1',
+#                         help="Robot IP address. On robot or Local Naoqi: use '127.0.0.1'.")
+#     parser.add_argument("--port", type=int, default=9559,
+#                         help="Naoqi port number")
+
+#     args = parser.parse_args()
+#     try:
+#         connection_url = "tcp://" + args.ip + ":" + str(args.port)
+#         app = qi.Application(["HumanGreeter", "--qi-url=" + connection_url])
+#     except RuntimeError:
+#         print("Can't connect to Naoqi at ip \"" + args.ip + "\" on port " + str(args.port) + ".\n"
+#               "Please check your script arguments. Run with -h option for help.")
+#         sys.exit(1)
+
+#     human_greeter = HumanGreeter(app)
+#     human_greeter.run()
 
