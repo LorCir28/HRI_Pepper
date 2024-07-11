@@ -10,6 +10,10 @@ import os
 import argparse
 
 # Python Image Library
+<<<<<<< HEAD
+=======
+# import Image
+>>>>>>> origin/main
 from PIL import Image
 
 from naoqi import ALProxy
@@ -144,9 +148,15 @@ class HumanGreeter(object):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+<<<<<<< HEAD
     parser.add_argument("--ip", type=str, default="127.0.0.1",
                         help="Robot IP address.  On robot or Local Naoqi: use '127.0.0.1'.")
     parser.add_argument("--port", type=int, default=64248,
+=======
+    parser.add_argument("--ip", type=str, default='127.0.0.1',
+                        help="Robot IP address. On robot or Local Naoqi: use '127.0.0.1'.")
+    parser.add_argument("--port", type=int, default=9559,
+>>>>>>> origin/main
                         help="Naoqi port number")
 
     args = parser.parse_args()
