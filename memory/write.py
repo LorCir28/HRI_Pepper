@@ -24,7 +24,7 @@ def main():
     key = args.key 
     val = args.val
 
-    #Starting application
+    #Starting application 
     try:
         connection_url = "tcp://" + pip + ":" + str(pport)
         print "Connecting to ",	connection_url

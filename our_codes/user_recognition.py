@@ -21,11 +21,10 @@ def main():
                         help="language")
     parser.add_argument("--speed", type=int, default=2000,
                         help="speed")
-    
+
     args = parser.parse_args()
     pip = args.pip
     pport = args.pport
-    strsay = 'Hello' + ' ' + user + ', I can recognize you!!'
     language = args.language
     speed = 10
 
@@ -35,30 +34,40 @@ def main():
         app = qi.Application(["Say", "--qi-url=" + connection_url ])
     except RuntimeError:
         print ("Can't connect to Naoqi at ip \"" + pip + "\" on port " + str(pport) +".\n"
-               "Please check your script arguments. Run with -h option for help.")
+            "Please check your script arguments. Run with -h option for help.")
         sys.exit(1)
 
     app.start()
     session = app.session
 
     tts_service = session.service("ALTextToSpeech")
+    memory_service  = session.service("ALMemory")
 
     tts_service.setLanguage(language)
     tts_service.setVolume(1.0)
     tts_service.setParameter("speed", speed)
+
+    # known_users = [] # array to save users
+
+    try:
+        val = memory_service.getData(user)
+        strsay = 'Hello' + ' ' + user + ', I can recognize you!!'
+    except:
+        memory_service.insertData(user,user)
+        strsay = 'Hello' + ' ' + user + ', nice to meet you for the first time!!'
+        
+    # if memory_service.getData(user):
+    #     strsay = 'Hello' + ' ' + user + ', I can recognize you!!'
+    # else:
+    #     known_users.append(user)
+    #     strsay = 'Hello' + ' ' + user + ', nice to meet you for the first time!!'
+
     tts_service.say(strsay)
     tts_service.say(strsay)
     tts_service.say(strsay)
-    tts_service.say(strsay)
-    tts_service.say(strsay)
-    tts_service.say(strsay)
-    tts_service.say(strsay)
-    tts_service.say(strsay)
-    tts_service.say(strsay)
-    tts_service.say(strsay)
+
     print"  -- Say: "+strsay
 
-    # time.sleep(10)
 
 
 
