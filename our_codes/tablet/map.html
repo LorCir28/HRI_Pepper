@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Storytelling</title>
+    <title>Map Adventure</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="screen">
         <div class="content story-content">
             <h1>Hello, <span id="display-name"></span>!</h1>
-            <p>You are about to start an interactive storytelling session with Pepper. Get ready for an amazing adventure!</p>
-            <p>Once upon a time, in a village near the mountains, there was a brave girl named Emma. Emma loved adventures. One day, she found a mysterious cave near her village.</p>
-            <button onclick="enterCave()" class="btn">Enter the cave</button>
-            <button onclick="goToVillage()" class="btn">Go back to the village</button>
+            <p>Inside the cave, Emma and her friends found an old map with a riddle.</p>
+            <button onclick="solveRiddle()" class="btn">Solve the riddle</button>
+            <button onclick="exploreFurther()" class="btn">Continue exploring</button>
         </div>
     </div>
     <script>
@@ -23,12 +22,12 @@
             document.getElementById('display-name').innerText = name;
         });
 
-        function enterCave() {
-            window.location.href = 'cave.html';
+        function solveRiddle() {
+            window.location.href = 'riddle.html';
         }
 
-        function goToVillage() {
-            window.location.href = 'village.html';
+        function exploreFurther() {
+            window.location.href = 'explore.html';
         }
     </script>
 </body>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Village Adventure</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="screen">
+        <div class="content story-content">
+            <h1>Hello, <span id="display-name"></span>!</h1>
+            <p>Emma went back to the village and told her friends about the cave. Her friends decided to join her and explore the cave together.</p>
+            <button onclick="location.href='map.html'" class="btn">Continue</button>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const name = urlParams.get('name');
+            document.getElementById('display-name').innerText = name;
+        });
+    </script>
+</body>
+</html>
