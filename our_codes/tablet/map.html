@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Adventure</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="screen">
+        <div class="content story-content">
+            <h1>Hello, <span id="display-name"></span>!</h1>
+            <p>Inside the cave, Emma and her friends found an old map with a riddle.</p>
+            <button onclick="solveRiddle()" class="btn">Solve the riddle</button>
+            <button onclick="exploreFurther()" class="btn">Continue exploring</button>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const name = urlParams.get('name');
+            document.getElementById('display-name').innerText = name;
+        });
+
+        function solveRiddle() {
+            window.location.href = 'riddle.html';
+        }
+
+        function exploreFurther() {
+            window.location.href = 'explore.html';
+        }
+    </script>
+</body>
+</html>

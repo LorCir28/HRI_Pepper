@@ -7,9 +7,19 @@ import os
 
 def main():
     parser = argparse.ArgumentParser()
+<<<<<<< HEAD
+    # parser.add_argument("--pip", type=str, default=os.environ['PEPPER_IP'],
+    #                     help="Robot IP address.  On robot or Local Naoqi: use '127.0.0.1'.")
+    # parser.add_argument("--pport", type=int, default=9559,
+    #                     help="Naoqi port number")
+    parser.add_argument("--pip", type=str, default="127.0.0.1",
+                        help="Robot IP address.  On robot or Local Naoqi: use '127.0.0.1'.")
+    parser.add_argument("--pport", type=int, default=64248,
+=======
     parser.add_argument("--pip", type=str, default=os.environ['PEPPER_IP'],
                         help="Robot IP address.  On robot or Local Naoqi: use '127.0.0.1'.")
     parser.add_argument("--pport", type=int, default=9559,
+>>>>>>> origin/main
                         help="Naoqi port number")
     parser.add_argument("--posture", type=str, default="Stand",
                         help="Desired robot posture. Choose among: Stand, StandZero, Crouch")
@@ -83,3 +93,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+<<<<<<< HEAD
+    exit(0)
+=======
+>>>>>>> origin/main

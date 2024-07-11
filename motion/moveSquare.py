@@ -9,7 +9,10 @@ import os
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--pip", type=str, default='127.0.0.1',
+
+    parser.add_argument("--pip", type=str, default="127.0.0.1",
+                        help="Robot IP address.  On robot or Local Naoqi: use '127.0.0.1'.")
+    parser.add_argument("--pport", type=int, default=64248,
                         help="Robot IP address.  On robot or Local Naoqi: use '127.0.0.1'.")
     parser.add_argument("--pport", type=int, default=9559,
                         help="Naoqi port number")
