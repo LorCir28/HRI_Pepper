@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pepper Presentation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="intro-screen" class="screen">
+        <div class="content">
+            <img src="pepper.png" alt="Pepper Robot" class="pepper-image">
+            <h1 id="pepper-name" class="fade-in">Pepper</h1>
+        </div>
+    </div>
+    <div id="input-screen" class="screen hidden">
+        <div id="welcome" class="content">
+            <h1>Welcome!</h1>
+            <p>Please enter your name:</p>
+            <input type="text" id="user-name" placeholder="Your name" class="input-field">
+            <button onclick="submitName()" class="btn">Submit</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
