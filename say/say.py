@@ -14,15 +14,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--pip", type=str, default='127.0.0.1',
                         help="Robot IP address.  On robot or Local Naoqi: use '127.0.0.1'.")
-<<<<<<< HEAD
     parser.add_argument("--pport", type=int, default=63607,
                         help="Naoqi port number (default: 9559)")
     parser.add_argument("--sentence", type=str, default="Li mortanguerieri noooo",
-=======
-    parser.add_argument("--pport", type=int, default=55776,
-                        help="Naoqi port number (default: 9559)")
-    parser.add_argument("--sentence", type=str, default="hello",
->>>>>>> origin/main
                         help="Sentence to say")
     parser.add_argument("--language", type=str, default="English",
                         help="language")
@@ -54,11 +48,7 @@ def main():
     tts_service.setVolume(1.0)
     tts_service.setParameter("speed", speed)
     tts_service.say(strsay)
-<<<<<<< HEAD
     print "  -- Say: "+strsay
-=======
-    print"  -- Say: "+strsay
->>>>>>> origin/main
 
 
 
